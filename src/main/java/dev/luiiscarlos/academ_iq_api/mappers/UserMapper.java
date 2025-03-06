@@ -5,20 +5,19 @@ import java.util.Set;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import dev.luiiscarlos.academ_iq_api.dtos.LoginResponseDto;
-import dev.luiiscarlos.academ_iq_api.dtos.RegisterRequestDto;
-import dev.luiiscarlos.academ_iq_api.dtos.RegisterResponseDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserLoginResponseDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterRequestDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.Role;
 import dev.luiiscarlos.academ_iq_api.models.User;
 
 @Component
 public class UserMapper {
 
-    private static final String PASSWORD_PREFIX = "{bcrypt}";
+    private static String PASSWORD_PREFIX = "{bcrypt}";
 
-
-    public RegisterResponseDto mapToRegisterResponseDto(User user) {
-        return RegisterResponseDto.builder()
+    public UserRegisterResponseDto mapToUserRegisterResponseDto(User user) {
+        return UserRegisterResponseDto.builder()
             .username(user.getUsername())
             .email(user.getEmail())
             .firstname(user.getFirstname())
@@ -26,8 +25,8 @@ public class UserMapper {
             .build();
     }
 
-    public RegisterResponseDto mapToRegisterResponseDto(User user, String accessToken, String refreshToken) {
-        return RegisterResponseDto.builder()
+    public UserRegisterResponseDto mapToUserRegisterResponseDto(User user, String accessToken, String refreshToken) {
+        return UserRegisterResponseDto.builder()
             .username(user.getUsername())
             .email(user.getEmail())
             .firstname(user.getFirstname())
@@ -35,7 +34,7 @@ public class UserMapper {
             .build();
     }
 
-    public User mapToUser(RegisterRequestDto registerRequest, String encodedPassword, Set<Role> authorities) {
+    public User mapToUser(UserRegisterRequestDto registerRequest, String encodedPassword, Set<Role> authorities) {
         return User.builder()
             .username(registerRequest.getUsername())
             .password(PASSWORD_PREFIX + encodedPassword)
@@ -47,8 +46,8 @@ public class UserMapper {
             .build();
     }
 
-    public LoginResponseDto mapToLoginResponseDto(User user, String accessToken, String refreshToken) {
-        return LoginResponseDto.builder()
+    public UserLoginResponseDto mapToUserLoginResponseDto(User user, String accessToken, String refreshToken) {
+        return UserLoginResponseDto.builder()
             .username(user.getUsername())
             .avatar(user.getAvatar())
             .email(user.getEmail())
@@ -59,10 +58,10 @@ public class UserMapper {
             .build();
     }
 
-    public LoginResponseDto mapToLoginResponseDto(Authentication auth, String accessToken, String refreshToken) {
+    public UserLoginResponseDto mapToUserLoginResponseDto(Authentication auth, String accessToken, String refreshToken) {
         User user = (User) auth.getPrincipal();
 
-        return LoginResponseDto.builder()
+        return UserLoginResponseDto.builder()
             .username(user.getUsername())
             .avatar(user.getAvatar())
             .email(user.getEmail())

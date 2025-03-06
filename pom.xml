@@ -6,11 +6,11 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.4.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
-	<groupId>dev.luiiscarlos</groupId>
+	<groupId>dev.luiiscarlos</groupId> <!-- TODO: Change groupId -->
 	<artifactId>academ-iq-api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-ALPHA</version>
 	<name>academ-iq-api</name>
 	<description>Academ-IQ API - Backend</description>
 	<url>https://github.com/LuiisCarlos/academ-iq-api</url>
@@ -22,11 +22,18 @@
 			<name>Luis Carlos Caicedo Giraldo</name>
 			<email>luisccg2003@gmail.com</email>
 		</developer>
+		<developer>
+			<name>Oliver Steve Saca Saltos</name>
+			<email>oliversaca2@gmail.com</email>
+		</developer>
+		<developer>
+			<name>Mohamed Amin El Friti</name>
+			<email></email> <!-- TODO: Add email -->
+		</developer>
 	</developers>
 	<scm>
 		<connection>https://github.com/LuiisCarlos/academ-iq-api.git</connection>
-		<developerConnection>https://github.com/luiiscarlos2003/academ-iq-api.git</developerConnection>
-		<tag/>
+		<developerConnection>https://github.com/LuiisCarlos/academ-iq-api.git</developerConnection>
 		<url>https://github.com/LuiisCarlos/academ-iq-api</url>
 	</scm>
 	<properties>

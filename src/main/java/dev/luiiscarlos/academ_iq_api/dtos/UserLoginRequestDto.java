@@ -3,7 +3,7 @@ package dev.luiiscarlos.academ_iq_api.dtos;
 import lombok.Data;
 
 @Data
-public class LoginRequestDto {
+public class UserLoginRequestDto {
 
     private String username;
 

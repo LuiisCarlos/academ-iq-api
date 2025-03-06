@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.exceptions.errors;
+package dev.luiiscarlos.academ_iq_api.exceptions.response;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.exceptions.handlers;
+package dev.luiiscarlos.academ_iq_api.exceptions.handler;
 
 
 import org.springframework.http.HttpHeaders;
@@ -19,7 +19,7 @@ import dev.luiiscarlos.academ_iq_api.exceptions.RoleNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserIsAlreadyRegisteredException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserRegistrationWithDifferentPasswordsException;
-import dev.luiiscarlos.academ_iq_api.exceptions.errors.ErrorResponse;
+import dev.luiiscarlos.academ_iq_api.exceptions.response.ErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {

@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.luiiscarlos.academ_iq_api.dtos.LoginRequestDto;
-import dev.luiiscarlos.academ_iq_api.dtos.LoginResponseDto;
-import dev.luiiscarlos.academ_iq_api.dtos.RegisterRequestDto;
-import dev.luiiscarlos.academ_iq_api.dtos.RegisterResponseDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserLoginRequestDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserLoginResponseDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterRequestDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterResponseDto;
 import dev.luiiscarlos.academ_iq_api.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,14 +23,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequest) {
+    public ResponseEntity<UserLoginResponseDto> login(@RequestBody UserLoginRequestDto loginRequest) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(authService.login(loginRequest));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponseDto> register(@RequestBody RegisterRequestDto registerRequest) {
+    public ResponseEntity<UserRegisterResponseDto> register(@RequestBody UserRegisterRequestDto registerRequest) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(authService.register(registerRequest));

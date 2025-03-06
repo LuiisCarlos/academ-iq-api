@@ -10,10 +10,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import dev.luiiscarlos.academ_iq_api.dtos.LoginRequestDto;
-import dev.luiiscarlos.academ_iq_api.dtos.LoginResponseDto;
-import dev.luiiscarlos.academ_iq_api.dtos.RegisterRequestDto;
-import dev.luiiscarlos.academ_iq_api.dtos.RegisterResponseDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserLoginRequestDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserLoginResponseDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterRequestDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterResponseDto;
 import dev.luiiscarlos.academ_iq_api.exceptions.BadCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RoleNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserIsAlreadyRegisteredException;
@@ -43,7 +43,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
 
-    public LoginResponseDto login(LoginRequestDto loginRequest) {
+    public UserLoginResponseDto login(UserLoginRequestDto loginRequest) {
         User user = userRepository.findByUsername(loginRequest.getUsername())
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -58,10 +58,10 @@ public class AuthService {
         String accessToken = tokenService.generateAccessToken(user.getUsername(), user.getRoles());
         String refreshToken = tokenService.generateRefreshToken(user.getUsername(), user.getRoles());
 
-        return userMapper.mapToLoginResponseDto(user, accessToken, refreshToken);
+        return userMapper.mapToUserLoginResponseDto(user, accessToken, refreshToken);
     }
 
-    public RegisterResponseDto register(RegisterRequestDto registerRequest) {
+    public UserRegisterResponseDto register(UserRegisterRequestDto registerRequest) {
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword()))
             throw new UserRegistrationWithDifferentPasswordsException("Passwords do not match");
 
@@ -77,7 +77,7 @@ public class AuthService {
 
         User user = userMapper.mapToUser(registerRequest, encodedPassword, authorities);
 
-        return userMapper.mapToRegisterResponseDto(userRepository.save(user));
+        return userMapper.mapToUserRegisterResponseDto(userRepository.save(user));
     }
 
     public String refreshToken(String refreshToken) {
