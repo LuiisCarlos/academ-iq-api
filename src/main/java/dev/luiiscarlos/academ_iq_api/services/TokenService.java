@@ -2,7 +2,6 @@ package dev.luiiscarlos.academ_iq_api.services;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -17,21 +16,31 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dev.luiiscarlos.academ_iq_api.models.Role;
+import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
+import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenExpiredException;
+import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenNotFoundException;
+import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
+import dev.luiiscarlos.academ_iq_api.models.User;
+import dev.luiiscarlos.academ_iq_api.repositories.RefreshTokenRepository;
+import dev.luiiscarlos.academ_iq_api.services.interfaces.ITokenService;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class TokenService {
+public class TokenService implements ITokenService {
+
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    private final ObjectMapper objectMapper;
 
     private final JwtEncoder jwtEncoder;
 
     private final JwtDecoder jwtDecoder;
 
-    private String generateToken(String username, Set<Role> authorities, Instant expiresAt) {
+    private String generateToken(User user, Instant expiresAt, String tokenType) {
         Instant now = Instant.now();
 
-        String scope = authorities.stream()
+        String scope = user.getRoles().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
@@ -39,19 +48,52 @@ public class TokenService {
                 .issuer("self")
                 .issuedAt(now)
                 .expiresAt(expiresAt)
-                .subject(username)
+                .subject(user.getUsername())
                 .claim("roles", scope)
+                .claim("token_type", tokenType)
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-    public String generateAccessToken(String username, Set<Role> authorities) {
-        return generateToken(username, authorities, Instant.now().plus(15, ChronoUnit.MINUTES));
+    public String generateAccessToken(User user) {
+        Instant expiresAt = Instant.now().plus(15, ChronoUnit.MINUTES);
+        String tokenType = "access";
+
+        return generateToken(user, expiresAt, tokenType);
     }
 
-    public String generateRefreshToken(String username, Set<Role> authorities) {
-        return generateToken(username, authorities, Instant.now().plus(30, ChronoUnit.DAYS));
+    public String generateRefreshToken(User user) {
+        Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
+        String tokenType = "refresh";
+
+        String token = generateToken(user, expiresAt, tokenType);
+
+        RefreshToken refreshToken = refreshTokenRepository.findByUser(user).map(rt -> {
+            rt.setToken(token);
+            rt.setExpiresAt(expiresAt);
+            return rt;
+        }).orElse(RefreshToken.builder()
+            .token(token)
+            .user(user)
+            .expiresAt(expiresAt)
+            .createdAt(Instant.now())
+            .build());
+
+        return refreshTokenRepository.save(refreshToken).getToken();
+    }
+
+    public String refreshAccessToken(String token) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+            .orElseThrow(() -> new RefreshTokenNotFoundException("Refresh token not found"));
+
+        if (!validateRefreshToken(token))
+            throw new InvalidCredentialsException("Refresh token is invalid");
+
+        if (refreshToken.getExpiresAt().isBefore(Instant.now()))
+            throw new RefreshTokenExpiredException("Refresh token expired");
+
+        return generateAccessToken(refreshToken.getUser());
     }
 
     public boolean validateRefreshToken(String token) {
@@ -63,19 +105,17 @@ public class TokenService {
         }
     }
 
-    public String getUsernameFromToken(String token) {
-        return jwtDecoder.decode(token).getClaimAsString("sub");
-    }
-
-    public String getTokenFromRequest(String request) {
+    public String extractTokenFromJson(String TokenJson) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(request);
-            String refreshToken = rootNode.path("refreshToken").asText();
-            return refreshToken;
+            JsonNode rootNode = objectMapper.readTree(TokenJson);
+            return rootNode.path("refreshToken").asText();
         } catch (JsonProcessingException e) {
             return null;
         }
+    }
+
+    public void invalidateRefreshToken(String token) {
+        refreshTokenRepository.deleteByToken(token);
     }
 
 }

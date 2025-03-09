@@ -14,7 +14,7 @@ public class KeyGeneratorUtility {
             keyPairGenerator.initialize(2048);
             keyPair = keyPairGenerator.generateKeyPair();
         } catch (Exception ex) {
-            throw new IllegalStateException("Could not generate RSA key", ex);
+            throw new IllegalStateException("Could not generate RSA key", ex); // TODO: Review this
         }
 
         return keyPair;

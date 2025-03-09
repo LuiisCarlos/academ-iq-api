@@ -6,15 +6,18 @@ import java.util.Set;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
 import dev.luiiscarlos.academ_iq_api.dtos.UserLoginRequestDto;
 import dev.luiiscarlos.academ_iq_api.dtos.UserLoginResponseDto;
 import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterRequestDto;
 import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterResponseDto;
-import dev.luiiscarlos.academ_iq_api.exceptions.BadCredentialsException;
+import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RoleNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserIsAlreadyRegisteredException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
@@ -24,7 +27,8 @@ import dev.luiiscarlos.academ_iq_api.models.Role;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.repositories.RoleRepository;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -52,11 +56,11 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
             );
         } catch (AuthenticationException ex) {
-            throw new BadCredentialsException("Invalid username or password");
+            throw new InvalidCredentialsException("Invalid username or password"); // TODO: Log this
         }
 
-        String accessToken = tokenService.generateAccessToken(user.getUsername(), user.getRoles());
-        String refreshToken = tokenService.generateRefreshToken(user.getUsername(), user.getRoles());
+        String accessToken = tokenService.generateAccessToken(user);
+        String refreshToken = tokenService.generateRefreshToken(user);
 
         return userMapper.mapToUserLoginResponseDto(user, accessToken, refreshToken);
     }
@@ -66,12 +70,12 @@ public class AuthService {
             throw new UserRegistrationWithDifferentPasswordsException("Passwords do not match");
 
         if (userRepository.findByUsername(registerRequest.getUsername()).isPresent())
-            throw new UserIsAlreadyRegisteredException("The user is not valid");
+            throw new UserIsAlreadyRegisteredException("User not valid");
 
         String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
 
         Role userRole = roleRepository.findByAuthority("USER")
-            .orElseThrow(() -> new RoleNotFoundException("Role 'USER' not found"));
+            .orElseThrow(() -> new RoleNotFoundException("Role not found"));
         Set<Role> authorities = new HashSet<>();
         authorities.add(userRole);
 
@@ -80,21 +84,23 @@ public class AuthService {
         return userMapper.mapToUserRegisterResponseDto(userRepository.save(user));
     }
 
-    public String refreshToken(String refreshToken) {
-        if (refreshToken == null)
-            throw new AuthenticationCredentialsNotFoundException("Refresh token is required");
+    public String refresh(String tokenJson) {
+        String token = tokenService.extractTokenFromJson(tokenJson);
 
-        if (tokenService.validateRefreshToken(refreshToken))
-            throw new AuthenticationCredentialsNotFoundException("Refresh token is invalid");
+        if (token == null)
+            throw new AuthenticationCredentialsNotFoundException("Token is required");
 
-        refreshToken = tokenService.getTokenFromRequest(refreshToken);
+        return tokenService.refreshAccessToken(token);
+    }
 
-        String username = tokenService.getUsernameFromToken(refreshToken);
+    // TODO: Finish this
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new UserNotFoundException("User not found"));
+        if (authentication != null)
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
 
-        return tokenService.generateAccessToken(user.getUsername(), user.getRoles());
+        SecurityContextHolder.clearContext();
     }
 
 }
