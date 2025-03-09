@@ -2,6 +2,7 @@ package dev.luiiscarlos.academ_iq_api.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,14 +14,24 @@ import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterRequestDto;
 import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterResponseDto;
 import dev.luiiscarlos.academ_iq_api.services.AuthService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
+
+    @GetMapping("/refresh")
+    public ResponseEntity<String> refresh(@RequestBody String token) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(authService.refresh(token));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<UserLoginResponseDto> login(@RequestBody UserLoginRequestDto loginRequest) {
@@ -36,11 +47,13 @@ public class AuthController {
             .body(authService.register(registerRequest));
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<String> refreshToken(@RequestBody String refreshToken) {
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        authService.logout(request, response);
+
         return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(authService.refreshToken(refreshToken));
-    }
+            .status(HttpStatus.NO_CONTENT)
+            .build();
+    } // TODO: Finish this
 
 }
