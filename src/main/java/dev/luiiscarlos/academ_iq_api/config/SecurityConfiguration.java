@@ -2,31 +2,16 @@ package dev.luiiscarlos.academ_iq_api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
-
-import dev.luiiscarlos.academ_iq_api.utils.RSAKeyProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,15 +20,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    private final RSAKeyProperties keys;
+    private final AccessTokenFilter accessTokenFilter;
 
-    @SuppressWarnings("removal") // <- For H2 Console
     @Bean
+    @SuppressWarnings("removal") // <- For H2 Console
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll());
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .anyRequest().authenticated());
 
         http
             .headers(headers -> headers.frameOptions().disable()); // <- For H2 Console
@@ -54,7 +40,7 @@ public class SecurityConfiguration {
                 .jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         http
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .addFilterBefore(accessTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -62,25 +48,6 @@ public class SecurityConfiguration {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    AuthenticationManager authenticationManager(UserDetailsService userDetailsService) {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
-        return new ProviderManager(daoAuthenticationProvider);
-    }
-
-    @Bean
-    JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(keys.getPublicKey()).build();
-    }
-
-    @Bean
-    JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey.Builder(keys.getPublicKey()).privateKey(keys.getPrivateKey()).build();
-        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>( new JWKSet(jwk) );
-        return  new NimbusJwtEncoder(jwks);
     }
 
     @Bean
@@ -92,4 +59,10 @@ public class SecurityConfiguration {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
 }
