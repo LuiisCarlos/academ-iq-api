@@ -1,9 +1,11 @@
 package dev.luiiscarlos.academ_iq_api.exceptions;
 
+import java.io.Serial;
 import java.util.UUID;
 
 public class UserRegistrationWithDifferentPasswordsException extends BaseException {
 
+    @Serial
     private static final long serialVersionUID = UUID.randomUUID().getMostSignificantBits();
 
     private static final String MESSAGE = "Passwords do not match";

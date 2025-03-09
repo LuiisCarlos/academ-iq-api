@@ -1,6 +1,5 @@
 package dev.luiiscarlos.academ_iq_api.exceptions.handler;
 
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -13,9 +12,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import dev.luiiscarlos.academ_iq_api.exceptions.BadCredentialsException;
+import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidPasswordException;
+import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenExpiredException;
+import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RoleNotFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.StorageException;
+import dev.luiiscarlos.academ_iq_api.exceptions.StorageFileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserIsAlreadyRegisteredException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserRegistrationWithDifferentPasswordsException;
@@ -24,7 +27,11 @@ import dev.luiiscarlos.academ_iq_api.exceptions.response.ErrorResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler({UserNotFoundException.class, RoleNotFoundException.class, AuthenticationCredentialsNotFoundException.class})
+	@ExceptionHandler({UserNotFoundException.class,
+		RoleNotFoundException.class,
+		AuthenticationCredentialsNotFoundException.class,
+		StorageFileNotFoundException.class,
+		RefreshTokenNotFoundException.class})
 	public ResponseEntity<ErrorResponse> handleNotFound(Exception ex) {
 		return ResponseEntity
 			.status(HttpStatus.NOT_FOUND)
@@ -34,7 +41,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 
-	@ExceptionHandler({UserIsAlreadyRegisteredException.class, UserRegistrationWithDifferentPasswordsException.class, InvalidPasswordException.class })
+	@ExceptionHandler({UserIsAlreadyRegisteredException.class,
+		UserRegistrationWithDifferentPasswordsException.class,
+		InvalidPasswordException.class,
+		StorageException.class})
 	public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex) {
 		return ResponseEntity
 			.status(HttpStatus.BAD_REQUEST)
@@ -43,7 +53,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				.message(ex.getMessage()).build());
 	}
 
-    @ExceptionHandler(BadCredentialsException.class)
+    @ExceptionHandler({InvalidCredentialsException.class, RefreshTokenExpiredException.class})
 	public ResponseEntity<ErrorResponse> handleUnauthorized(Exception ex) {
 		return ResponseEntity
 			.status(HttpStatus.UNAUTHORIZED)
