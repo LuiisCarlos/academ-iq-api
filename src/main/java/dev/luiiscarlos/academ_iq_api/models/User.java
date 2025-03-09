@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,17 +32,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-public class User implements UserDetails{
+public class User implements UserDetails {
 
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NonNull
     private String username;
 
+    @NonNull
     private String password;
 
+    @NonNull
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role_junction",
@@ -49,14 +54,19 @@ public class User implements UserDetails{
     )
     private Set<Role> roles;
 
+    @Nullable
     private String avatar;
 
+    @NonNull
     private String email;
 
+    @NonNull
     private String firstname;
 
+    @NonNull
     private String lastname;
 
+    @Nullable
     private String phone;
 
     @Override
@@ -65,13 +75,23 @@ public class User implements UserDetails{
     }
 
     @Override
-    public String getPassword() {
-        return password;
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
     @Override
-    public String getUsername() {
-        return username;
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
 }
