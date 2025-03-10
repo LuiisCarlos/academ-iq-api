@@ -3,19 +3,18 @@ package dev.luiiscarlos.academ_iq_api.exceptions;
 import java.io.Serial;
 import java.util.UUID;
 
-public class StorageFileNotFoundException extends BaseException {
+public class StorageNoFileTypeFoundException extends BaseException {
 
     @Serial
     private static final long serialVersionUID = UUID.randomUUID().getMostSignificantBits();
 
-    private static final String MESSAGE = "File not found";
+    private static final String MESSAGE = "File type not found";
 
-    public StorageFileNotFoundException() {
+    public StorageNoFileTypeFoundException() {
         super(MESSAGE);
     }
 
-    public StorageFileNotFoundException(String message) {
+    public StorageNoFileTypeFoundException(String message) {
         super(message);
     }
-
 }

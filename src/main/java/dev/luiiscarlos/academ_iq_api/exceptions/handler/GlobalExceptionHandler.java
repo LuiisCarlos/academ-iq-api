@@ -7,11 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.oauth2.jwt.BadJwtException;
+import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import dev.luiiscarlos.academ_iq_api.exceptions.CourseNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidPasswordException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenExpiredException;
@@ -19,7 +22,8 @@ import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RoleNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.StorageException;
 import dev.luiiscarlos.academ_iq_api.exceptions.StorageFileNotFoundException;
-import dev.luiiscarlos.academ_iq_api.exceptions.UserIsAlreadyRegisteredException;
+import dev.luiiscarlos.academ_iq_api.exceptions.StorageNoFileTypeFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.UserAlreadyRegisteredException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserRegistrationWithDifferentPasswordsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.response.ErrorResponse;
@@ -31,7 +35,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		RoleNotFoundException.class,
 		AuthenticationCredentialsNotFoundException.class,
 		StorageFileNotFoundException.class,
-		RefreshTokenNotFoundException.class})
+		RefreshTokenNotFoundException.class,
+		StorageNoFileTypeFoundException.class,
+		CourseNotFoundException.class})
 	public ResponseEntity<ErrorResponse> handleNotFound(Exception ex) {
 		return ResponseEntity
 			.status(HttpStatus.NOT_FOUND)
@@ -41,7 +47,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 
-	@ExceptionHandler({UserIsAlreadyRegisteredException.class,
+	@ExceptionHandler({UserAlreadyRegisteredException.class,
 		UserRegistrationWithDifferentPasswordsException.class,
 		InvalidPasswordException.class,
 		StorageException.class})
@@ -59,6 +65,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			.status(HttpStatus.UNAUTHORIZED)
 			.body(ErrorResponse.builder()
 				.status(HttpStatus.UNAUTHORIZED)
+				.message(ex.getMessage()).build());
+	}
+
+
+	@ExceptionHandler({JwtValidationException.class, BadJwtException.class})
+	public ResponseEntity<ErrorResponse> handleForbidden(Exception ex) {
+		return ResponseEntity
+			.status(HttpStatus.FORBIDDEN)
+			.body(ErrorResponse.builder()
+				.status(HttpStatus.FORBIDDEN)
 				.message(ex.getMessage()).build());
 	}
 
