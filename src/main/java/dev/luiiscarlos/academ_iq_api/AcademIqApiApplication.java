@@ -3,6 +3,7 @@ package dev.luiiscarlos.academ_iq_api;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+
 import dev.luiiscarlos.academ_iq_api.services.StorageService;
 
 @SpringBootApplication

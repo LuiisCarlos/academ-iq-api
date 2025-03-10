@@ -1,6 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.controllers;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import dev.luiiscarlos.academ_iq_api.dtos.UserLoginRequestDto;
 import dev.luiiscarlos.academ_iq_api.dtos.UserLoginResponseDto;
 import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterRequestDto;
 import dev.luiiscarlos.academ_iq_api.dtos.UserRegisterResponseDto;
+import dev.luiiscarlos.academ_iq_api.dtos.UserChangePasswordDto;
 import dev.luiiscarlos.academ_iq_api.services.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +32,7 @@ public class AuthController {
     public ResponseEntity<String> refresh(@RequestBody String token) {
         return ResponseEntity
             .status(HttpStatus.OK)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(authService.refresh(token));
     }
 
@@ -37,6 +40,7 @@ public class AuthController {
     public ResponseEntity<UserLoginResponseDto> login(@RequestBody UserLoginRequestDto loginRequest) {
         return ResponseEntity
             .status(HttpStatus.OK)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(authService.login(loginRequest));
     }
 
@@ -44,16 +48,27 @@ public class AuthController {
     public ResponseEntity<UserRegisterResponseDto> register(@RequestBody UserRegisterRequestDto registerRequest) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(authService.register(registerRequest));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        authService.logout(request, response);
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response, @RequestBody String token) {
+        authService.logout(request, response, token);
 
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
+            .contentType(MediaType.APPLICATION_JSON)
             .build();
-    } // TODO: Finish this
+    }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@RequestBody UserChangePasswordDto changePassword) {
+        authService.changePassword(changePassword);
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .contentType(MediaType.APPLICATION_JSON)
+            .build();
+    }
 }

@@ -28,7 +28,13 @@ public class SecurityConfiguration {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/api/v1/auth/reset-password/**").authenticated()
                 .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/courses/**").permitAll()
+                .requestMatchers("/api/v1/users/@me/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/storage/**").hasRole("ADMIN")
                 .anyRequest().authenticated());
 
         http
