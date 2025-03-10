@@ -1,5 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.dtos;
 
+import java.time.LocalDate;
+
 import lombok.Data;
 
 @Data
@@ -18,5 +20,7 @@ public class UserRegisterRequestDto {
     private String lastname;
 
     private String phone;
+
+    private LocalDate birthdate;
 
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UserLoginResponseDto {
+public class UserResponseDto {
 
     private String username;
 
@@ -20,11 +20,5 @@ public class UserLoginResponseDto {
     private String phone;
 
     private String birthdate;
-
-    private String accessToken;
-
-    private String refreshToken;
-
-    private String refreshTokenExpiresAt;
 
 }

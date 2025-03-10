@@ -8,27 +8,19 @@
 		<version>3.4.3</version>
 		<relativePath/>
 	</parent>
-	<groupId>dev.luiiscarlos</groupId> <!-- TODO: Change groupId -->
+	<groupId>dev.luiiscarlos</groupId>
 	<artifactId>academ-iq-api</artifactId>
 	<version>1.0.0-ALPHA</version>
 	<name>academ-iq-api</name>
 	<description>Academ-IQ API - Backend</description>
 	<url>https://github.com/LuiisCarlos/academ-iq-api</url>
-	<licenses> <!-- TODO: Add license -->
+	<licenses> <!-- ! Add license -->
 		<license/>
 	</licenses>
 	<developers>
 		<developer>
 			<name>Luis Carlos Caicedo Giraldo</name>
 			<email>luisccg2003@gmail.com</email>
-		</developer>
-		<developer>
-			<name>Oliver Steve Saca Saltos</name>
-			<email>oliversaca2@gmail.com</email>
-		</developer>
-		<developer>
-			<name>Mohamed Amin El Friti</name>
-			<email></email> <!-- TODO: Add email -->
 		</developer>
 	</developers>
 	<scm>

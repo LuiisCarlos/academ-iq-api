@@ -15,4 +15,8 @@ public class UserRegisterResponseDto {
 
     private String lastname;
 
+    private String phone;
+
+    private String birthdate;
+
 }
