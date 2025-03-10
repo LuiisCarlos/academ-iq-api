@@ -23,9 +23,13 @@ import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.repositories.RefreshTokenRepository;
 import dev.luiiscarlos.academ_iq_api.services.interfaces.ITokenService;
+
+import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class TokenService implements ITokenService {
 
@@ -40,7 +44,7 @@ public class TokenService implements ITokenService {
     private String generateToken(User user, Instant expiresAt, String tokenType) {
         Instant now = Instant.now();
 
-        String scope = user.getRoles().stream()
+        String scope = user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
@@ -63,7 +67,7 @@ public class TokenService implements ITokenService {
         return generateToken(user, expiresAt, tokenType);
     }
 
-    public String generateRefreshToken(User user) {
+    public RefreshToken generateRefreshToken(User user) {
         Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
         String tokenType = "refresh";
 
@@ -80,18 +84,18 @@ public class TokenService implements ITokenService {
             .createdAt(Instant.now())
             .build());
 
-        return refreshTokenRepository.save(refreshToken).getToken();
+        return refreshTokenRepository.save(refreshToken);
     }
 
     public String refreshAccessToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-            .orElseThrow(() -> new RefreshTokenNotFoundException("Refresh token not found"));
+            .orElseThrow(() -> new RefreshTokenNotFoundException());
 
         if (!validateRefreshToken(token))
             throw new InvalidCredentialsException("Refresh token is invalid");
 
         if (refreshToken.getExpiresAt().isBefore(Instant.now()))
-            throw new RefreshTokenExpiredException("Refresh token expired");
+            throw new RefreshTokenExpiredException();
 
         return generateAccessToken(refreshToken.getUser());
     }
@@ -105,6 +109,10 @@ public class TokenService implements ITokenService {
         }
     }
 
+    public String extractUsernameFromToken(String token) {
+        return jwtDecoder.decode(token).getSubject();
+    }
+
     public String extractTokenFromJson(String TokenJson) {
         try {
             JsonNode rootNode = objectMapper.readTree(TokenJson);
@@ -116,6 +124,11 @@ public class TokenService implements ITokenService {
 
     public void invalidateRefreshToken(String token) {
         refreshTokenRepository.deleteByToken(token);
+    }
+
+    public RefreshToken findByToken(String token) {
+        return refreshTokenRepository.findByToken(token)
+            .orElseThrow(() -> new RefreshTokenNotFoundException());
     }
 
 }

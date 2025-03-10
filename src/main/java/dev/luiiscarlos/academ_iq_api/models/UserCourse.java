@@ -1,6 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.models;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -13,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,16 +23,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "refresh_tokens")
-public class RefreshToken {
+@Table(name = "user_course_junction")
+public class UserCourse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @NonNull
-    @Column(length = 600)
-    private String token;
 
     @NonNull
     @ManyToOne
@@ -41,11 +36,23 @@ public class RefreshToken {
     private User user;
 
     @NonNull
-    @Column(name = "expires_at")
-    private Instant expiresAt;
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
 
     @NonNull
-    @Column(name = "created_at")
-    private Instant createdAt;
+    @Column(name = "started_at")
+    private LocalDate startedAt;
+
+    @NonNull
+    private Double progress;
+
+    @NonNull
+    @Column(name = "is_completed")
+    private Boolean isCompleted;
+
+    @Nullable
+    @Column(name = "completed_at")
+    private LocalDate completedAt;
 
 }
