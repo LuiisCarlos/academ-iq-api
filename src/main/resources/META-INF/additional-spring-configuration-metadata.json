@@ -1,5 +1,17 @@
-{"properties": [{
-  "name": "upload.root-location",
-  "type": "java.lang.String",
-  "description": "A description for 'upload.root-location'"
-}]}
+{"properties": [
+  {
+    "name": "storage.root-location",
+    "type": "java.lang.String",
+    "description": "This is the storage root location for the storage"
+  },
+  {
+    "name": "storage.avatar-location",
+    "type": "java.lang.String",
+    "description": "This is the storage location for the users' avatar"
+  },
+  {
+    "name": "storage.course-location",
+    "type": "java.lang.String",
+    "description": "This is the storage location for the courses"
+  }
+]}
