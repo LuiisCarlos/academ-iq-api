@@ -2,21 +2,19 @@ package dev.luiiscarlos.academ_iq_api.services;
 
 import java.util.List;
 
-import org.springframework.core.io.Resource;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import dev.luiiscarlos.academ_iq_api.controllers.StorageController;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
-import dev.luiiscarlos.academ_iq_api.exceptions.StorageException;
-import dev.luiiscarlos.academ_iq_api.exceptions.StorageFileNotFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.FileStorageException;
+import dev.luiiscarlos.academ_iq_api.exceptions.AuthCredentialsNotFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
+import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.User;
+import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.mappers.FileMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;
 import dev.luiiscarlos.academ_iq_api.services.interfaces.IUserService;
 
@@ -27,14 +25,15 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService, IUserService {
+public class UserService implements IUserService {
 
     private final UserRepository userRepository;
 
-    private final StorageService storageService;
+    private final FileService fileService;
 
     private final TokenService tokenService;
 
+    private final FileMapper fileMapper;
 
     /**
      * Finds all users
@@ -58,7 +57,12 @@ public class UserService implements UserDetailsService, IUserService {
      */
     public User findById(Long id) {
         return userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException());
+            .orElseThrow(() -> new UserNotFoundException("Failed to find user: User not found with id " + id));
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException("Failed to find user : User not found with username " + username));
     }
 
     /**
@@ -67,18 +71,21 @@ public class UserService implements UserDetailsService, IUserService {
      * @param id the id of the user
      * @return the user's avatar
      */
-    public Resource findAvatarById(Long id) {
+    public FileResponseDto findAvatarById(Long id) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException());
+            .orElseThrow(() -> new UserNotFoundException("Failed to find user's avatar: User not found with id " + id));
 
-        String filePath = user.getAvatar();
-
-        if (filePath == null)
-            throw new StorageFileNotFoundException();
+        String filePath = user.getAvatarUrl();
 
         String filename = StringUtils.getFilename(filePath);
+        File file = fileService.findByFilename(filename);
 
-        return storageService.loadAsResource(filename);
+        return fileMapper.toFileResponseDto(file);
+    }
+
+    public User save(User user) {
+        if (user == null) throw new UserNotFoundException("Failed to save user: User is null");
+        return userRepository.save(user);
     }
 
     /**
@@ -97,7 +104,7 @@ public class UserService implements UserDetailsService, IUserService {
             u.setPhone(user.getPhone());
             u.setBirthdate(user.getBirthdate());
             return userRepository.save(u);
-        }).orElseThrow(() -> new UserNotFoundException());
+        }).orElseThrow(() -> new UserNotFoundException("Failed to update user: User not found with id " + id));
     }
 
     /**
@@ -107,26 +114,20 @@ public class UserService implements UserDetailsService, IUserService {
      * @param avatar the new avatar
      * @return the updated avatar
      */
-    public Resource updateAvatarById(Long id, MultipartFile avatar) {
-        if (avatar.isEmpty())
-            throw new StorageException("File is required");
+    public FileResponseDto updateAvatarById(Long id, MultipartFile avatar) {
+        if (avatar.isEmpty()) throw new FileStorageException("Failed to update user's avatar: Avatar is required");
 
-        String filename = storageService.store(avatar);
-        String urlFile = MvcUriComponentsBuilder
-            .fromMethodName(StorageController.class, "findByFilename", filename, null)
-            .build()
-            .toUriString();
+        File file = fileService.save(avatar);
 
-        Resource newAvatar = userRepository.findById(id).map(u -> {
-            if (u.getAvatar() != null)
-                    storageService.delete(StringUtils.getFilename(u.getAvatar()));
+        userRepository.findById(id).map(u -> {
+            if (u.getAvatarUrl() != null)
+                fileService.deleteByFilename(StringUtils.getFilename(u.getAvatarUrl()));
 
-            u.setAvatar(urlFile);
-            userRepository.save(u);
-            return storageService.loadAsResource(StringUtils.getFilename(u.getAvatar()));
-        }).orElseThrow(() -> new UserNotFoundException());
+            u.setAvatarUrl(file.getUrl());
+            return userRepository.save(u);
+        }).orElseThrow(() -> new UserNotFoundException("Failed to update user's avatar: User not found with id " + id));
 
-        return newAvatar;
+        return fileMapper.toFileResponseDto(file);
     }
 
     /**
@@ -136,7 +137,7 @@ public class UserService implements UserDetailsService, IUserService {
      */
     public void deleteById(Long id) {
         if (!userRepository.existsById(id))
-            throw new UserNotFoundException();
+            throw new UserNotFoundException("Failed to delete user: User not found with id " + id);
 
         userRepository.deleteById(id);
     }
@@ -148,12 +149,17 @@ public class UserService implements UserDetailsService, IUserService {
      */
     public void deleteAvatarById(Long id) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException());
+            .orElseThrow(() -> new UserNotFoundException("Failed to delete user's avatar: User not found with id " + id));
 
-        if (user.getAvatar() == null)
-            throw new StorageFileNotFoundException();
+        if (user.getAvatarUrl() == null)
+            throw new FileNotFoundException("Failed to delete user's avatar: Avatar not found");
 
-        storageService.delete(StringUtils.getFilename(user.getAvatar()));
+        fileService.deleteByFilename(StringUtils.getFilename(user.getAvatarUrl()));
+
+        userRepository.findById(id).map(u -> {
+            u.setAvatarUrl("http://localhost:8888/api/v1/files/default-user-avatar.png"); // TODO: Change this to a Env variable
+            return userRepository.save(u);
+        }).orElseThrow(() -> new UserNotFoundException("Failed to delete user's avatar: User not found with id " + id));
     }
 
     /**
@@ -164,16 +170,16 @@ public class UserService implements UserDetailsService, IUserService {
      */
     public User findByToken(String token) {
         if (token == null)
-            throw new InvalidCredentialsException("Token is required");
+            throw new AuthCredentialsNotFoundException("Failed to find user: Token is required");
 
         token = token.substring(7);
 
-        if (!tokenService.validateRefreshToken(token))
-            throw new InvalidCredentialsException("Token is invalid");
+        if (!tokenService.isValidToken(token))
+            throw new InvalidCredentialsException("Failed to find user: Invalid token");
 
         String username = tokenService.extractUsernameFromToken(token);
         return userRepository.findByUsername(username)
-            .orElseThrow(() -> new UserNotFoundException());
+            .orElseThrow(() -> new UserNotFoundException("Failed to find user: User not found with username " + username));
     }
 
     /**
@@ -182,17 +188,15 @@ public class UserService implements UserDetailsService, IUserService {
      * @param token the token of the user
      * @return the user's avatar
      */
-    public Resource findAvatarByToken(String token) {
+    public FileResponseDto findAvatarByToken(String token) {
         User user = this.findByToken(token);
 
-        String filePath = user.getAvatar();
-
-        if (filePath == null)
-            throw new StorageFileNotFoundException();
+        String filePath = user.getAvatarUrl();
 
         String filename = StringUtils.getFilename(filePath);
+        File file = fileService.findByFilename(filename);
 
-        return storageService.loadAsResource(filename);
+        return fileMapper.toFileResponseDto(file);
     }
 
     /**
@@ -214,7 +218,7 @@ public class UserService implements UserDetailsService, IUserService {
      * @param avatar the new avatar
      * @return the updated avatar
      */
-    public Resource updateAvatarByToken(String token, MultipartFile avatar) {
+    public FileResponseDto updateAvatarByToken(String token, MultipartFile avatar) {
         User user = this.findByToken(token);
 
         return updateAvatarById(user.getId(), avatar);
@@ -243,16 +247,13 @@ public class UserService implements UserDetailsService, IUserService {
     }
 
     /**
-     * Loads the user by the username
+     * Checks if a user exists by its username
      *
      * @param username the username of the user
-     * @return the user
+     * @return true if the user exists, false otherwise
      */
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("In the user details service");
-        return userRepository.findByUsername(username)
-            .orElseThrow(() -> new UserNotFoundException());
+    public Boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 
 }

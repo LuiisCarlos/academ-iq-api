@@ -2,7 +2,6 @@ package dev.luiiscarlos.academ_iq_api.controllers;
 
 import java.util.List;
 
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.dtos.UserResponseDto;
-import dev.luiiscarlos.academ_iq_api.mappers.UserMapper;
 import dev.luiiscarlos.academ_iq_api.models.User;
-import dev.luiiscarlos.academ_iq_api.services.StorageService;
+import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.UserResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.mappers.UserMapper;
 import dev.luiiscarlos.academ_iq_api.services.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,8 +31,6 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
-
-    private final StorageService storageService;
 
     private final UserMapper userMapper;
 
@@ -54,19 +51,15 @@ public class UserController {
     }
 
     @GetMapping("/{id}/avatar")
-    public ResponseEntity<Resource> findAvatarById(@PathVariable Long id, HttpServletRequest request) {
-        Resource avatar = userService.findAvatarById(id);
-
-        String contentType = storageService.checkContentType(request, avatar);
-
+    public ResponseEntity<FileResponseDto> findAvatarById(@PathVariable Long id, HttpServletRequest request) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .contentType(MediaType.parseMediaType(contentType))
-            .body(avatar);
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(userService.findAvatarById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<User> updateById(@PathVariable Long id, @RequestBody User user) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
@@ -74,20 +67,16 @@ public class UserController {
     }
 
     @PutMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Resource> updateAvatarById(HttpServletRequest request, @PathVariable Long id, @RequestPart("avatar") MultipartFile file) {
-
-        Resource avatar = userService.updateAvatarById(id, file);
-
-        String contentType = storageService.checkContentType(request, avatar);
+    public ResponseEntity<FileResponseDto> updateAvatarById(HttpServletRequest request, @PathVariable Long id, @RequestPart("avatar") MultipartFile file) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(avatar);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userService.updateAvatarById(id, file));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         userService.deleteById(id);
 
         return ResponseEntity
@@ -97,7 +86,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/avatar")
-    public ResponseEntity<Void> deleteAvatar(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteAvatarById(@PathVariable Long id) {
         userService.deleteAvatarById(id);
 
         return ResponseEntity
@@ -107,55 +96,47 @@ public class UserController {
     }
 
     @GetMapping("/@me")
-    public ResponseEntity<UserResponseDto> findMe(HttpServletRequest request) {
+    public ResponseEntity<UserResponseDto> findByToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
 
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(userMapper.mapToUserResponseDto(userService.findByToken(token)));
+            .body(userMapper.toUserResponseDto(userService.findByToken(token)));
     }
 
     @GetMapping("/@me/avatar")
-    public ResponseEntity<Resource> findMyAvatar(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-
-        Resource avatar = userService.findAvatarByToken(token);
-
-        String contentType = storageService.checkContentType(request, avatar);
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.parseMediaType(contentType))
-            .body(avatar);
-    }
-
-    @PutMapping("/@me")
-    public ResponseEntity<UserResponseDto> updateMe(HttpServletRequest request) {
+    public ResponseEntity<FileResponseDto> findAvatartByToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
 
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(userMapper.mapToUserResponseDto(userService.updateByToken(token)));
+            .body(userService.findAvatarByToken(token));
     }
 
-    @PutMapping(value = "/@me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Resource> updateMyAvatar(HttpServletRequest request, @RequestPart("avatar") MultipartFile file) {
+    @PutMapping("/@me")
+    public ResponseEntity<UserResponseDto> updateByToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
-
-        Resource avatar = userService.updateAvatarByToken(token, file);
-
-        String contentType = storageService.checkContentType(request, avatar);
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .contentType(MediaType.parseMediaType(contentType))
-            .body(avatar);
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(userMapper.toUserResponseDto(userService.updateByToken(token)));
+    }
+
+    @PutMapping(value = "/@me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<FileResponseDto> updateAvatarByToken(HttpServletRequest request, @RequestPart("avatar") MultipartFile file) {
+        String token = request.getHeader("Authorization");
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(userService.updateAvatarByToken(token, file));
     }
 
     @DeleteMapping("/@me")
-    public ResponseEntity<Void> deleteMe(HttpServletRequest request) {
+    public ResponseEntity<Void> deleteByToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
 
         userService.deleteByToken(token);
@@ -167,7 +148,7 @@ public class UserController {
     }
 
     @DeleteMapping("/@me/avatar")
-    public ResponseEntity<Void> deleteMyAvatar(HttpServletRequest request) {
+    public ResponseEntity<Void> deleteAvatarByToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
 
         userService.deleteAvatarByToken(token);

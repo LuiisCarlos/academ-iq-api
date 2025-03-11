@@ -5,13 +5,13 @@
     "description": "This is the storage root location for the storage"
   },
   {
-    "name": "storage.avatar-location",
+    "name": "storage.default.user-avatar-url",
     "type": "java.lang.String",
-    "description": "This is the storage location for the users' avatar"
+    "description": "This is the default user avatar url"
   },
   {
-    "name": "storage.course-location",
+    "name": "storage.default.course-thumbnail-url",
     "type": "java.lang.String",
-    "description": "This is the storage location for the courses"
+    "description": "This is the default course thumbnail url"
   }
 ]}
