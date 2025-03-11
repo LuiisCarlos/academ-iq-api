@@ -3,20 +3,20 @@ package dev.luiiscarlos.academ_iq_api.exceptions;
 import java.io.Serial;
 import java.util.UUID;
 
-public class InvalidPasswordException extends RuntimeException {
+public class UserUnderageException extends RuntimeException {
 
     @Serial
     private static final long serialVersionUID = UUID.randomUUID().getMostSignificantBits();
 
-    public InvalidPasswordException(String message) {
+    public UserUnderageException(String message) {
         super(message);
     }
 
-    public InvalidPasswordException(String message, Throwable cause) {
+    public UserUnderageException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidPasswordException(Throwable cause) {
+    public UserUnderageException(Throwable cause) {
         super(cause);
     }
 

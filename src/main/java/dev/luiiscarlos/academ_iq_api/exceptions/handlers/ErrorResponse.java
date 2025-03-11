@@ -1,8 +1,9 @@
-package dev.luiiscarlos.academ_iq_api.exceptions.response;
+package dev.luiiscarlos.academ_iq_api.exceptions.handlers;
 
 import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
@@ -21,10 +22,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ErrorResponse {
 
+	private Integer statusCode;
+
 	@NonNull
 	private HttpStatus status;
 
-	@NonNull
+	@Nullable
 	@Builder.Default
 	@JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
 	private LocalDateTime timestamp = LocalDateTime.now();

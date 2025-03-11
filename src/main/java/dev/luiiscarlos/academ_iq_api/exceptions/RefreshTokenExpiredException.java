@@ -3,19 +3,21 @@ package dev.luiiscarlos.academ_iq_api.exceptions;
 import java.io.Serial;
 import java.util.UUID;
 
-public class RefreshTokenExpiredException extends BaseException {
+public class RefreshTokenExpiredException extends RuntimeException {
 
     @Serial
     private static final long serialVersionUID = UUID.randomUUID().getMostSignificantBits();
 
-    private static final String MESSAGE = "Refresh token expired";
-
-    public RefreshTokenExpiredException() {
-        super(MESSAGE);
-    }
-
     public RefreshTokenExpiredException(String message) {
         super(message);
+    }
+
+    public RefreshTokenExpiredException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public RefreshTokenExpiredException(Throwable cause) {
+        super(cause);
     }
 
 }

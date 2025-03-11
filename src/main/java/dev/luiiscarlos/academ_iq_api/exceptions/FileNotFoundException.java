@@ -3,20 +3,20 @@ package dev.luiiscarlos.academ_iq_api.exceptions;
 import java.io.Serial;
 import java.util.UUID;
 
-public class InvalidPasswordException extends RuntimeException {
+public class FileNotFoundException extends RuntimeException {
 
     @Serial
     private static final long serialVersionUID = UUID.randomUUID().getMostSignificantBits();
 
-    public InvalidPasswordException(String message) {
+    public FileNotFoundException(String message) {
         super(message);
     }
 
-    public InvalidPasswordException(String message, Throwable cause) {
+    public FileNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidPasswordException(Throwable cause) {
+    public FileNotFoundException(Throwable cause) {
         super(cause);
     }
 

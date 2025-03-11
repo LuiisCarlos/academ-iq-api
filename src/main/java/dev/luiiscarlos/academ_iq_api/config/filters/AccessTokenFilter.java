@@ -7,14 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import dev.luiiscarlos.academ_iq_api.exceptions.response.ErrorResponse;
+import dev.luiiscarlos.academ_iq_api.services.TokenService;
+import dev.luiiscarlos.academ_iq_api.utils.ErrorHandler;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,9 +24,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AccessTokenFilter extends OncePerRequestFilter {
 
-    private final JwtDecoder jwtDecoder;
+    private final TokenService tokenService;
 
-    private final ObjectMapper objectMapper;
+    private final ErrorHandler errorHandler;
 
     /**
      * Filters the request and checks if the access token is valid and if it is, it sets the authentication
@@ -41,25 +39,30 @@ public class AccessTokenFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
-
+            @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
 
-        if (token != null && token.startsWith("Bearer ")) {
+        if (token != null && token.startsWith("Bearer")) {
             token = token.substring(7);
+            Instant expiresAt = tokenService.getTokenExpiration(token);
+            String tokenType = tokenService.getTokenType(token);
+            Jwt jwt = tokenService.getJwtToken(token);
 
-            Jwt jwt = jwtDecoder.decode(token);
-
-            Instant expiresAt = jwt.getExpiresAt();
-
-            if (expiresAt == null || expiresAt.isBefore(Instant.now())){
-                sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token is expired");
+            if (!tokenService.isValidToken(token)) {
+                errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
+                    "Failed to validate Token: Invalid access token");
                 return;
             }
 
-            if (!"access".equals(jwt.getClaim("token_type"))) {
-                sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token is not an access token");
+            if (expiresAt.isBefore(Instant.now())){
+                errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
+                    "Failed to validate Token: Expired access token");
+                return;
+            }
+
+            if (!"access".equals(tokenType)) {
+                errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
+                    "Failed to validate Token: Invalid token type");
                 return;
             }
 
@@ -70,26 +73,4 @@ public class AccessTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    /**
-     * Sends an error response to the client
-     *
-     * @param response The response to send the error to
-     * @param status The status of the error
-     * @param message The message of the error
-     * @throws IOException If an I/O error occurs
-     */
-    private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String message)
-            throws IOException {
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(status)
-                .message(message)
-                .build();
-
-        String jsonResponse = objectMapper.writeValueAsString(errorResponse);
-
-        response.setStatus(status.value());
-        response.setContentType("application/json");
-        response.getWriter().write(jsonResponse);
-    }
 }
