@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -81,7 +82,6 @@ public class TokenService implements ITokenService {
             .token(token)
             .user(user)
             .expiresAt(expiresAt)
-            .createdAt(Instant.now())
             .build());
 
         return refreshTokenRepository.save(refreshToken);
@@ -89,18 +89,18 @@ public class TokenService implements ITokenService {
 
     public String refreshAccessToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-            .orElseThrow(() -> new RefreshTokenNotFoundException());
+            .orElseThrow(() -> new RefreshTokenNotFoundException("Failed to refresh access token: Refresh token not found"));
 
-        if (!validateRefreshToken(token))
-            throw new InvalidCredentialsException("Refresh token is invalid");
+        if (!isValidToken(token))
+            throw new InvalidCredentialsException("Failed to refresh access token: Invalid refresh token");
 
         if (refreshToken.getExpiresAt().isBefore(Instant.now()))
-            throw new RefreshTokenExpiredException();
+            throw new RefreshTokenExpiredException("Failed to refresh access token: Expired refresh token");
 
         return generateAccessToken(refreshToken.getUser());
     }
 
-    public boolean validateRefreshToken(String token) {
+    public boolean isValidToken(String token) {
         try {
             jwtDecoder.decode(token);
             return true;
@@ -128,7 +128,18 @@ public class TokenService implements ITokenService {
 
     public RefreshToken findByToken(String token) {
         return refreshTokenRepository.findByToken(token)
-            .orElseThrow(() -> new RefreshTokenNotFoundException());
+            .orElseThrow(() -> new RefreshTokenNotFoundException("Failed to find refresh token: Refresh token not found"));
     }
 
+    public String getTokenType(String token) {
+        return jwtDecoder.decode(token).getClaimAsString("token_type");
+    }
+
+    public Instant getTokenExpiration(String token) {
+        return jwtDecoder.decode(token).getExpiresAt();
+    }
+
+    public Jwt getJwtToken(String token) {
+        return jwtDecoder.decode(token);
+    }
 }
