@@ -1,15 +1,15 @@
-package dev.luiiscarlos.academ_iq_api.dtos;
+package dev.luiiscarlos.academ_iq_api.models.dtos;
 
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
-public class UserResponseDto {
+public class UserRegisterRequestDto {
 
     private String username;
 
-    private String avatar;
+    private String password;
+
+    private String confirmPassword;
 
     private String email;
 

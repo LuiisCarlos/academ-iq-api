@@ -1,4 +1,9 @@
-package dev.luiiscarlos.academ_iq_api.dtos;
+package dev.luiiscarlos.academ_iq_api.models.dtos;
+
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +14,7 @@ public class UserLoginResponseDto {
 
     private String username;
 
-    private String avatar;
+    private String avatarUrl;
 
     private String email;
 
@@ -19,7 +24,8 @@ public class UserLoginResponseDto {
 
     private String phone;
 
-    private String birthdate;
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
+    private LocalDate birthdate;
 
     private String accessToken;
 

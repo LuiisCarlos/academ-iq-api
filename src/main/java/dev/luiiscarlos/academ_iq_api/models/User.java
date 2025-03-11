@@ -11,6 +11,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -57,7 +60,9 @@ public class User implements UserDetails {
     private Set<Role> authorities;
 
     @Nullable
-    private String avatar;
+    @Builder.Default
+    @Column(name = "avatar_url")
+    private String avatarUrl = "http://localhost:8888/api/v1/files/default-user-avatar.png"; // TODO: Change this to a Env variable
 
     @NonNull
     private String email;
@@ -75,12 +80,15 @@ public class User implements UserDetails {
     private String phone;
 
     @Nullable
+    @Builder.Default
     @OneToMany(mappedBy = "user")
-    private List<UserCourse> courses;
+    private List<Enrollment> enrollments = List.of();
 
     @Nullable
+    @Builder.Default
     @Column(name = "registered_at")
-    private LocalDateTime registeredAt;
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime registeredAt = LocalDateTime.now();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

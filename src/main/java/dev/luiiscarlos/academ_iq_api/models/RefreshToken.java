@@ -1,10 +1,14 @@
 package dev.luiiscarlos.academ_iq_api.models;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+
+import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -44,8 +48,10 @@ public class RefreshToken {
     @Column(name = "expires_at")
     private Instant expiresAt;
 
-    @NonNull
+    @Nullable
+    @Builder.Default
     @Column(name = "created_at")
-    private Instant createdAt;
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
 }

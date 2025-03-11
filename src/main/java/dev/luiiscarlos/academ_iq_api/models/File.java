@@ -1,8 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.models;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
 
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -15,11 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,39 +24,33 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "courses")
-public class Course {
+@Table(name = "files")
+public class File {
+
     @Id
+    @Nullable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NonNull
-    private String name;
+    private String filename;
+
+    @Nullable
+    @Column(name = "content_type")
+    private String contentType;
 
     @NonNull
-    private String description;
+    private Long size;
 
     @NonNull
-    private String author;
+    private String url;
 
-    @NonNull
-    @Column(name = "thumbnail_url")
-    private String thumbnailUrl;
+    @Nullable
+    private String extension;
 
-    @NonNull
-    @Column(name = "video_url")
-    private String videoUrl;
-
-    @NonNull
-    private String category;
-
-    @NonNull
-    @Enumerated(EnumType.STRING)
-    private Level level;
-
-    @NonNull
-    @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-    private LocalTime duration;
+    @Nullable
+    @Builder.Default
+    private Boolean isImage = true;
 
     @Nullable
     @Builder.Default
@@ -71,8 +59,8 @@ public class Course {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Nullable
-    @Builder.Default
-    @OneToMany(mappedBy = "course")
-    private List<Enrollment> enrollments = List.of();
+    @Column(name = "updated_at")
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime updatedAt;
 
 }

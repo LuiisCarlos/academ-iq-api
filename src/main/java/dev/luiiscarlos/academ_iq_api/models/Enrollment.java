@@ -5,6 +5,9 @@ import java.time.LocalDate;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,7 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user_course_junction")
-public class UserCourse {
+public class Enrollment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,19 +43,24 @@ public class UserCourse {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @NonNull
+    @Nullable
+    @Builder.Default
     @Column(name = "started_at")
-    private LocalDate startedAt;
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
+    private LocalDate startedAt = LocalDate.now();
 
-    @NonNull
-    private Double progress;
+    @Nullable
+    @Builder.Default
+    private Double progress = 0.0;
 
-    @NonNull
+    @Nullable
+    @Builder.Default
     @Column(name = "is_completed")
-    private Boolean isCompleted;
+    private Boolean isCompleted = false;
 
     @Nullable
     @Column(name = "completed_at")
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate completedAt;
 
 }

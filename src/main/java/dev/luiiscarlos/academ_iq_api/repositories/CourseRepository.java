@@ -18,6 +18,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     List<Course> findByDuration(LocalTime duration);
 
-    List<Course> findByUploadedAt(LocalDateTime uploadedAt);
+    List<Course> findByCreatedAt(LocalDateTime createdAt);
 
 }
