@@ -117,7 +117,7 @@ public class UserService implements IUserService {
     public FileResponseDto updateAvatarById(Long id, MultipartFile avatar) {
         if (avatar.isEmpty()) throw new FileStorageException("Failed to update user's avatar: Avatar is required");
 
-        File file = fileService.save(avatar);
+        File file = fileService.save(avatar, true);
 
         userRepository.findById(id).map(u -> {
             if (u.getAvatarUrl() != null)

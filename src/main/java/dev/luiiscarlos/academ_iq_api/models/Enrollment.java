@@ -30,6 +30,7 @@ import lombok.NoArgsConstructor;
 public class Enrollment {
 
     @Id
+    @Nullable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

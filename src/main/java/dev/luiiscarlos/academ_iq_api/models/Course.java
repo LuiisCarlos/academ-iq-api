@@ -32,7 +32,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "courses")
 public class Course {
+
     @Id
+    @Nullable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -45,13 +47,18 @@ public class Course {
     @NonNull
     private String author;
 
-    @NonNull
+    @Nullable
+    @Builder.Default
     @Column(name = "thumbnail_url")
-    private String thumbnailUrl;
+    private String thumbnailUrl = "http://localhost:8888/api/v1/files/default-course-thumbnail.jpg";
 
-    @NonNull
+    @Nullable
+    @Builder.Default
     @Column(name = "video_url")
-    private String videoUrl;
+    private String videoUrl = null;
+
+    @Nullable
+    private List<String> requirements;
 
     @NonNull
     private String category;

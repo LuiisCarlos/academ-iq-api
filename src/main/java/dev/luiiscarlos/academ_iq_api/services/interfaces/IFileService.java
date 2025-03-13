@@ -19,7 +19,7 @@ public interface IFileService {
 
     Resource findResourceByFilename(String filename);
 
-	File save(MultipartFile file);
+	File save(MultipartFile file, boolean isImage);
 
 	void deleteByFilename(String filename);
 

@@ -96,7 +96,7 @@ public class FileService implements IFileService {
 
 	@SuppressWarnings("null") // <- This is a workaround to avoid the null pointer exception
 	@Override
-	public File save(MultipartFile file) {
+	public File save(MultipartFile file, boolean isImage) {
 		if (file.isEmpty() || file == null) throw new FileStorageException("Failed to save file: File is required");
 
         try (InputStream inputStream = file.getInputStream()) {
@@ -120,6 +120,7 @@ public class FileService implements IFileService {
 				.filename(storedFilename)
 				.contentType(contentType)
 				.size(file.getSize())
+				.isImage(isImage)
 				.url(urlFile)
 				.extension(StringUtils.getFilenameExtension(filename))
 				.build();

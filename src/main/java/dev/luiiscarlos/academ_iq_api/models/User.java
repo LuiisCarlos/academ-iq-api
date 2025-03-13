@@ -40,6 +40,7 @@ import lombok.NoArgsConstructor;
 public class User implements UserDetails {
 
     @Id
+    @Nullable
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -62,7 +63,7 @@ public class User implements UserDetails {
     @Nullable
     @Builder.Default
     @Column(name = "avatar_url")
-    private String avatarUrl = "http://localhost:8888/api/v1/files/default-user-avatar.png"; // TODO: Change this to a Env variable
+    private String avatarUrl = "http://localhost:8888/api/v1/files/default-user-avatar.png"; // TODO: Change this to a Env variable maybe
 
     @NonNull
     private String email;

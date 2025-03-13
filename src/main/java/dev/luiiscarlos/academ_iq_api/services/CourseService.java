@@ -54,7 +54,7 @@ public class CourseService {
 
         if (video.isEmpty()) throw new FileStorageException("Failed to save course: Video is required");
 
-        String videoUrl = fileService.save(video).getUrl();
+        String videoUrl = fileService.save(video, false).getUrl();
 
         Course course = courseMapper.toCourse(RequestResponse, videoUrl);
 
@@ -70,8 +70,8 @@ public class CourseService {
         if (thumbnail.isEmpty()) throw new FileStorageException("Failed to save course: Thumbnail is required");
         if (video.isEmpty()) throw new FileStorageException("Failed to save course: Video is required");
 
-        String thumbnailUrl = fileService.save(thumbnail).getUrl();
-        String videoUrl = fileService.save(video).getUrl();
+        String thumbnailUrl = fileService.save(thumbnail, true).getUrl();
+        String videoUrl = fileService.save(video, false).getUrl();
 
         Course course = courseMapper.toCourse(RequestResponse, thumbnailUrl, videoUrl);
 

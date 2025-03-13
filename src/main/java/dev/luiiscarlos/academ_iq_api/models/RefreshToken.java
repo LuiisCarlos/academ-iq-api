@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
 public class RefreshToken {
 
     @Id
+    @Nullable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

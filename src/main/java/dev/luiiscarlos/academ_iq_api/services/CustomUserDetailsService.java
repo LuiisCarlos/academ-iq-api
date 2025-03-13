@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.services;
+/*package dev.luiiscarlos.academ_iq_api.services;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;
@@ -25,3 +25,5 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
 }
+
+*/
