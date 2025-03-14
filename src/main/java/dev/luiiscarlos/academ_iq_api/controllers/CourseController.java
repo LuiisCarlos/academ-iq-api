@@ -5,9 +5,11 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -42,27 +44,30 @@ public class CourseController {
             .body(courseService.findById(id));
     }
 
-    @PostMapping(value = "")
-    public ResponseEntity<CourseRequestResponseDto> save(@RequestBody CourseRequestResponseDto course) {
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(courseService.save(course));
-    }
-
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CourseRequestResponseDto> save(@RequestBody CourseRequestResponseDto course,
             @RequestPart("thumbnail") MultipartFile thumbnail,
             @RequestPart("video") MultipartFile video) {
-
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .contentType(MediaType.APPLICATION_JSON)
             .body(courseService.save(course, thumbnail, video));
     }
 
-    
+    @PutMapping("/{id}")
+    public ResponseEntity<CourseRequestResponseDto> updateById(@PathVariable Long id,
+            @RequestBody CourseRequestResponseDto course,
+            @RequestPart("thumbnail") MultipartFile thumbnail,
+            @RequestPart("video") MultipartFile video) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(courseService.updateById(id, course, thumbnail, video));
+    }
 
-    // @GetMapping("/courses/{id}/enrollments")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        return null;
+    }
 
 }

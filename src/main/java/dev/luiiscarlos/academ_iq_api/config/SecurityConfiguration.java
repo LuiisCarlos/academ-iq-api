@@ -1,5 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.config;
 
+//import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,6 +13,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+//import org.springframework.web.cors.CorsConfiguration;
+//import org.springframework.web.cors.CorsConfigurationSource;
+//import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import dev.luiiscarlos.academ_iq_api.config.filters.AccessTokenFilter;
@@ -38,7 +43,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/v1/auth/change-password/**").authenticated()
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/courses/{id}/**").authenticated()
+                .requestMatchers("/api/v1/courses/{id}/**").hasRole("ADMIN") // TODO: Check save course endpoint
                 .requestMatchers("/api/v1/courses/**").permitAll()
                 .requestMatchers("/api/v1/users/@me/**").authenticated()
                 .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
@@ -80,5 +85,17 @@ public class SecurityConfiguration {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
+
+    /*
+    @Bean
+    UrlBasedCorsConfigurationSource corsConfigurationSource() { // TODO: Cors config
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:9999/"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+    */
 
 }
