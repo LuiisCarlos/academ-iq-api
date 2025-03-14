@@ -65,14 +65,14 @@ public class TokenService implements ITokenService {
         Instant expiresAt = Instant.now().plus(15, ChronoUnit.MINUTES);
         String tokenType = "access";
 
-        return generateToken(user, expiresAt, tokenType);
+        return "Bearer " + generateToken(user, expiresAt, tokenType);
     }
 
     public RefreshToken generateRefreshToken(User user) {
         Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
         String tokenType = "refresh";
 
-        String token = generateToken(user, expiresAt, tokenType);
+        String token = "Bearer " + generateToken(user, expiresAt, tokenType);
 
         RefreshToken refreshToken = refreshTokenRepository.findByUser(user).map(rt -> {
             rt.setToken(token);

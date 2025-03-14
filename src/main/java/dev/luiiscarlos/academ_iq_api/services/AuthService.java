@@ -114,6 +114,7 @@ public class AuthService implements IAuthService {
      * @param tokenJson The refresh token
      */
     @Override
+    @SuppressWarnings("null") // TODO: Review this
     public void logout(String tokenJson) {
         String token = tokenService.extractTokenFromJson(tokenJson);
 
