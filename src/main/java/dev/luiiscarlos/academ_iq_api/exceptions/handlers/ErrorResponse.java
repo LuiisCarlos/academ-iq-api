@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 
 @Setter
@@ -22,17 +21,21 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ErrorResponse {
 
-	private Integer statusCode;
+	@Nullable
+	@Builder.Default
+	private Integer statusCode = HttpStatus.INTERNAL_SERVER_ERROR.value();
 
-	@NonNull
-	private HttpStatus status;
+	@Nullable
+	@Builder.Default
+	private HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
 	@Nullable
 	@Builder.Default
 	@JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
 	private LocalDateTime timestamp = LocalDateTime.now();
 
-	@NonNull
-	private String message;
+	@Nullable
+	@Builder.Default
+	private String message = "An error has ocurred";
 
 }

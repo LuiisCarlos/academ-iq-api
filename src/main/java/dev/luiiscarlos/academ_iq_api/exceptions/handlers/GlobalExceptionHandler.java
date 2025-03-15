@@ -47,7 +47,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				.message(ex.getMessage()).build());
 	}
 
-
 	@ExceptionHandler({UserAlreadyRegisteredException.class,
 		UserWithDifferentPasswordsException.class,
 		InvalidPasswordException.class,
@@ -71,7 +70,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				.message(ex.getMessage()).build());
 	}
 
-
 	@ExceptionHandler({JwtValidationException.class,
 		BadJwtException.class,
 		UserUnderageException.class,
@@ -87,20 +85,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	@Override
-	@ExceptionHandler(Exception.class)
+	@ExceptionHandler({Exception.class})
 	protected ResponseEntity<Object> handleExceptionInternal(
             @NonNull Exception ex,
             @Nullable Object body,
             @NonNull HttpHeaders headers,
 			@NonNull HttpStatusCode statusCode,
             @NonNull WebRequest request) {
+		String message = ex.getCause() != null ? ex.getCause().getMessage() : null;
 		return ResponseEntity
 			.status(statusCode)
 			.headers(headers)
 			.body(ErrorResponse.builder()
 				.status(HttpStatus.valueOf(statusCode.value()))
 				.statusCode(statusCode.value())
-				.message(ex.getCause().getMessage()).build());
+				.message(message));
 	}
 
 }
