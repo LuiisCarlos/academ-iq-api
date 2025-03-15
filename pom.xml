@@ -11,8 +11,8 @@
 	<groupId>dev.luiiscarlos</groupId>
 	<artifactId>academ-iq-api</artifactId>
 	<version>1.0.0-ALPHA</version>
-	<name>academ-iq-api</name>
-	<description>Academ-IQ API - Backend</description>
+	<name>Academ-IQ API</name>
+	<description>RESTful API for my senior grade year final project</description>
 	<url>https://github.com/LuiisCarlos/academ-iq-api</url>
 	<licenses> <!-- ! Add license -->
 		<license/>
@@ -23,11 +23,6 @@
 			<email>luisccg2003@gmail.com</email>
 		</developer>
 	</developers>
-	<scm>
-		<connection>https://github.com/LuiisCarlos/academ-iq-api.git</connection>
-		<developerConnection>https://github.com/LuiisCarlos/academ-iq-api.git</developerConnection>
-		<url>https://github.com/LuiisCarlos/academ-iq-api</url>
-	</scm>
 	<properties>
 		<java.version>21</java.version>
 		<java.target>21</java.target>
@@ -70,6 +65,10 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

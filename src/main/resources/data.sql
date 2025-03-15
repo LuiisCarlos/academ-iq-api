@@ -1,5 +1,7 @@
-INSERT INTO roles (authority) VALUES ('ADMIN');
 INSERT INTO roles (authority) VALUES ('USER');
+INSERT INTO roles (authority) VALUES ('ADMIN');
+INSERT INTO roles (authority) VALUES ('ENDPOINT_ADMIN');
+INSERT INTO roles (authority) VALUES ('ACADEMIQ_ADMIN');
 
 INSERT INTO files (filename, content_type, size, url, extension)
     VALUES ('default-user-avatar.png', 'image/png', 2048, 'https://localhost:8888/api/v1/files/default-user-avatar.png', 'png');
