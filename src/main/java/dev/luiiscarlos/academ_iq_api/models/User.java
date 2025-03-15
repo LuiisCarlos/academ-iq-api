@@ -60,10 +60,10 @@ public class User implements UserDetails {
     )
     private Set<Role> authorities;
 
-    @Nullable
+    @NonNull
     @Builder.Default
     @Column(name = "avatar_url")
-    private String avatarUrl = "http://localhost:8888/api/v1/files/default-user-avatar.png"; // TODO: Change this to a Env variable maybe
+    private String avatarUrl = "http://localhost:8888/api/v1/files/default-user-avatar.png";
 
     @NonNull
     private String email;
@@ -80,16 +80,21 @@ public class User implements UserDetails {
     @Nullable
     private String phone;
 
-    @Nullable
+    @NonNull
     @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<Enrollment> enrollments = List.of();
 
-    @Nullable
+    @NonNull
     @Builder.Default
     @Column(name = "registered_at")
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime registeredAt = LocalDateTime.now();
+
+    @NonNull
+    @Builder.Default
+    @Column(name = "is_email_verified")
+    private Boolean isEmailVerified = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

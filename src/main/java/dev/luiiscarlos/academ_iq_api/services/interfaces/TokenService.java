@@ -7,13 +7,15 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
 import dev.luiiscarlos.academ_iq_api.models.User;
 
-public interface ITokenService {
+public interface TokenService {
 
     RefreshToken findByToken(String token);
 
     String generateAccessToken(User user);
 
     RefreshToken generateRefreshToken(User user);
+
+    String generateConfirmationToken(User user);
 
     String refreshAccessToken(String token);
 

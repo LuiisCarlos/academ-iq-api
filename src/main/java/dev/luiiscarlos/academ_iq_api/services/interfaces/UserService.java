@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
 
-public interface IUserService {
+public interface UserService {
 
     List<User> findAll();
 

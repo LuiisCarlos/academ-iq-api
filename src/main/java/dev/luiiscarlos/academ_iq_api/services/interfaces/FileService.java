@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.models.File;
 
-public interface IFileService {
+public interface FileService {
 
     void init();
 

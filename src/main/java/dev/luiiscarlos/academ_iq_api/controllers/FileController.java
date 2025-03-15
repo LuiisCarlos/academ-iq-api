@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.luiiscarlos.academ_iq_api.models.File;
-import dev.luiiscarlos.academ_iq_api.services.FileService;
+import dev.luiiscarlos.academ_iq_api.services.FileServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FileController {
 
-	private final FileService fileService;
+	private final FileServiceImpl fileService;
 
 	@SuppressWarnings("null")// <- Already handled in the service layer
 	@GetMapping("/{filename:.+}")

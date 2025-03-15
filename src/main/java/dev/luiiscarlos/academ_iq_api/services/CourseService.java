@@ -24,7 +24,7 @@ public class CourseService {
 
     private final CourseMapper courseMapper;
 
-    private final FileService fileService;
+    private final FileServiceImpl fileService;
 
     /**
      * Find all courses

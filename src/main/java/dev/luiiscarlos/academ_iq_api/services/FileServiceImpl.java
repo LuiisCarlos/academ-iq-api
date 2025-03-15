@@ -22,7 +22,7 @@ import dev.luiiscarlos.academ_iq_api.exceptions.FileStorageException;
 import dev.luiiscarlos.academ_iq_api.controllers.FileController;
 import dev.luiiscarlos.academ_iq_api.exceptions.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.File;
-import dev.luiiscarlos.academ_iq_api.services.interfaces.IFileService;
+import dev.luiiscarlos.academ_iq_api.services.interfaces.FileService;
 import dev.luiiscarlos.academ_iq_api.repositories.FileRepository;
 
 import jakarta.transaction.Transactional;
@@ -32,14 +32,14 @@ import jakarta.transaction.Transactional;
 @Service
 @Transactional
 
-public class FileService implements IFileService {
+public class FileServiceImpl implements FileService {
 
 	@Autowired
 	private final FileRepository fileRepository;
 
 	public final Path ROOT_LOCATION;
 
-	public FileService(
+	public FileServiceImpl(
 		@Value("${storage.root-location}") String rootLocation,
 		FileRepository fileRepository
 	) {

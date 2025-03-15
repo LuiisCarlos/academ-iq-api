@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
+import dev.luiiscarlos.academ_iq_api.exceptions.InvalidTokenException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserAlreadyRegisteredException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserWithDifferentPasswordsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserUnderageException;
@@ -19,8 +20,9 @@ import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.UserResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.UserMapper;
-import dev.luiiscarlos.academ_iq_api.services.interfaces.IAuthService;
+import dev.luiiscarlos.academ_iq_api.services.interfaces.AuthService;
 
 import jakarta.transaction.Transactional;
 
@@ -29,15 +31,17 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AuthService implements IAuthService {
+public class AuthServiceImpl implements AuthService {
 
     private static final String ENCODED_PASSWORD_PREFIX = "{bcrypt}";
 
     private final PasswordEncoder passwordEncoder;
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
-    private final TokenService tokenService;
+    private final TokenServiceImpl tokenService;
+
+    private final EmailService emailService;
 
     private final RoleService roleService;
 
@@ -86,6 +90,9 @@ public class AuthService implements IAuthService {
         Set<Role> authorities = Set.of(userRole);
 
         User user = userMapper.toUser(registerRequest, encodedPassword, authorities);
+
+        emailService.sendConfirmationEmail(user);
+
         return userMapper.toUserRegisterResponseDto(userService.save(user));
     }
 
@@ -127,9 +134,28 @@ public class AuthService implements IAuthService {
         RefreshToken refreshToken = tokenService.findByToken(token);
 
         if (!refreshToken.getUser().getId().equals(user.getId()))
-            throw new InvalidCredentialsException("Failed to logout: Refresh token is invalid");
+            throw new InvalidTokenException("Failed to logout: Invalid refresh token");
 
         tokenService.invalidateRefreshToken(refreshToken.getToken());
+    }
+
+    /**
+     * Verifies the user's email
+     *
+     * @param token The token
+     * @return The user
+     */
+    @Override
+    public UserResponseDto verify(String token) {
+        if (!tokenService.isValidToken(token))
+            throw new InvalidTokenException("Failed to verify the email: Invalid token");
+
+        String username = tokenService.extractUsernameFromToken(token);
+
+        User user = userService.findByUsername(username);
+        user.setIsEmailVerified(true);
+
+        return userMapper.toUserResponseDto(userService.save(user));
     }
 
     @Override

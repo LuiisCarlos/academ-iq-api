@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserChangePasswordDto;
@@ -16,7 +17,8 @@ import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterResponseDto;
-import dev.luiiscarlos.academ_iq_api.services.AuthService;
+import dev.luiiscarlos.academ_iq_api.models.dtos.UserResponseDto;
+import dev.luiiscarlos.academ_iq_api.services.AuthServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthServiceImpl authService;
 
     @GetMapping("/refresh")
     public ResponseEntity<String> refresh(@RequestBody String token) {
@@ -59,6 +61,14 @@ public class AuthController {
             .status(HttpStatus.NO_CONTENT)
             .contentType(MediaType.APPLICATION_JSON)
             .build();
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<UserResponseDto> verify(@RequestParam String token) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(authService.verify(token));
     }
 
     @PutMapping("/change-password")

@@ -23,7 +23,7 @@ import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.repositories.RefreshTokenRepository;
-import dev.luiiscarlos.academ_iq_api.services.interfaces.ITokenService;
+import dev.luiiscarlos.academ_iq_api.services.interfaces.TokenService;
 
 import jakarta.transaction.Transactional;
 
@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class TokenService implements ITokenService {
+public class TokenServiceImpl implements TokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
@@ -85,6 +85,14 @@ public class TokenService implements ITokenService {
             .build());
 
         return refreshTokenRepository.save(refreshToken);
+    }
+
+    @Override
+    public String generateConfirmationToken(User user) {
+        Instant expiresAt = Instant.now().plus(24, ChronoUnit.HOURS);
+        String tokenType = "confirmation";
+
+        return generateToken(user, expiresAt, tokenType);
     }
 
     public String refreshAccessToken(String token) {

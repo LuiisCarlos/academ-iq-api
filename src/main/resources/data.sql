@@ -7,3 +7,5 @@ INSERT INTO files (filename, content_type, size, url, extension)
     VALUES ('default-user-avatar.png', 'image/png', 2048, 'https://localhost:8888/api/v1/files/default-user-avatar.png', 'png');
 INSERT INTO files (filename, content_type, size, url, extension)
     VALUES ('default-video-thumbnail.jpg', 'image/jpg', 2048, 'https://localhost:8888/api/v1/files/default-video-thumbnail.jpg', 'jpg');
+INSERT INTO files (filename, content_type, size, url, extension)
+    VALUES ('academiq-logo.png', 'image/png', 2048, 'http://localhost:8888/api/v1/files/academiq-logo.png', 'png');

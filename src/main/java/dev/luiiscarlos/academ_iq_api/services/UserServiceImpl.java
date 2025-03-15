@@ -9,14 +9,13 @@ import org.springframework.web.multipart.MultipartFile;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.FileStorageException;
 import dev.luiiscarlos.academ_iq_api.exceptions.AuthCredentialsNotFoundException;
-import dev.luiiscarlos.academ_iq_api.exceptions.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.FileMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;
-import dev.luiiscarlos.academ_iq_api.services.interfaces.IUserService;
+import dev.luiiscarlos.academ_iq_api.services.interfaces.UserService;
 
 import jakarta.transaction.Transactional;
 
@@ -25,13 +24,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserService implements IUserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final FileService fileService;
+    private final FileServiceImpl fileService;
 
-    private final TokenService tokenService;
+    private final TokenServiceImpl tokenService;
 
     private final FileMapper fileMapper;
 
@@ -151,13 +150,10 @@ public class UserService implements IUserService {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new UserNotFoundException("Failed to delete user's avatar: User not found with id " + id));
 
-        if (user.getAvatarUrl() == null)
-            throw new FileNotFoundException("Failed to delete user's avatar: Avatar not found");
-
         fileService.deleteByFilename(StringUtils.getFilename(user.getAvatarUrl()));
 
         userRepository.findById(id).map(u -> {
-            u.setAvatarUrl("http://localhost:8888/api/v1/files/default-user-avatar.png"); // TODO: Change this to a Env variable
+            u.setAvatarUrl("http://localhost:8888/api/v1/files/default-user-avatar.png"); // TODO: Change this to a Env variable - Review avatar verification
             return userRepository.save(u);
         }).orElseThrow(() -> new UserNotFoundException("Failed to delete user's avatar: User not found with id " + id));
     }

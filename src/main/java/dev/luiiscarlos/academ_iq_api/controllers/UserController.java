@@ -19,7 +19,7 @@ import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.UserMapper;
-import dev.luiiscarlos.academ_iq_api.services.UserService;
+import dev.luiiscarlos.academ_iq_api.services.UserServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     private final UserMapper userMapper;
 

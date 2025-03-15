@@ -19,6 +19,7 @@ import dev.luiiscarlos.academ_iq_api.exceptions.AuthCredentialsNotFoundException
 import dev.luiiscarlos.academ_iq_api.exceptions.CourseNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidPasswordException;
+import dev.luiiscarlos.academ_iq_api.exceptions.InvalidTokenException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenExpiredException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RoleNotFoundException;
@@ -50,7 +51,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler({UserAlreadyRegisteredException.class,
 		UserWithDifferentPasswordsException.class,
 		InvalidPasswordException.class,
-		FileStorageException.class})
+		FileStorageException.class,
+		InvalidTokenException.class})
 	public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex) {
 		return ResponseEntity
 			.status(HttpStatus.BAD_REQUEST)
@@ -92,7 +94,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             @NonNull HttpHeaders headers,
 			@NonNull HttpStatusCode statusCode,
             @NonNull WebRequest request) {
-		String message = ex.getCause() != null ? ex.getCause().getMessage() : null;
+		String message = ex.getCause() != null ? ex.getCause().getLocalizedMessage() : null;
 		return ResponseEntity
 			.status(statusCode)
 			.headers(headers)
