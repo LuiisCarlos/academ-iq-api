@@ -121,19 +121,20 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Logout the user and invalidate the refresh token
      *
-     * @param tokenJson The refresh token
+     * @param token The refresh token
      */
     @SuppressWarnings("null") // TODO: Review this
-    public void logout(String tokenJson) {
-        String token = tokenService.extractTokenFromJson(tokenJson);
-
+    public void logout(String token) {
+        System.out.println("\n" + token + "\n");
         if (token == null)
             throw new AuthCredentialsNotFoundException("Failed to logout: Refresh token is required");
 
+        token = token.contains("{") ? tokenService.extractTokenFromJson(token) : token;
+        RefreshToken refreshToken = tokenService.findByToken(token);
+
+        token = token.startsWith("Bearer ") ? token.substring(7) : token;
         String username = tokenService.extractUsernameFromToken(token);
         User user = userService.findByUsername(username);
-
-        RefreshToken refreshToken = tokenService.findByToken(token);
 
         if (!refreshToken.getUser().getId().equals(user.getId()))
             throw new InvalidTokenException("Failed to logout: Invalid refresh token");

@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
+import dev.luiiscarlos.academ_iq_api.exceptions.InvalidTokenException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenExpiredException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
@@ -33,6 +34,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
+
+    private final String TOKEN_PREFIX = "Bearer ";
 
     private final RefreshTokenRepository refreshTokenRepository;
 
@@ -65,14 +68,14 @@ public class TokenServiceImpl implements TokenService {
         Instant expiresAt = Instant.now().plus(1, ChronoUnit.HOURS);
         String tokenType = "access";
 
-        return "Bearer " + generateToken(user, expiresAt, tokenType);
+        return TOKEN_PREFIX + generateToken(user, expiresAt, tokenType);
     }
 
     public RefreshToken generateRefreshToken(User user) {
         Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
         String tokenType = "refresh";
 
-        String token = "Bearer " + generateToken(user, expiresAt, tokenType);
+        String token = TOKEN_PREFIX + generateToken(user, expiresAt, tokenType);
 
         RefreshToken refreshToken = refreshTokenRepository.findByUser(user).map(rt -> {
             rt.setToken(token);
@@ -139,7 +142,8 @@ public class TokenServiceImpl implements TokenService {
     }
 
     public void invalidateRefreshToken(String token) {
-        refreshTokenRepository.deleteByToken(token);
+        if (refreshTokenRepository.existsByToken(token))
+            refreshTokenRepository.deleteByToken(token);
     }
 
     public RefreshToken findByToken(String token) {
@@ -148,14 +152,26 @@ public class TokenServiceImpl implements TokenService {
     }
 
     public String getTokenType(String token) {
-        return jwtDecoder.decode(token).getClaimAsString("token_type");
+        try {
+            return jwtDecoder.decode(token).getClaimAsString("token_type");
+        } catch (JwtException ex){
+            throw new InvalidTokenException("Failed to validate token: Malformed Token");
+        }
     }
 
     public Instant getTokenExpiration(String token) {
-        return jwtDecoder.decode(token).getExpiresAt();
+        try {
+            return jwtDecoder.decode(token).getExpiresAt();
+        } catch (JwtException ex){
+            throw new InvalidTokenException("Failed to validate token: Malformed Token");
+        }
     }
 
     public Jwt getJwtToken(String token) {
-        return jwtDecoder.decode(token);
+        try {
+            return jwtDecoder.decode(token);
+        } catch (JwtException ex){
+            throw new InvalidTokenException("Failed to validate token: Malformed Token");
+        }
     }
 }
