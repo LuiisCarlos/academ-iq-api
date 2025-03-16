@@ -1,26 +1,25 @@
 package dev.luiiscarlos.academ_iq_api.services.interfaces;
 
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserChangePasswordDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.UserResetPasswordDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterResponseDto;;
 
 public interface AuthService {
 
-    UserLoginResponseDto login(UserLoginRequestDto loginRequest);
+    UserLoginResponseDto login(String origin, UserLoginRequestDto loginRequest);
 
-    UserRegisterResponseDto register(UserRegisterRequestDto registerRequest);
+    UserRegisterResponseDto register(String origin, UserRegisterRequestDto registerRequest);
 
     String refresh(String tokenJson);
 
     void logout(String token);
 
-    UserResponseDto verify(String token);
+    void verify(String token);
 
-    String recoverPassword(String email);
+    void recoverPassword(String origin, String email);
 
-    void changePassword(String token, UserChangePasswordDto changePassword);
+    void resetPassword(String token, UserResetPasswordDto resetPassword);
 
 }

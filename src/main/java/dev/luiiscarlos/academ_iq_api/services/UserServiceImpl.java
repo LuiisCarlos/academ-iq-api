@@ -17,6 +17,8 @@ import dev.luiiscarlos.academ_iq_api.models.mappers.FileMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;
 import dev.luiiscarlos.academ_iq_api.services.interfaces.UserService;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,8 @@ public class UserServiceImpl implements UserService {
     private final TokenServiceImpl tokenService;
 
     private final FileMapper fileMapper;
+
+    private final Dotenv dotenv;
 
     /**
      * Finds all users
@@ -59,9 +63,26 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new UserNotFoundException("Failed to find user: User not found with id " + id));
     }
 
+    /**
+     * Finds the user by its username
+     *
+     * @param username the user name
+     * @return the user
+     */
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("Failed to find user : User not found with username " + username));
+    }
+
+    /**
+     * Finds the user by its email
+     *
+     * @param email The user's email
+     * @return The user
+     */
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("Failed to find user: User not found with email " + email));
     }
 
     /**
@@ -153,7 +174,8 @@ public class UserServiceImpl implements UserService {
         fileService.deleteByFilename(StringUtils.getFilename(user.getAvatarUrl()));
 
         userRepository.findById(id).map(u -> {
-            u.setAvatarUrl("http://localhost:8888/api/v1/files/default-user-avatar.png"); // TODO: Change this to a Env variable - Review avatar verification
+            String address = dotenv.get("SERVER_PROTOCOL") + "://" + dotenv.get("SERVER_DOMAIN") + ":" + dotenv.get("SERVER_PORT");
+            u.setAvatarUrl( address + "/api/v1/files/default-user-avatar.png");
             return userRepository.save(u);
         }).orElseThrow(() -> new UserNotFoundException("Failed to delete user's avatar: User not found with id " + id));
     }

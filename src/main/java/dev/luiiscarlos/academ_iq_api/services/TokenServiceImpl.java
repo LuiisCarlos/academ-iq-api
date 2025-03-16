@@ -62,7 +62,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     public String generateAccessToken(User user) {
-        Instant expiresAt = Instant.now().plus(15, ChronoUnit.MINUTES);
+        Instant expiresAt = Instant.now().plus(1, ChronoUnit.HOURS);
         String tokenType = "access";
 
         return "Bearer " + generateToken(user, expiresAt, tokenType);
@@ -88,9 +88,17 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String generateConfirmationToken(User user) {
+    public String generateVerificationToken(User user) {
         Instant expiresAt = Instant.now().plus(24, ChronoUnit.HOURS);
-        String tokenType = "confirmation";
+        String tokenType = "verify";
+
+        return generateToken(user, expiresAt, tokenType);
+    }
+
+    @Override
+    public String generateRecoverPasswordToken(User user) {
+        Instant expiresAt = Instant.now().plus(30, ChronoUnit.MINUTES);
+        String tokenType = "recover";
 
         return generateToken(user, expiresAt, tokenType);
     }
@@ -118,7 +126,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     public String extractUsernameFromToken(String token) {
-        return jwtDecoder.decode(token).getSubject();
+        return jwtDecoder.decode(token).getSubject(); // TODO: catch jwt exception at decoding
     }
 
     public String extractTokenFromJson(String TokenJson) {

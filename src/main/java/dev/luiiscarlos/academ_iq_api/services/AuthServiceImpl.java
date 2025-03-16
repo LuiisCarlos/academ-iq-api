@@ -1,5 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.services;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -9,18 +10,18 @@ import org.springframework.stereotype.Service;
 import dev.luiiscarlos.academ_iq_api.exceptions.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidTokenException;
+import dev.luiiscarlos.academ_iq_api.exceptions.UserAccountNotVerifiedException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserAlreadyRegisteredException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserWithDifferentPasswordsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserUnderageException;
 import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
 import dev.luiiscarlos.academ_iq_api.models.Role;
 import dev.luiiscarlos.academ_iq_api.models.User;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserChangePasswordDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.UserResetPasswordDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.UserMapper;
 import dev.luiiscarlos.academ_iq_api.services.interfaces.AuthService;
 
@@ -50,12 +51,17 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Login a user
      *
+     * @param origin the origin of the request
      * @param loginRequest The user to login
      * @return The logged in user
      */
-    @Override
-    public UserLoginResponseDto login(UserLoginRequestDto loginRequest) {
+    public UserLoginResponseDto login(String origin, UserLoginRequestDto loginRequest) {
         User user = userService.findByUsername(loginRequest.getUsername());
+
+        if (!user.getIsAccountVerified()) {
+            emailService.sendEmailVerification(origin, user);
+            throw new UserAccountNotVerifiedException("Failed to login: User account is not verified");
+        }
 
         if (!passwordEncoder.matches(loginRequest.getPassword(),
                 user.getPassword().substring(ENCODED_PASSWORD_PREFIX.length())))
@@ -70,11 +76,11 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Register a new user
      *
+     * @param origin the origin of the request
      * @param registerRequest The user to register
      * @return The registered user
      */
-    @Override
-    public UserRegisterResponseDto register(UserRegisterRequestDto registerRequest) {
+    public UserRegisterResponseDto register(String origin, UserRegisterRequestDto registerRequest) {
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword()))
             throw new UserWithDifferentPasswordsException("Failed to register user: Passwords do not match");
 
@@ -91,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userMapper.toUser(registerRequest, encodedPassword, authorities);
 
-        emailService.sendConfirmationEmail(user);
+        emailService.sendEmailVerification(origin, user);
 
         return userMapper.toUserRegisterResponseDto(userService.save(user));
     }
@@ -102,7 +108,6 @@ public class AuthServiceImpl implements AuthService {
      * @param tokenJson The refresh token
      * @return The new access token
      */
-    @Override
     public String refresh(String tokenJson) {
         String token = tokenService.extractTokenFromJson(tokenJson);
 
@@ -116,11 +121,8 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Logout the user and invalidate the refresh token
      *
-     * @param request The request
-     * @param response The response
      * @param tokenJson The refresh token
      */
-    @Override
     @SuppressWarnings("null") // TODO: Review this
     public void logout(String tokenJson) {
         String token = tokenService.extractTokenFromJson(tokenJson);
@@ -143,48 +145,68 @@ public class AuthServiceImpl implements AuthService {
      * Verifies the user's email
      *
      * @param token The token
-     * @return The user
      */
-    @Override
-    public UserResponseDto verify(String token) {
+    public void verify(String token) {
         if (!tokenService.isValidToken(token))
             throw new InvalidTokenException("Failed to verify the email: Invalid token");
+
+        if (!"verify".equals(tokenService.getTokenType(token)))
+            throw new InvalidTokenException("Failed to verify the email: Invalid token type");
+
+        if (tokenService.getTokenExpiration(token).isBefore(Instant.now()))
+            throw new InvalidTokenException("Failed to verify the email: Token is expired");
 
         String username = tokenService.extractUsernameFromToken(token);
 
         User user = userService.findByUsername(username);
-        user.setIsEmailVerified(true);
-
-        return userMapper.toUserResponseDto(userService.save(user));
+        user.isAccountVerified(true);
+        userService.save(user);
     }
 
-    @Override
-    public String recoverPassword(String email) {
-        // ? QST: Implement this
-        throw new UnsupportedOperationException("Unimplemented method 'recoverPassword'");
+    /**
+     *  If the user account is verified, can recover his password by its email
+     *
+     * @param origin the origin of the request
+     * @param email the user's email
+     */
+    public void recoverPassword(String origin, String email) {
+        User user = userService.findByEmail(email);
+
+        if (!user.isAccountVerified())
+            throw new UserAccountNotVerifiedException("Failed to recover password: User's account is not verified");
+
+        emailService.sendEmailPasswordRecover(origin, user);
     }
 
     /**
      * Change the password of the current user
      *
-     * @param changePassword The new password and the old password
+     * @param token the recover token
+     * @param resetPassword the new password and its confirmation
      */
-    @Override
-    public void changePassword(String token, UserChangePasswordDto changePassword) {
-        token = token.substring(ENCODED_PASSWORD_PREFIX.length());
+    public void resetPassword(String token, UserResetPasswordDto resetPassword) {
+        if (!tokenService.isValidToken(token))
+            throw new InvalidTokenException("Failed to verify the email: Invalid token");
+
+        if (!"recover".equals(tokenService.getTokenType(token)))
+            throw new InvalidTokenException("Failed to verify the email: Invalid token type");
+
+        if (tokenService.getTokenExpiration(token).isBefore(Instant.now()))
+            throw new InvalidTokenException("Failed to verify the email: Token is expired");
+
         String username = tokenService.extractUsernameFromToken(token);
 
         User user = userService.findByUsername(username);
 
-        if (!passwordEncoder.matches(changePassword.getOldPassword(),
-                user.getPassword().substring(ENCODED_PASSWORD_PREFIX.length())))
-            throw new InvalidCredentialsException("Failed to change password: Invalid old password");
-
-        if (!changePassword.getNewPassword().equals(changePassword.getConfirmNewPassword()))
+        if (!resetPassword.getPassword().equals(resetPassword.getConfirmPassword()))
             throw new UserWithDifferentPasswordsException("Failed to change password: Passwords do not match");
 
-        user.setPassword(ENCODED_PASSWORD_PREFIX + passwordEncoder.encode(changePassword.getNewPassword()));
+        user.setPassword(ENCODED_PASSWORD_PREFIX + passwordEncoder.encode(resetPassword.getPassword()));
         userService.save(user);
     }
 
 }
+
+        /*if (!passwordEncoder.matches(resetPassword.getOldPassword(),
+            user.getPassword().substring(ENCODED_PASSWORD_PREFIX.length())))
+            throw new InvalidCredentialsException("Failed to change password: Invalid old password");*/

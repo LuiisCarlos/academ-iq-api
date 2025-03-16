@@ -15,7 +15,9 @@ public interface TokenService {
 
     RefreshToken generateRefreshToken(User user);
 
-    String generateConfirmationToken(User user);
+    String generateVerificationToken(User user);
+
+    String generateRecoverPasswordToken(User user);
 
     String refreshAccessToken(String token);
 

@@ -15,21 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import dev.luiiscarlos.academ_iq_api.exceptions.AuthCredentialsNotFoundException;
-import dev.luiiscarlos.academ_iq_api.exceptions.CourseNotFoundException;
-import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
-import dev.luiiscarlos.academ_iq_api.exceptions.InvalidPasswordException;
-import dev.luiiscarlos.academ_iq_api.exceptions.InvalidTokenException;
-import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenExpiredException;
-import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenNotFoundException;
-import dev.luiiscarlos.academ_iq_api.exceptions.RoleNotFoundException;
-import dev.luiiscarlos.academ_iq_api.exceptions.FileStorageException;
-import dev.luiiscarlos.academ_iq_api.exceptions.FileNotFoundException;
-import dev.luiiscarlos.academ_iq_api.exceptions.UserAlreadyRegisteredException;
-import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
-import dev.luiiscarlos.academ_iq_api.exceptions.UserWithDifferentPasswordsException;
-import dev.luiiscarlos.academ_iq_api.exceptions.UserUnderageException;
-
+import dev.luiiscarlos.academ_iq_api.exceptions.*;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -76,7 +62,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		BadJwtException.class,
 		UserUnderageException.class,
 		RefreshTokenExpiredException.class,
-		AccessDeniedException.class})
+		AccessDeniedException.class,
+		UserAccountNotVerifiedException.class})
 	public ResponseEntity<ErrorResponse> handleForbidden(Exception ex) {
 		return ResponseEntity
 			.status(HttpStatus.FORBIDDEN)

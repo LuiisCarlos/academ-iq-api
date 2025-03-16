@@ -45,8 +45,8 @@ public class SecurityConfiguration {
                 .requestMatchers("/actuator/**").hasAnyRole("ADMIN", "ENDPOINT_ADMIN")
                 .requestMatchers("/api/v1/auth/change-password/**").authenticated()
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/courses/{id}/**").hasAnyRole("ADMIN","ACADEMIQ_ADMIN") // TODO: Check post method course endpoint
-                .requestMatchers("/api/v1/courses/**").permitAll()
+                .requestMatchers("/api/v1/courses/{id}/**").hasAnyRole("ADMIN","ACADEMIQ_ADMIN")
+                .requestMatchers("/api/v1/courses/**").permitAll()  // TODO: Check post method course endpoint
                 .requestMatchers("/api/v1/users/@me/**").authenticated()
                 .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
                 .requestMatchers("/api/v1/files/**").permitAll() // TODO: Review this
