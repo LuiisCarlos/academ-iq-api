@@ -93,12 +93,20 @@ public class User implements UserDetails {
 
     @NonNull
     @Builder.Default
-    @Column(name = "is_email_verified")
-    private Boolean isEmailVerified = false;
+    @Column(name = "is_account_verified")
+    private Boolean isAccountVerified = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
+    }
+
+    public Boolean isAccountVerified() {
+        return this.isAccountVerified;
+    }
+
+    public void isAccountVerified(Boolean isVerified) {
+        this.isAccountVerified = isVerified;
     }
 
 }

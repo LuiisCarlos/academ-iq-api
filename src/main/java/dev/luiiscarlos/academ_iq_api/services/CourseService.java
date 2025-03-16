@@ -65,10 +65,10 @@ public class CourseService {
         String thumbnailUrl = "";
         String videoUrl = "";
 
-        if (!thumbnail.isEmpty() && thumbnail != null)
+        if (!thumbnail.isEmpty())
             thumbnailUrl = fileService.save(thumbnail, true).getUrl();
 
-        if (!video.isEmpty() && thumbnail != null)
+        if (!video.isEmpty())
             videoUrl = fileService.save(video, false).getUrl();
 
         Course course = courseMapper.toCourse(RequestResponse, thumbnailUrl, videoUrl);
@@ -92,10 +92,10 @@ public class CourseService {
         return courseRepository.findById(id).map(c -> {
             String thumbnailUrl = "";
             String videoUrl = "";
-            if (!thumbnail.isEmpty() && thumbnail != null)
+            if (!thumbnail.isEmpty())
                 thumbnailUrl = fileService.save(thumbnail, true).getUrl();
 
-            if (!video.isEmpty() && thumbnail != null)
+            if (!video.isEmpty())
                 videoUrl = fileService.save(video, false).getUrl();
 
             Course course = courseMapper.toCourse(RequestResponse, thumbnailUrl, videoUrl);
