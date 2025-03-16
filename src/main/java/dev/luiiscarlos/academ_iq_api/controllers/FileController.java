@@ -1,5 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.controllers;
 
+
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.services.FileServiceImpl;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,7 +24,7 @@ public class FileController {
 
 	@SuppressWarnings("null")// <- Already handled in the service layer
 	@GetMapping("/{filename:.+}")
-	public ResponseEntity<Resource> findResourceByFilename(@PathVariable String filename, HttpServletRequest request) {
+	public ResponseEntity<Resource> findResourceByFilename(@PathVariable String filename) {
 		File file = fileService.findByFilename(filename);
 		Resource resource = fileService.findResourceByFilename(filename);
 
@@ -37,4 +37,3 @@ public class FileController {
 	}
 
 }
-

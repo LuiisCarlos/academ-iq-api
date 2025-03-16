@@ -63,7 +63,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		UserUnderageException.class,
 		RefreshTokenExpiredException.class,
 		AccessDeniedException.class,
-		UserAccountNotVerifiedException.class})
+		UserAccountNotVerifiedException.class,
+		InvalidFileTypeException.class})
 	public ResponseEntity<ErrorResponse> handleForbidden(Exception ex) {
 		return ResponseEntity
 			.status(HttpStatus.FORBIDDEN)

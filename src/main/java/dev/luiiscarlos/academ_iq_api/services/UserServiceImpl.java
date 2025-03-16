@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
+import dev.luiiscarlos.academ_iq_api.exceptions.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.exceptions.FileStorageException;
 import dev.luiiscarlos.academ_iq_api.exceptions.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
@@ -136,6 +137,8 @@ public class UserServiceImpl implements UserService {
      */
     public FileResponseDto updateAvatarById(Long id, MultipartFile avatar) {
         if (avatar.isEmpty()) throw new FileStorageException("Failed to update user's avatar: Avatar is required");
+        if (!fileService.validateImage(avatar))
+            throw new InvalidFileTypeException("Failed to update avatar: Invalid file type");
 
         File file = fileService.save(avatar, true);
 

@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.FileStorageException;
+import dev.luiiscarlos.academ_iq_api.exceptions.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.controllers.FileController;
 import dev.luiiscarlos.academ_iq_api.exceptions.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.File;
@@ -31,13 +33,16 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
-
 public class FileServiceImpl implements FileService {
+
+	public static final String[] ALLOWED_IMAGE_TYPES = new String[] {"image/jpeg", "image/jpg", "image/png"};
+
+	public static final String[] ALLOWED_VIDEO_TYPES = new String[] {"video/mp4", "video/avi", "video/mkv"};
+
+	private final Path ROOT_LOCATION;
 
 	@Autowired
 	private final FileRepository fileRepository;
-
-	public final Path ROOT_LOCATION;
 
 	public FileServiceImpl(
 		@Value("${storage.root-location}") String rootLocation,
@@ -75,8 +80,13 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public File findByFilename(String filename) {
-		return fileRepository.findByFilename(filename)
+		File file =fileRepository.findByFilename(filename)
 			.orElseThrow(() -> new FileNotFoundException("Failed to find file: File not found with name " + filename));
+
+		if (!Arrays.asList(ALLOWED_IMAGE_TYPES).contains(file.getContentType()))
+			throw new InvalidFileTypeException("Failed to find file: Files with video content type can not be retrieve");
+
+		return file;
 	}
 
 	@Override
@@ -94,8 +104,8 @@ public class FileServiceImpl implements FileService {
         }
 	}
 
-	@SuppressWarnings("null") // <- This is a workaround to avoid the null pointer exception
 	@Override
+	@SuppressWarnings("null") // TODO: Review this
 	public File save(MultipartFile file, boolean isImage) {
 		if (file.isEmpty() || file == null) throw new FileStorageException("Failed to save file: File is required");
 
@@ -146,5 +156,19 @@ public class FileServiceImpl implements FileService {
 			throw new FileStorageException("Failed to delete file: " + e.getMessage());
 		}
 	}
+
+	public boolean validateImage(MultipartFile image) {
+        String contentType = image.getContentType();
+        if (!Arrays.asList(ALLOWED_IMAGE_TYPES).contains(contentType))
+            return false;
+        return true;
+    }
+
+	public boolean validateVideo(MultipartFile video) {
+        String contentType = video.getContentType();
+        if (!Arrays.asList(ALLOWED_VIDEO_TYPES).contains(contentType))
+			return false;
+        return true;
+    }
 
 }

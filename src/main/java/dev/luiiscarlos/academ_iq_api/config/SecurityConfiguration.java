@@ -4,6 +4,7 @@ package dev.luiiscarlos.academ_iq_api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -43,10 +44,10 @@ public class SecurityConfiguration {
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/actuator/**").hasAnyRole("ADMIN", "ENDPOINT_ADMIN")
-                .requestMatchers("/api/v1/auth/change-password/**").authenticated()
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/courses/{id}/**").hasAnyRole("ADMIN","ACADEMIQ_ADMIN")
-                .requestMatchers("/api/v1/courses/**").permitAll()  // TODO: Check post method course endpoint
+                .requestMatchers(HttpMethod.POST, "/api/v1/courses/**").hasAnyRole("ADMIN","ACADEMIQ_ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/courses/**").permitAll()
                 .requestMatchers("/api/v1/users/@me/**").authenticated()
                 .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
                 .requestMatchers("/api/v1/files/**").permitAll() // TODO: Review this
@@ -63,8 +64,7 @@ public class SecurityConfiguration {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http
-            .exceptionHandling(exception -> exception
-                .accessDeniedHandler(accessDeniedHandler));
+            .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler));
 
         http
             .addFilterBefore(exceptionHandlingFilter, UsernamePasswordAuthenticationFilter.class)
@@ -87,17 +87,5 @@ public class SecurityConfiguration {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
-
-    /*
-    @Bean
-    UrlBasedCorsConfigurationSource corsConfigurationSource() { // TODO: Cors config
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://localhost:9999/"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-    */
 
 }

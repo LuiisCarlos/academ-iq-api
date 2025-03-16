@@ -2,6 +2,7 @@ package dev.luiiscarlos.academ_iq_api.services;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +29,9 @@ import dev.luiiscarlos.academ_iq_api.services.interfaces.AuthService;
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -70,6 +73,7 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = tokenService.generateAccessToken(user);
         RefreshToken refreshToken = tokenService.generateRefreshToken(user);
 
+        log.info("User " + user.getUsername() + " has successfully logged in at " + LocalDateTime.now());
         return userMapper.toUserLoginResponseDto(user, accessToken, refreshToken.getToken(), refreshToken.getExpiresAt());
     }
 
@@ -125,7 +129,6 @@ public class AuthServiceImpl implements AuthService {
      */
     @SuppressWarnings("null") // TODO: Review this
     public void logout(String token) {
-        System.out.println("\n" + token + "\n");
         if (token == null)
             throw new AuthCredentialsNotFoundException("Failed to logout: Refresh token is required");
 
@@ -140,6 +143,7 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidTokenException("Failed to logout: Invalid refresh token");
 
         tokenService.invalidateRefreshToken(refreshToken.getToken());
+        log.info("User " + user.getUsername() + " has successfully logged out at " + LocalDateTime.now());
     }
 
     /**
@@ -162,6 +166,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userService.findByUsername(username);
         user.isAccountVerified(true);
         userService.save(user);
+        log.info("User " + user.getUsername() + " has successfully verified the account at " + LocalDateTime.now());
     }
 
     /**

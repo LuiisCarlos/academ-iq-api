@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.CourseNotFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.models.Course;
 import dev.luiiscarlos.academ_iq_api.models.dtos.CourseRequestResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
@@ -64,6 +65,9 @@ public class CourseService {
              MultipartFile video) {
         String thumbnailUrl = "";
         String videoUrl = "";
+
+        if (!fileService.validateImage(thumbnail) || !fileService.validateVideo(video))
+            throw new InvalidFileTypeException("Failed to save a file: Thumbnail or video has an invalid type");
 
         if (!thumbnail.isEmpty())
             thumbnailUrl = fileService.save(thumbnail, true).getUrl();
