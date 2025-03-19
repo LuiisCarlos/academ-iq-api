@@ -5,6 +5,10 @@ import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -46,7 +50,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
             token = token.substring(7);
             Instant expiresAt = tokenService.getTokenExpiration(token);
             String tokenType = tokenService.getTokenType(token);
-            //Jwt jwt = tokenService.getJwtToken(token);
+            Jwt jwt = tokenService.getJwtToken(token);
 
             if (!tokenService.isValidToken(token)) {
                 errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
@@ -66,8 +70,8 @@ public class AccessTokenFilter extends OncePerRequestFilter {
                 return;
             }
 
-            //JwtAuthenticationToken authentication = new JwtAuthenticationToken(jwt);
-            //SecurityContextHolder.getContext().setAuthentication(authentication);
+            Authentication authentication = new JwtAuthenticationToken(jwt);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);

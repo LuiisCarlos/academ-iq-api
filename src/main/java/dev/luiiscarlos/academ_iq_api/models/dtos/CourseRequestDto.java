@@ -1,11 +1,11 @@
 package dev.luiiscarlos.academ_iq_api.models.dtos;
 
-import lombok.Builder;
+import java.util.List;
+
 import lombok.Data;
 
 @Data
-@Builder
-public class CourseRequestResponseDto {
+public class CourseRequestDto {
 
     private String name;
 
@@ -13,13 +13,10 @@ public class CourseRequestResponseDto {
 
     private String author;
 
-    private String thumbnailUrl;
-
-    private String videoUrl;
+    private List<String> recommendedRequirements;
 
     private String category;
 
     private String level;
 
-    private String duration;
 }

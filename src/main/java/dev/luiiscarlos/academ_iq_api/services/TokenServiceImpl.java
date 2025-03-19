@@ -1,6 +1,8 @@
 package dev.luiiscarlos.academ_iq_api.services;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
@@ -73,18 +75,19 @@ public class TokenServiceImpl implements TokenService {
 
     public RefreshToken generateRefreshToken(User user) {
         Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
-        String tokenType = "refresh";
+        ZoneId zoneId = ZoneId.of("Europe/Madrid");
 
+        String tokenType = "refresh";
         String token = TOKEN_PREFIX + generateToken(user, expiresAt, tokenType);
 
         RefreshToken refreshToken = refreshTokenRepository.findByUser(user).map(rt -> {
             rt.setToken(token);
-            rt.setExpiresAt(expiresAt);
+            rt.setExpiresAt(LocalDateTime.ofInstant(expiresAt, zoneId));
             return rt;
         }).orElse(RefreshToken.builder()
             .token(token)
             .user(user)
-            .expiresAt(expiresAt)
+            .expiresAt(LocalDateTime.ofInstant(expiresAt, zoneId))
             .build());
 
         return refreshTokenRepository.save(refreshToken);
@@ -113,7 +116,7 @@ public class TokenServiceImpl implements TokenService {
         if (!isValidToken(token))
             throw new InvalidCredentialsException("Failed to refresh access token: Invalid refresh token");
 
-        if (refreshToken.getExpiresAt().isBefore(Instant.now()))
+        if (refreshToken.getExpiresAt().isBefore(LocalDateTime.now()))
             throw new RefreshTokenExpiredException("Failed to refresh access token: Expired refresh token");
 
         return generateAccessToken(refreshToken.getUser());
@@ -126,10 +129,6 @@ public class TokenServiceImpl implements TokenService {
         } catch (JwtException e) {
             return false;
         }
-    }
-
-    public String extractUsernameFromToken(String token) {
-        return jwtDecoder.decode(token).getSubject(); // TODO: catch jwt exception at decoding
     }
 
     public String extractTokenFromJson(String TokenJson) {
@@ -162,6 +161,14 @@ public class TokenServiceImpl implements TokenService {
     public Instant getTokenExpiration(String token) {
         try {
             return jwtDecoder.decode(token).getExpiresAt();
+        } catch (JwtException ex){
+            throw new InvalidTokenException("Failed to validate token: Malformed Token");
+        }
+    }
+
+    public String getTokenSubject(String token) {
+        try {
+            return jwtDecoder.decode(token).getSubject();
         } catch (JwtException ex){
             throw new InvalidTokenException("Failed to validate token: Malformed Token");
         }

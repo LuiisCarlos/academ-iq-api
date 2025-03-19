@@ -1,15 +1,26 @@
 package dev.luiiscarlos.academ_iq_api.services;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import dev.luiiscarlos.academ_iq_api.exceptions.CourseAlreadyExistsEception;
 import dev.luiiscarlos.academ_iq_api.exceptions.CourseNotFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.models.Course;
-import dev.luiiscarlos.academ_iq_api.models.dtos.CourseRequestResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.File;
+import dev.luiiscarlos.academ_iq_api.models.Level;
+import dev.luiiscarlos.academ_iq_api.models.Section;
+import dev.luiiscarlos.academ_iq_api.models.dtos.CourseRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.CourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
+import dev.luiiscarlos.academ_iq_api.models.mappers.FileMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.CourseRepository;
 
 import jakarta.transaction.Transactional;
@@ -23,22 +34,75 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
+    private final FileServiceImpl fileService;
+
     private final CourseMapper courseMapper;
 
-    private final FileServiceImpl fileService;
+    private final FileMapper fileMapper;
+
+    /**
+     * Saves the course
+     *
+     * @param courseRequest the course details
+     * @return the course
+     */
+    public CourseResponseDto save(CourseRequestDto courseRequest) {
+        if (courseRepository.existsByName(courseRequest.getName()))
+            throw new CourseAlreadyExistsEception("Failed to save course: Course already exists");
+
+        File file = fileService.findByFilename("default-course-thumbnail.jpg");
+        Course course = courseRepository.save(courseMapper.toCourse(courseRequest, file));
+
+        return courseMapper.toCourseResponseDto(course);
+    }
+
+
+    public CourseResponseDto saveSectionById(Long id, String sectionName, MultipartFile ...videos) { // TODO: Create exception classes
+        Course course = this.findById(id);
+        List<File> files = new ArrayList<>();
+
+        if (videos.length == 0 || videos == null)
+            throw new RuntimeException("Failed to create section: No videos found");
+
+        for (MultipartFile video : videos) {
+            if (!fileService.validateVideo(video) || fileService.validateImage(video))
+                throw new InvalidFileTypeException("Failed to create section: Invalid video content type " + video.getContentType());
+
+            if (video.isEmpty())
+                throw new RuntimeException("Failed to create section: video is empty"); // TODO: Review this
+
+            files.add(fileService.save(video, false));
+        }
+
+        Section section = Section.builder()
+            .name(sectionName)
+            .course(course)
+            .videos(files)
+            .build();
+
+        List<Section> sections = course.getSections();
+
+        if (sections == null || sections.isEmpty())
+            sections = new ArrayList<>();
+        sections.add(section);
+
+        course.setSections(sections);
+
+        return courseMapper.toCourseResponseDto(courseRepository.save(course));
+    }
 
     /**
      * Find all courses
      *
      * @return the list of the courses
      */
-    public List<Course> findAll() {
+    public List<CourseResponseDto> findAll() {
         List<Course> courses = courseRepository.findAll();
 
         if (courses.isEmpty())
             throw new CourseNotFoundException("Failed to find courses: No courses found");
 
-        return courses;
+        return courses.stream().map(courseMapper::toCourseResponseDto).toList();
     }
 
     /**
@@ -53,60 +117,67 @@ public class CourseService {
     }
 
     /**
-     * Saves the course
+     * Finds the course's thumbnail by its id
      *
-     * @param RequestResponse the course infomation
-     * @param thumbnail the thumbnail of the course
-     * @param video the video of the course
-     * @return the course
+     * @param id the course's id
+     * @return the course's thumbnail
      */
-    public CourseRequestResponseDto save(CourseRequestResponseDto RequestResponse,
-             MultipartFile thumbnail,
-             MultipartFile video) {
-        String thumbnailUrl = "";
-        String videoUrl = "";
+    @SuppressWarnings("null") // * Already handled
+    public FileResponseDto findThumbnailById(Long id) {
+        Course course = courseRepository.findById(id)
+            .orElseThrow(() -> new CourseNotFoundException("Failed to find course: Course not found with id " + id));
 
-        if (!fileService.validateImage(thumbnail) || !fileService.validateVideo(video))
-            throw new InvalidFileTypeException("Failed to save a file: Thumbnail or video has an invalid type");
-
-        if (!thumbnail.isEmpty())
-            thumbnailUrl = fileService.save(thumbnail, true).getUrl();
-
-        if (!video.isEmpty())
-            videoUrl = fileService.save(video, false).getUrl();
-
-        Course course = courseMapper.toCourse(RequestResponse, thumbnailUrl, videoUrl);
-        courseRepository.save(course);
-
-        return courseMapper.toCourseRequestResponseDto(course);
+        File file = fileService.findByFilename(course.getThumbnail().getFilename());
+        return fileMapper.toFileResponseDto(file);
     }
 
     /**
      * Updates the course by its id
      *
-     * @param RequestResponse the course infomation
-     * @param thumbnail the thumbnail of the course
-     * @param video the video of the course
+     * @param RequestResponse the course details
      * @return the course
      */
-    public CourseRequestResponseDto updateById(Long id,
-            CourseRequestResponseDto RequestResponse,
-            MultipartFile thumbnail,
-            MultipartFile video) {
-        return courseRepository.findById(id).map(c -> {
-            String thumbnailUrl = "";
-            String videoUrl = "";
-            if (!thumbnail.isEmpty())
-                thumbnailUrl = fileService.save(thumbnail, true).getUrl();
+    public CourseResponseDto updateById(Long id, CourseRequestDto courseRequest) {
+        Course course =  courseRepository.findById(id).map(c -> {
+            c.setName(courseRequest.getName());
+            c.setDescription(courseRequest.getDescription());
+            c.setAuthor(courseRequest.getAuthor());
+            c.setRecommendedRequirements(courseRequest.getRecommendedRequirements());
+            c.setCategory(courseRequest.getCategory());
+            c.setLevel(Level.valueOf(courseRequest.getLevel()));
+            // TODO: Calcular duración
 
-            if (!video.isEmpty())
-                videoUrl = fileService.save(video, false).getUrl();
-
-            Course course = courseMapper.toCourse(RequestResponse, thumbnailUrl, videoUrl);
-            courseRepository.save(course);
-
-            return courseMapper.toCourseRequestResponseDto(course);
+            return courseRepository.save(c);
         }).orElseThrow(() -> new CourseNotFoundException("Failed to find a course: Course not found with id " + id));
+
+        return courseMapper.toCourseResponseDto(course);
+    }
+
+    /**
+     * Updates the course's thumbnail by its id
+     *
+     * @param id the id of the course
+     * @param thumbnail the new thumbnail
+     * @return the updated course
+     */
+    @SuppressWarnings("null") // * Already handled
+    public CourseResponseDto updateThumbnailById(Long id, MultipartFile thumbnail) {
+        if (thumbnail.isEmpty())
+        throw new FileNotFoundException("Failed to save file: Thumbnail not found");
+        if (!fileService.validateImage(thumbnail))
+            throw new InvalidFileTypeException("Failed to update thumbnail: Invalid file content type");
+
+        Course course = courseRepository.findById(id).map(c -> {
+            fileService.deleteByFilename(c.getThumbnail().getFilename());
+
+            File file = fileService.save(thumbnail, true);
+            file.setUpdatedAt(LocalDateTime.now());
+            c.setThumbnail(file);
+
+            return courseRepository.save(c);
+        }).orElseThrow(() -> new CourseNotFoundException("Failed to find a course: Course not found with id " + id));
+
+        return courseMapper.toCourseResponseDto(course);
     }
 
     /**

@@ -12,9 +12,10 @@ import dev.luiiscarlos.academ_iq_api.exceptions.AuthCredentialsNotFoundException
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidTokenException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserAccountNotVerifiedException;
-import dev.luiiscarlos.academ_iq_api.exceptions.UserAlreadyRegisteredException;
+import dev.luiiscarlos.academ_iq_api.exceptions.UserAlreadyExistsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserWithDifferentPasswordsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserUnderageException;
+import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
 import dev.luiiscarlos.academ_iq_api.models.Role;
 import dev.luiiscarlos.academ_iq_api.models.User;
@@ -49,6 +50,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final RoleService roleService;
 
+    private final FileServiceImpl fileService;
+
     private final UserMapper userMapper;
 
     /**
@@ -61,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
     public UserLoginResponseDto login(String origin, UserLoginRequestDto loginRequest) {
         User user = userService.findByUsername(loginRequest.getUsername());
 
-        if (!user.getIsAccountVerified()) {
+        if (!user.isVerified()) {
             emailService.sendEmailVerification(origin, user);
             throw new UserAccountNotVerifiedException("Failed to login: User account is not verified");
         }
@@ -89,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
             throw new UserWithDifferentPasswordsException("Failed to register user: Passwords do not match");
 
         if (userService.existsByUsername(registerRequest.getUsername()))
-            throw new UserAlreadyRegisteredException("Failed to register user: Invalid username or password");
+            throw new UserAlreadyExistsException("Failed to register user: Invalid username or password");
 
         if (LocalDate.parse(registerRequest.getBirthdate()).isAfter(LocalDate.now().minusYears(18)))
             throw new UserUnderageException("Failed to register user: User is underage");
@@ -97,9 +100,9 @@ public class AuthServiceImpl implements AuthService {
         String encodedPassword = ENCODED_PASSWORD_PREFIX + passwordEncoder.encode(registerRequest.getPassword());
 
         Role userRole = roleService.findByAuthority("USER");
-        Set<Role> authorities = Set.of(userRole);
+        File defaltAvatar = fileService.findByFilename("default-user-avatar.png");
 
-        User user = userMapper.toUser(registerRequest, encodedPassword, authorities);
+        User user = userMapper.toUser(registerRequest, encodedPassword, Set.of(userRole), defaltAvatar);
 
         emailService.sendEmailVerification(origin, user);
 
@@ -136,7 +139,7 @@ public class AuthServiceImpl implements AuthService {
         RefreshToken refreshToken = tokenService.findByToken(token);
 
         token = token.startsWith("Bearer ") ? token.substring(7) : token;
-        String username = tokenService.extractUsernameFromToken(token);
+        String username = tokenService.getTokenSubject(token);
         User user = userService.findByUsername(username);
 
         if (!refreshToken.getUser().getId().equals(user.getId()))
@@ -161,10 +164,10 @@ public class AuthServiceImpl implements AuthService {
         if (tokenService.getTokenExpiration(token).isBefore(Instant.now()))
             throw new InvalidTokenException("Failed to verify the email: Token is expired");
 
-        String username = tokenService.extractUsernameFromToken(token);
+        String username = tokenService.getTokenSubject(token);
 
         User user = userService.findByUsername(username);
-        user.isAccountVerified(true);
+        user.setVerified(true);
         userService.save(user);
         log.info("User " + user.getUsername() + " has successfully verified the account at " + LocalDateTime.now());
     }
@@ -178,7 +181,7 @@ public class AuthServiceImpl implements AuthService {
     public void recoverPassword(String origin, String email) {
         User user = userService.findByEmail(email);
 
-        if (!user.isAccountVerified())
+        if (!user.isVerified())
             throw new UserAccountNotVerifiedException("Failed to recover password: User's account is not verified");
 
         emailService.sendEmailPasswordRecover(origin, user);
@@ -200,7 +203,7 @@ public class AuthServiceImpl implements AuthService {
         if (tokenService.getTokenExpiration(token).isBefore(Instant.now()))
             throw new InvalidTokenException("Failed to verify the email: Token is expired");
 
-        String username = tokenService.extractUsernameFromToken(token);
+        String username = tokenService.getTokenSubject(token);
 
         User user = userService.findByUsername(username);
 

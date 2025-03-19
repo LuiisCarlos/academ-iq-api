@@ -32,6 +32,9 @@ public class File {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Nullable
+    private String name;
+
     @NonNull
     private String filename;
 
@@ -50,17 +53,34 @@ public class File {
 
     @Nullable
     @Builder.Default
+    @Column(name = "is_image")
     private Boolean isImage = true;
 
     @Nullable
     @Builder.Default
-    @Column(name = "created_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "is_default_file")
+    private Boolean isDefaultFile = false;
 
     @Nullable
+    @Builder.Default
     @Column(name = "updated_at")
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    public Boolean isImage() {
+        return this.isImage;
+    }
+
+    public void setImage(Boolean isImage) {
+        this.isImage = isImage;
+    }
+
+    public Boolean isDefaultFile() {
+        return this.isDefaultFile;
+    }
+
+    public void setDefaultFile(Boolean isDefaultFile) {
+        this.isDefaultFile = isDefaultFile;
+    }
 
 }

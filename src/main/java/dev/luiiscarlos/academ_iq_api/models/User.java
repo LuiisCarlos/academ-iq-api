@@ -1,5 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.models;
 
+import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,6 +25,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -60,10 +63,10 @@ public class User implements UserDetails {
     )
     private Set<Role> authorities;
 
-    @NonNull
-    @Builder.Default
-    @Column(name = "avatar_url")
-    private String avatarUrl = "http://localhost:8888/api/v1/files/default-user-avatar.png";
+    @Nullable
+    @ManyToOne
+    @JoinColumn(name = "file_id")
+    private File avatar;
 
     @NonNull
     private String email;
@@ -82,8 +85,8 @@ public class User implements UserDetails {
 
     @NonNull
     @Builder.Default
-    @OneToMany(mappedBy = "user")
-    private List<Enrollment> enrollments = List.of();
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Enrollment> enrollments = new ArrayList<>();
 
     @NonNull
     @Builder.Default
@@ -93,20 +96,20 @@ public class User implements UserDetails {
 
     @NonNull
     @Builder.Default
-    @Column(name = "is_account_verified")
-    private Boolean isAccountVerified = false;
+    @Column(name = "is_verified")
+    private Boolean isVerified = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
-    public Boolean isAccountVerified() {
-        return this.isAccountVerified;
+    public Boolean isVerified() {
+        return this.isVerified;
     }
 
-    public void isAccountVerified(Boolean isVerified) {
-        this.isAccountVerified = isVerified;
+    public void setVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
     }
 
 }

@@ -1,6 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.models.dtos;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
@@ -31,6 +32,7 @@ public class UserLoginResponseDto {
 
     private String refreshToken;
 
-    private String refreshTokenExpiresAt;
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime refreshTokenExpiresAt;
 
 }

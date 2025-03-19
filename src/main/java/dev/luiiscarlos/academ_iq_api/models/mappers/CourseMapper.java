@@ -1,62 +1,57 @@
 package dev.luiiscarlos.academ_iq_api.models.mappers;
 
-import java.time.LocalTime;
-
 import org.springframework.stereotype.Component;
-
 import dev.luiiscarlos.academ_iq_api.models.Course;
+import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.Level;
-import dev.luiiscarlos.academ_iq_api.models.dtos.CourseRequestResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.CourseRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.CourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.EnrollmentCourseResponseDto;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class CourseMapper {
 
-    public Course toCourse(CourseRequestResponseDto course) {
+    private final SectionMapper sectionMapper;
+
+    public Course toCourse(CourseRequestDto courseRequest, File thumbnail) {
         return Course.builder()
-            .name(course.getName())
-            .description(course.getDescription())
-            .author(course.getAuthor())
-            .category(course.getCategory())
-            .level(Level.valueOf(course.getLevel()))
-            .duration(LocalTime.parse(course.getDuration()))
+            .name(courseRequest.getName())
+            .description(courseRequest.getDescription())
+            .author(courseRequest.getAuthor())
+            .thumbnail(thumbnail)
+            .recommendedRequirements(courseRequest.getRecommendedRequirements())
+            .category(courseRequest.getCategory())
+            .level(Level.valueOf(courseRequest.getLevel()))
             .build();
     }
 
-    public Course toCourse(CourseRequestResponseDto course, String videoUrl) {
-        return Course.builder()
+    @SuppressWarnings("null") // Already handled
+    public CourseResponseDto toCourseResponseDto(Course course) {
+        return CourseResponseDto.builder()
             .name(course.getName())
             .description(course.getDescription())
             .author(course.getAuthor())
-            .videoUrl(videoUrl)
+            .thumbnailUrl(course.getThumbnail().getUrl())
+            .recommendedRequirements(course.getRecommendedRequirements())
             .category(course.getCategory())
-            .level(Level.valueOf(course.getLevel()))
-            .duration(LocalTime.parse(course.getDuration()))
-            .build();
-    }
-
-    public Course toCourse(CourseRequestResponseDto course, String thumbnailUrl, String videoUrl) {
-        return Course.builder()
-            .name(course.getName())
-            .description(course.getDescription())
-            .author(course.getAuthor())
-            .thumbnailUrl(thumbnailUrl)
-            .videoUrl(videoUrl)
-            .category(course.getCategory())
-            .level(Level.valueOf(course.getLevel()))
-            .duration(LocalTime.parse(course.getDuration()))
-            .build();
-    }
-
-    public CourseRequestResponseDto toCourseRequestResponseDto(Course course) {
-        return CourseRequestResponseDto.builder()
-            .name(course.getName())
-            .description(course.getDescription())
-            .author(course.getAuthor())
-            .thumbnailUrl(course.getThumbnailUrl())
-            .videoUrl(course.getVideoUrl())
-            .category(course.getCategory())
+            .sections(course.getSections().stream().map(sectionMapper::toSectionResponseDto).toList())
+            .rating(course.getRating())
             .level(course.getLevel().toString())
-            .duration(course.getDuration().toString())
+            .duration(course.getDuration())
+            .createdAt(course.getCreatedAt())
+            .build();
+    }
+
+    @SuppressWarnings("null") // Already handled
+    public EnrollmentCourseResponseDto toEnrollmentCourseResponseDto(Course course) {
+        return EnrollmentCourseResponseDto.builder()
+            .name(course.getName())
+            .author(course.getAuthor())
+            .thumbnailUrl(course.getThumbnail().getUrl())
+            .category(course.getCategory())
             .build();
     }
 

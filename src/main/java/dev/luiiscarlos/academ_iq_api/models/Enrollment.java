@@ -1,6 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.models;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -46,13 +46,26 @@ public class Enrollment {
 
     @Nullable
     @Builder.Default
-    @Column(name = "started_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
-    private LocalDate startedAt = LocalDate.now();
+    private Double progress = 0.0;
 
     @Nullable
     @Builder.Default
-    private Double progress = 0.0;
+    @Column(name = "rating")
+    private Integer rating = 0;
+
+    @Nullable
+    @Builder.Default
+    private String comment = "";
+
+    @Nullable
+    @Builder.Default
+    @Column(name = "is_favorite")
+    private Boolean isFavorite = false;
+
+    @Nullable
+    @Builder.Default
+    @Column(name = "is_archived")
+    private Boolean isArchived = false;
 
     @Nullable
     @Builder.Default
@@ -60,8 +73,33 @@ public class Enrollment {
     private Boolean isCompleted = false;
 
     @Nullable
-    @Column(name = "completed_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
-    private LocalDate completedAt;
+    @Builder.Default
+    @Column(name = "enrolled_at")
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime enrolledAt = LocalDateTime.now();
+
+    public Boolean isFavorite() {
+        return this.isFavorite;
+    }
+
+    public void setFavorite(Boolean isFavorite) {
+        this.isFavorite = isFavorite;
+    }
+
+    public Boolean isArchived() {
+        return this.isArchived;
+    }
+
+    public void setArchived(Boolean isArchived) {
+        this.isArchived = isArchived;
+    }
+
+    public Boolean isCompleted() {
+        return this.isCompleted;
+    }
+
+    public void setCompleted(Boolean isCompleted) {
+        this.isCompleted = isCompleted;
+    }
 
 }

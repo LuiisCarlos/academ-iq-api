@@ -35,7 +35,7 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class FileServiceImpl implements FileService {
 
-	public static final String[] ALLOWED_IMAGE_TYPES = new String[] {"image/jpeg", "image/jpg", "image/png"};
+	public static final String[] ALLOWED_IMAGE_TYPES = new String[] {"image/jpeg", "image/png"};
 
 	public static final String[] ALLOWED_VIDEO_TYPES = new String[] {"video/mp4", "video/avi", "video/mkv"};
 
@@ -80,10 +80,10 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public File findByFilename(String filename) {
-		File file =fileRepository.findByFilename(filename)
+		File file = fileRepository.findByFilename(filename)
 			.orElseThrow(() -> new FileNotFoundException("Failed to find file: File not found with name " + filename));
 
-		if (!Arrays.asList(ALLOWED_IMAGE_TYPES).contains(file.getContentType()))
+		if (!file.isImage()) //TODO: return video if authenticated else return bad request
 			throw new InvalidFileTypeException("Failed to find file: Files with video content type can not be retrieve");
 
 		return file;
@@ -122,7 +122,7 @@ public class FileServiceImpl implements FileService {
 			String contentType = file.getContentType() == null ? "application/octet-stream" : file.getContentType();
 
 			String urlFile = MvcUriComponentsBuilder
-				.fromMethodName(FileController.class, "findResourceByFilename", storedFilename, null)
+				.fromMethodName(FileController.class, "findResourceByFilename", storedFilename)
 				.build()
 				.toUriString();
 
@@ -147,10 +147,11 @@ public class FileServiceImpl implements FileService {
 			throw new FileNotFoundException("Failed to delete file: File not found with name " + filename);
 
 		try {
-			if (!"default-user-avatar.png".equals(filename)) {
+			File file = fileRepository.findByFilename(filename).get();
+			if (!file.isDefaultFile()) {
 				fileRepository.deleteByFilename(filename);
-				Path file = ROOT_LOCATION.resolve(filename);
-				Files.deleteIfExists(file);
+				Path filePath = ROOT_LOCATION.resolve(filename);
+				Files.deleteIfExists(filePath);
 			}
 		} catch (IOException e) {
 			throw new FileStorageException("Failed to delete file: " + e.getMessage());

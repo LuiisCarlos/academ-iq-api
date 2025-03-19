@@ -25,8 +25,8 @@ public class FileController {
 	@SuppressWarnings("null")// <- Already handled in the service layer
 	@GetMapping("/{filename:.+}")
 	public ResponseEntity<Resource> findResourceByFilename(@PathVariable String filename) {
-		File file = fileService.findByFilename(filename);
 		Resource resource = fileService.findResourceByFilename(filename);
+		File file = fileService.findByFilename(filename);
 
 		String contentType = file.getContentType();
 

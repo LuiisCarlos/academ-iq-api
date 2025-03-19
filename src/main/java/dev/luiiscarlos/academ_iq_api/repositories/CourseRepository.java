@@ -20,4 +20,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     List<Course> findByCreatedAt(LocalDateTime createdAt);
 
+    Boolean existsByName(String name);
+
 }

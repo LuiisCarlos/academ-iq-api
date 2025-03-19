@@ -1,19 +1,18 @@
 package dev.luiiscarlos.academ_iq_api.models;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-
-import io.micrometer.common.lang.Nullable;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -27,31 +26,30 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "refresh_tokens")
-public class RefreshToken {
+@Table(name = "sections")
+public class Section {
 
     @Id
     @Nullable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
-    @Column(length = 600)
-    private String token;
-
-    @NonNull
+    @Nullable
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "course_id")
+    private Course course;
 
     @NonNull
-    @Column(name = "expires_at")
-    private LocalDateTime expiresAt;
+    private String name;
 
     @Nullable
+    @ManyToMany
     @Builder.Default
-    @Column(name = "created_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @JoinTable(
+            name = "section_file_junction",
+            joinColumns = { @JoinColumn(name = "section_id") },
+            inverseJoinColumns = { @JoinColumn(name = "file_id") }
+    )
+    private List<File> videos = new ArrayList<>();
 
 }

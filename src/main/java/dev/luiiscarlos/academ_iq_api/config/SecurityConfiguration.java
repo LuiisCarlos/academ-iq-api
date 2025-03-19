@@ -46,8 +46,8 @@ public class SecurityConfiguration {
                 .requestMatchers("/actuator/**").hasAnyRole("ADMIN", "ENDPOINT_ADMIN")
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/courses/{id}/**").hasAnyRole("ADMIN","ACADEMIQ_ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/v1/courses/**").hasAnyRole("ADMIN","ACADEMIQ_ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/v1/courses/**").permitAll()
+                .requestMatchers( "/api/v1/courses/**").hasAnyRole("ADMIN","ACADEMIQ_ADMIN")
                 .requestMatchers("/api/v1/users/@me/**").authenticated()
                 .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
                 .requestMatchers("/api/v1/files/**").permitAll() // TODO: Review this

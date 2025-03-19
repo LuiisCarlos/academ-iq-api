@@ -24,7 +24,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		AuthCredentialsNotFoundException.class,
 		FileNotFoundException.class,
 		RefreshTokenNotFoundException.class,
-		CourseNotFoundException.class})
+		CourseNotFoundException.class,
+		EnrollmentNotFoundException.class})
 	public ResponseEntity<ErrorResponse> handleNotFound(Exception ex) {
 		return ResponseEntity
 			.status(HttpStatus.NOT_FOUND)
@@ -34,11 +35,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				.message(ex.getMessage()).build());
 	}
 
-	@ExceptionHandler({UserAlreadyRegisteredException.class,
+	@ExceptionHandler({UserAlreadyExistsException.class,
 		UserWithDifferentPasswordsException.class,
 		InvalidPasswordException.class,
 		FileStorageException.class,
-		InvalidTokenException.class})
+		InvalidTokenException.class,
+		CourseAlreadyExistsEception.class,
+		InvalidRatingException.class})
 	public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex) {
 		return ResponseEntity
 			.status(HttpStatus.BAD_REQUEST)

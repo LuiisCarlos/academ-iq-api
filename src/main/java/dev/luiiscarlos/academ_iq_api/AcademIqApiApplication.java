@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.Role;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.repositories.RefreshTokenRepository;
@@ -34,26 +35,47 @@ public class AcademIqApiApplication {
 			RefreshTokenRepository refreshTokenRepository,
 			TokenService tokenService,
 			PasswordEncoder passwordEncoder,
-			RoleService roleService) {
+			RoleService roleService,
+			FileServiceImpl fileService) {
 		return args -> {
+			File avatar = fileService.findByFilename("default-user-avatar.png");
+
+			Role userRole = roleService.findByAuthority("USER");
 			Role adminRole = roleService.findByAuthority("ADMIN");
-        	Set<Role> authorities = Set.of(adminRole);
 
 			User user = User.builder()
+				.username("user")
+				.password("{bcrypt}" + passwordEncoder.encode("user"))
+				.email("user@academ-iq.net")
+				.firstname("user")
+				.lastname("user")
+				.birthdate(LocalDate.of(2000,1,1))
+				.authorities(Set.of(userRole))
+				.avatar(avatar)
+				.phone("999999999")
+				.isVerified(true)
+				.build();
+			User admin = User.builder()
 				.username("admin")
 				.password("{bcrypt}" + passwordEncoder.encode("admin"))
 				.email("admin@academ-iq.net")
 				.firstname("admin")
 				.lastname("admin")
 				.birthdate(LocalDate.of(2000,1,1))
-				.authorities(authorities)
+				.authorities(Set.of(adminRole))
+				.avatar(avatar)
 				.phone("999999999")
-				.isAccountVerified(true)
+				.isVerified(true)
 				.build();
-			userRepository.save(user);
 
-			System.out.println("\nAdmin access token: " + tokenService.generateAccessToken(user) + "\n");
+			userRepository.save(user);
+			userRepository.save(admin);
+
+			System.out.println("\nUser access token: " + tokenService.generateAccessToken(user) + "\n");
 			refreshTokenRepository.save(tokenService.generateRefreshToken(user));
+
+			System.out.println("Admin access token: " + tokenService.generateAccessToken(admin) + "\n");
+			refreshTokenRepository.save(tokenService.generateRefreshToken(admin));
 		};
 	}
 
