@@ -26,13 +26,13 @@ public class FileController {
 
 	@SuppressWarnings("null")// <- Already handled
 	@GetMapping("/{filename:.+}")
-	public ResponseEntity<Resource> findResourceByFilename(HttpServletRequest request, @PathVariable String filename) {
+	public ResponseEntity<Resource> findResourceByFilename(@PathVariable String filename, HttpServletRequest request) {
 		Resource resource = fileService.findResourceByFilename(filename);
 		File file = fileService.findByFilename(request.getHeader("Authorization"), filename);
 		String contentType = file.getContentType();
 
 		return ResponseEntity
-			.status(HttpStatus.OK)
+            .status(HttpStatus.OK)
 			.contentType(MediaType.parseMediaType(contentType))
 			.body(resource);
 	}

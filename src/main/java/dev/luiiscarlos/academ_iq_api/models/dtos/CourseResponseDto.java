@@ -22,10 +22,6 @@ public class CourseResponseDto {
 
     private String thumbnailUrl;
 
-    private List<SectionResponseDto> sections;
-
-    private List<String> recommendedRequirements;
-
     private String category;
 
     private String level;
@@ -37,5 +33,9 @@ public class CourseResponseDto {
 
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createdAt;
+
+    private List<String> recommendedRequirements;
+
+    private List<SectionResponseDto> sections;
 
 }

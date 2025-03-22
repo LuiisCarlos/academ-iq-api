@@ -11,6 +11,6 @@ public class SectionResponseDto {
 
     private String name;
 
-    private List<String> videosUrl;
+    private List<FileResponseDto> videos;
 
 }

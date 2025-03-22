@@ -1,9 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.services;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +13,6 @@ import dev.luiiscarlos.academ_iq_api.exceptions.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.models.Course;
 import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.Level;
-import dev.luiiscarlos.academ_iq_api.models.Section;
 import dev.luiiscarlos.academ_iq_api.models.dtos.CourseRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.CourseResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
@@ -56,39 +53,11 @@ public class CourseService {
         return courseMapper.toCourseResponseDto(course);
     }
 
+    public Course save(Course course) {
+        if (courseRepository == null)
+            throw new CourseNotFoundException("Failed to save course: Course is null");
 
-    public CourseResponseDto saveSectionById(Long id, String sectionName, MultipartFile ...videos) { // TODO: Create exception classes
-        Course course = this.findById(id);
-        List<File> files = new ArrayList<>();
-
-        if (videos.length == 0 || videos == null)
-            throw new RuntimeException("Failed to create section: No videos found");
-
-        for (MultipartFile video : videos) {
-            if (!fileService.validateVideo(video) || fileService.validateImage(video))
-                throw new InvalidFileTypeException("Failed to create section: Invalid video content type " + video.getContentType());
-
-            if (video.isEmpty())
-                throw new RuntimeException("Failed to create section: video is empty"); // TODO: Review this
-
-            files.add(fileService.save(video, false));
-        }
-
-        Section section = Section.builder()
-            .name(sectionName)
-            .course(course)
-            .videos(files)
-            .build();
-
-        List<Section> sections = course.getSections();
-
-        if (sections == null || sections.isEmpty())
-            sections = new ArrayList<>();
-        sections.add(section);
-
-        course.setSections(sections);
-
-        return courseMapper.toCourseResponseDto(courseRepository.save(course));
+        return courseRepository.save(course);
     }
 
     /**

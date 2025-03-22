@@ -25,7 +25,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		FileNotFoundException.class,
 		RefreshTokenNotFoundException.class,
 		CourseNotFoundException.class,
-		EnrollmentNotFoundException.class})
+		EnrollmentNotFoundException.class,
+		SectionNotFoundException.class})
 	public ResponseEntity<ErrorResponse> handleNotFound(Exception ex) {
 		return ResponseEntity
 			.status(HttpStatus.NOT_FOUND)

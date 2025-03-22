@@ -168,7 +168,7 @@ public class FileServiceImpl implements FileService {
 			String contentType = file.getContentType() == null ? "application/octet-stream" : file.getContentType();
 
 			String urlFile = MvcUriComponentsBuilder
-				.fromMethodName(FileController.class, "findResourceByFilename", storedFilename)
+				.fromMethodName(FileController.class, "findResourceByFilename", storedFilename, null)
 				.build()
 				.toUriString();
 
@@ -193,19 +193,25 @@ public class FileServiceImpl implements FileService {
 	 * @param filename the file name
 	 */
 	public void deleteByFilename(String filename) {
-		if (!fileRepository.existsByFilename(filename))
-			throw new FileNotFoundException("Failed to delete file: File not found with name " + filename);
+		File file = fileRepository.findByFilename(filename)
+            .orElseThrow(() -> new FileNotFoundException("Failed to delete file: File not found with name " + filename));
 
-		try {
-			File file = fileRepository.findByFilename(filename).get();
-			if (!file.isDefaultFile()) {
-				fileRepository.deleteByFilename(filename);
-				Path filePath = ROOT_LOCATION.resolve(filename);
+		System.out.println("Deleting file: " + filename);
+
+		if (!file.isDefaultFile()) {
+			int deletedFiles = fileRepository.deleteByFilename(filename);
+			System.out.println("Número de archivos eliminados: " + deletedFiles);
+			System.out.println("File deleted in database: " + filename);
+			Path filePath = ROOT_LOCATION.resolve(filename);
+			try {
 				Files.deleteIfExists(filePath);
+				System.out.println("File deleted in storage: " + filename);
+			} catch (IOException e) {
+				throw new FileStorageException("Failed to delete file: " + e.getMessage());
 			}
-		} catch (IOException e) {
-			throw new FileStorageException("Failed to delete file: " + e.getMessage());
 		}
+
+
 	}
 
 	/**

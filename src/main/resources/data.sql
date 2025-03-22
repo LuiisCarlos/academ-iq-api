@@ -10,7 +10,7 @@ INSERT INTO files (is_default_file, is_image, filename, content_type, size, url,
 INSERT INTO files (is_default_file, is_image, filename, content_type, size, url, extension)
     VALUES (true, true, 'academiq-logo.png', 'image/png', 175625, 'http://localhost:8888/api/v1/files/academiq-logo.png', 'png');
 INSERT INTO files (is_default_file, is_image, filename, content_type, size, url, extension)
-    VALUES (false, false, 'video-example.mp4', 'video/mp4', 49880892, 'http://localhost:8888/api/v1/files/video-example.mp4', 'mp4');
+    VALUES (false, true, 'video-example.mp4', 'video/mp4', 49880892, 'http://localhost:8888/api/v1/files/video-example.mp4', 'mp4');
 INSERT INTO files (is_default_file, is_image, filename, content_type, size, url, extension)
     VALUES (false, true, '1742398160643_typescript_fundamentals.png', 'image/png', 190548, 'http://localhost:8888/api/v1/files/1742398160643_typescript_fundamentals.png', 'png');
 INSERT INTO files (is_default_file, is_image, filename, content_type, size, url, extension)

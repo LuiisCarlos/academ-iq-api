@@ -2,10 +2,10 @@ package dev.luiiscarlos.academ_iq_api.models;
 
 public enum Level {
 
-    BEGINNER,
+    Beginner,
 
-    INTERMEDIATE,
+    Intermediate,
 
-    ADVANCED
+    Advanced
 
 }

@@ -32,9 +32,6 @@ public class File {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Nullable
-    private String name;
-
     @NonNull
     private String filename;
 
@@ -51,7 +48,7 @@ public class File {
     @Nullable
     private String extension;
 
-    @Nullable
+    @NonNull
     @Builder.Default
     @Column(name = "is_image")
     private Boolean isImage = true;

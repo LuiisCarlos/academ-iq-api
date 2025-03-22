@@ -58,8 +58,8 @@ public class AuthServiceImpl implements AuthService {
      * Login a user
      *
      * @param origin the origin of the request
-     * @param loginRequest The user to login
-     * @return The logged in user
+     * @param loginRequest the user to login
+     * @return the logged in user
      */
     public UserLoginResponseDto login(String origin, UserLoginRequestDto loginRequest) {
         User user = userService.findByUsername(loginRequest.getUsername());
@@ -84,8 +84,8 @@ public class AuthServiceImpl implements AuthService {
      * Register a new user
      *
      * @param origin the origin of the request
-     * @param registerRequest The user to register
-     * @return The registered user
+     * @param registerRequest the user to register
+     * @return the registered user
      */
     public UserRegisterResponseDto register(String origin, UserRegisterRequestDto registerRequest) {
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword()))
@@ -112,15 +112,21 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Refresh the access token
      *
-     * @param tokenJson The refresh token
-     * @return The new access token
+     * @param tokenJson the refresh token
+     * @return the new access token
      */
-    public String refresh(String tokenJson) {
-        String token = tokenService.extractTokenFromJson(tokenJson);
+    public String refresh(String token) {
+        token = token.contains("{") ? tokenService.extractTokenFromJson(token) : token;
 
         if (token == null)
             throw new AuthCredentialsNotFoundException(
                 "Failed to refresh access token: Refresh token is required");
+
+        if (tokenService.getTokenExpiration(token).isBefore(Instant.now()))
+            throw new InvalidTokenException("Failed to refresh access token: Refresh token is expired");
+
+        if (!tokenService.isValidToken(token))
+            throw new InvalidTokenException("Failed to refresh access token: Invalid refresh token");
 
         return tokenService.refreshAccessToken(token);
     }
@@ -128,7 +134,7 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Logout the user and invalidate the refresh token
      *
-     * @param token The refresh token
+     * @param token the refresh token
      */
     @SuppressWarnings("null") // TODO: Review this
     public void logout(String token) {
@@ -136,9 +142,9 @@ public class AuthServiceImpl implements AuthService {
             throw new AuthCredentialsNotFoundException("Failed to logout: Refresh token is required");
 
         token = token.contains("{") ? tokenService.extractTokenFromJson(token) : token;
-        RefreshToken refreshToken = tokenService.findByToken(token);
-
         token = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+        RefreshToken refreshToken = tokenService.findByToken(token);
         String username = tokenService.getTokenSubject(token);
         User user = userService.findByUsername(username);
 
@@ -152,7 +158,7 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Verifies the user's email
      *
-     * @param token The token
+     * @param token the token
      */
     public void verify(String token) {
         if (!tokenService.isValidToken(token))
@@ -215,7 +221,3 @@ public class AuthServiceImpl implements AuthService {
     }
 
 }
-
-        /*if (!passwordEncoder.matches(resetPassword.getOldPassword(),
-            user.getPassword().substring(ENCODED_PASSWORD_PREFIX.length())))
-            throw new InvalidCredentialsException("Failed to change password: Invalid old password");*/

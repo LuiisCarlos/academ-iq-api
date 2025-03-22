@@ -14,7 +14,7 @@ public interface FileRepository extends JpaRepository<File, Long> {
 
     Optional<File> findByUrl(String url);
 
-    void deleteByFilename(String filename);
+    int deleteByFilename(String filename);
 
     Boolean existsByFilename(String filename);
 

@@ -20,8 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import dev.luiiscarlos.academ_iq_api.models.dtos.CourseRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.CourseResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.SectionResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.services.CourseService;
+import dev.luiiscarlos.academ_iq_api.services.SectionService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +36,8 @@ public class CourseController {
 
     private final CourseMapper courseMapper;
 
+    private final SectionService sectionService;
+
     @PostMapping
     public ResponseEntity<CourseResponseDto> save(@RequestBody CourseRequestDto course) {
         return ResponseEntity
@@ -43,13 +47,13 @@ public class CourseController {
     }
 
     @PostMapping(value = "/{id}/sections", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CourseResponseDto> updateById(@PathVariable Long id,
+    public ResponseEntity<CourseResponseDto> saveSectionByCourseId(@PathVariable Long id,
             @RequestParam String sectionName,
             @RequestPart MultipartFile ...videos) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(courseService.saveSectionById(id, sectionName, videos));
+            .body(sectionService.save(id, sectionName, videos));
     }
 
     @GetMapping
@@ -68,6 +72,23 @@ public class CourseController {
             .body(courseMapper.toCourseResponseDto(courseService.findById(id)));
     }
 
+    @GetMapping("/{id}/sections")
+    public ResponseEntity<List<SectionResponseDto>> findAllSectionsByCourseId(@PathVariable Long id) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(sectionService.findAll(id));
+    }
+
+    @GetMapping("/{id}/sections/{index}")
+    public ResponseEntity<SectionResponseDto> findSectionByCourseIdAndSectionId(@PathVariable Long id,
+            @PathVariable Integer index) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(sectionService.findById(id, index));
+    }
+
     @GetMapping("/{id}/thumbnail")
     public ResponseEntity<FileResponseDto> findThumbnailById(@PathVariable Long id) {
         return ResponseEntity
@@ -84,6 +105,18 @@ public class CourseController {
             .body(courseService.updateById(id, course));
     }
 
+    @PutMapping("/{id}/sections/{index}")
+    public ResponseEntity<SectionResponseDto> updateSectionByCourseIdAndSectionId(@PathVariable Long id,
+            @PathVariable int index,
+            @RequestParam String sectionName,
+            @RequestPart MultipartFile ...videos) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(sectionService.updateById(id, index, sectionName, videos));
+    }
+
+
     @PutMapping(value = "/{id}/thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CourseResponseDto> updateThumbnailById(@PathVariable Long id, @RequestPart MultipartFile thumbnail) {
         return ResponseEntity
@@ -95,6 +128,15 @@ public class CourseController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         courseService.deleteById(id);
+
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .build();
+    }
+
+    @DeleteMapping("/{id}/sections/{index}")
+    public ResponseEntity<Void> deleteSectionByCourseIdAndSectionId(@PathVariable Long id, @PathVariable int index) {
+        sectionService.deleteById(id, index);
 
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)

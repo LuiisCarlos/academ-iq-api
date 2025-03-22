@@ -12,7 +12,7 @@ public class EnvConfiguration {
 
     private final Dotenv dotenv;
 
-    EnvConfiguration() {
+    public EnvConfiguration() {
         this.dotenv = Dotenv.configure()
             .ignoreIfMissing()
             .load();

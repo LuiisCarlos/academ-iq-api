@@ -3,7 +3,6 @@ package dev.luiiscarlos.academ_iq_api.services;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -115,11 +114,11 @@ public class UserServiceImpl implements UserService {
     public User updateById(Long id, User user) {
         return userRepository.findById(id).map(u -> {
             u.setUsername(user.getUsername());
+            u.setEmail(user.getEmail());
             u.setFirstname(user.getFirstname());
             u.setLastname(user.getLastname());
-            u.setEmail(user.getEmail());
-            u.setPhone(user.getPhone());
             u.setBirthdate(user.getBirthdate());
+            u.setPhone(user.getPhone());
             return userRepository.save(u);
         }).orElseThrow(() -> new UserNotFoundException("Failed to update user: User not found with id " + id));
     }
