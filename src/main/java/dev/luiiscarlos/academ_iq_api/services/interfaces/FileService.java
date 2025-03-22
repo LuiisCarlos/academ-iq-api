@@ -17,6 +17,8 @@ public interface FileService {
 
     File findByFilename(String filename);
 
+    File findByFilename(String token, String filename);
+
     Resource findResourceByFilename(String filename);
 
 	File save(MultipartFile file, boolean isImage);

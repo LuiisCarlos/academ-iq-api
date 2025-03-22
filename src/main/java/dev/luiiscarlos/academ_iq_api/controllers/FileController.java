@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.services.FileServiceImpl;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,16 +24,15 @@ public class FileController {
 
 	private final FileServiceImpl fileService;
 
-	@SuppressWarnings("null")// <- Already handled in the service layer
+	@SuppressWarnings("null")// <- Already handled
 	@GetMapping("/{filename:.+}")
-	public ResponseEntity<Resource> findResourceByFilename(@PathVariable String filename) {
+	public ResponseEntity<Resource> findResourceByFilename(HttpServletRequest request, @PathVariable String filename) {
 		Resource resource = fileService.findResourceByFilename(filename);
-		File file = fileService.findByFilename(filename);
-
+		File file = fileService.findByFilename(request.getHeader("Authorization"), filename);
 		String contentType = file.getContentType();
 
 		return ResponseEntity
-            .status(HttpStatus.OK)
+			.status(HttpStatus.OK)
 			.contentType(MediaType.parseMediaType(contentType))
 			.body(resource);
 	}
