@@ -21,6 +21,7 @@ import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.EnrollmentRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.EnrollmentResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.PasswordUpateDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.UserMapper;
 import dev.luiiscarlos.academ_iq_api.services.EnrollmentService;
@@ -115,7 +116,7 @@ public class UserController {
     @GetMapping("/@me")
     public ResponseEntity<UserResponseDto> findByToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
-
+        
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
@@ -193,6 +194,16 @@ public class UserController {
             .status(HttpStatus.NO_CONTENT)
             .contentType(MediaType.APPLICATION_JSON)
             .body(enrollmentService.deleteEnrollmentByToken(token, courseId));
+    }
+
+    @PostMapping("/@me/change-password")
+    public ResponseEntity<Void> updatePasswordByToken(@RequestHeader("Authorization") String token,
+            @RequestBody PasswordUpateDto passwordUpate) {
+        userService.updatePasswordByToken(token, passwordUpate);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .build();
     }
 
 }

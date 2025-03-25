@@ -136,7 +136,7 @@ public class AuthServiceImpl implements AuthService {
      *
      * @param token the refresh token
      */
-    @SuppressWarnings("null") // TODO: Review this
+    @SuppressWarnings("null") // Already handled
     public void logout(String token) {
         if (token == null)
             throw new AuthCredentialsNotFoundException("Failed to logout: Refresh token is required");

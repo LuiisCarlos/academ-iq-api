@@ -114,7 +114,6 @@ public class CourseService {
             c.setRecommendedRequirements(courseRequest.getRecommendedRequirements());
             c.setCategory(courseRequest.getCategory());
             c.setLevel(Level.valueOf(courseRequest.getLevel()));
-            // TODO: Calcular duración
 
             return courseRepository.save(c);
         }).orElseThrow(() -> new CourseNotFoundException("Failed to find a course: Course not found with id " + id));

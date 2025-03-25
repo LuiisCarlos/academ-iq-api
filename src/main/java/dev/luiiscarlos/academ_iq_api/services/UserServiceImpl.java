@@ -1,21 +1,25 @@
 package dev.luiiscarlos.academ_iq_api.services;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidFileTypeException;
+import dev.luiiscarlos.academ_iq_api.exceptions.InvalidTokenException;
 import dev.luiiscarlos.academ_iq_api.exceptions.FileStorageException;
 import dev.luiiscarlos.academ_iq_api.exceptions.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
-
+import dev.luiiscarlos.academ_iq_api.exceptions.UserWithDifferentPasswordsException;
 import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.User;
 
 import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.PasswordUpateDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.FileMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;
 import dev.luiiscarlos.academ_iq_api.services.interfaces.UserService;
@@ -36,6 +40,8 @@ public class UserServiceImpl implements UserService {
     private final TokenServiceImpl tokenService;
 
     private final FileMapper fileMapper;
+
+    private final PasswordEncoder passwordEncoder;
 
     public User save(User user) {
         if (user == null) throw new UserNotFoundException("Failed to save user: User is null");
@@ -194,6 +200,9 @@ public class UserServiceImpl implements UserService {
         if (!tokenService.isValidToken(token))
             throw new InvalidCredentialsException("Failed to find user: Invalid token");
 
+        if (tokenService.getTokenExpiration(token).isBefore(Instant.now()))
+            throw new InvalidTokenException("Failed to refresh access token: Refresh token is expired");
+
         String username = tokenService.getTokenSubject(token);
         return userRepository.findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("Failed to find user: User not found with username " + username));
@@ -233,6 +242,29 @@ public class UserServiceImpl implements UserService {
         User user = this.findByToken(token);
 
         return updateAvatarById(user.getId(), avatar);
+    }
+
+    /**
+     * Updates the user's password by the token
+     *
+     * @param token the user's token
+     * @param passwordUpdate the current and new password
+     */
+    public void updatePasswordByToken(String token, PasswordUpateDto passwordUpdate) {
+        User user = this.findByToken(token);
+
+        if (!passwordEncoder.matches(passwordUpdate.getCurrentPassword(), user.getPassword()))
+            throw new UserWithDifferentPasswordsException("Failed to update password: Invalid old password");
+
+        if (passwordUpdate.getNewPassword().equals(passwordUpdate.getCurrentPassword()))
+            throw new UserWithDifferentPasswordsException(
+                "Failed to update password: New password is the same as the old password");
+
+        if (!passwordUpdate.getNewPassword().equals(passwordUpdate.getConfirmPassword()))
+            throw new UserWithDifferentPasswordsException(
+                "Failed to update password: New password does not match the confirm password");
+
+        user.setPassword("{bcrypt}" + passwordEncoder.encode(passwordUpdate.getNewPassword()));
     }
 
     /**

@@ -50,7 +50,7 @@ public class SecurityConfiguration {
                 .requestMatchers( "/api/v1/courses/**").hasAnyRole("ADMIN","ACADEMIQ_ADMIN")
                 .requestMatchers("/api/v1/users/@me/**").authenticated()
                 .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
-                .requestMatchers("/api/v1/files/**").permitAll() // TODO: Review this
+                .requestMatchers("/api/v1/files/**").permitAll()
                 .anyRequest().authenticated());
 
         http

@@ -110,7 +110,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     public String refreshAccessToken(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(TOKEN_PREFIX + token)
             .orElseThrow(() -> new RefreshTokenNotFoundException("Failed to refresh access token: Refresh token not found"));
 
         if (!isValidToken(token))
