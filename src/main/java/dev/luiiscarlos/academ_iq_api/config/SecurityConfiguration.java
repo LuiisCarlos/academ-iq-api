@@ -36,7 +36,6 @@ public class SecurityConfiguration {
     private final AccessDeniedHandler accessDeniedHandler;
 
     @Bean
-    @SuppressWarnings("removal") // <- For H2 Console
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
@@ -54,17 +53,13 @@ public class SecurityConfiguration {
                 .anyRequest().authenticated());
 
         http
-            .headers(headers -> headers.frameOptions().disable()); // <- For H2 Console
-
-        http
             .oauth2ResourceServer(server -> server
                 .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         http
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http
-            .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler));
+        http.exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler));
 
         http
             .addFilterBefore(exceptionHandlingFilter, UsernamePasswordAuthenticationFilter.class)

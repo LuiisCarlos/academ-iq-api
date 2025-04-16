@@ -28,7 +28,7 @@ public class AuthController {
     private final AuthServiceImpl authService;
 
     @GetMapping("/refresh")
-    public ResponseEntity<String> refresh(@RequestBody String token) {
+    public ResponseEntity<String> refresh(@RequestHeader("Authorization") String token) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
@@ -52,7 +52,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody String token) {
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
         authService.logout(token);
 
         return ResponseEntity

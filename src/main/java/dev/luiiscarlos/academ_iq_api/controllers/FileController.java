@@ -7,13 +7,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.services.FileServiceImpl;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,9 +25,9 @@ public class FileController {
 
 	@SuppressWarnings("null")// <- Already handled
 	@GetMapping("/{filename:.+}")
-	public ResponseEntity<Resource> findResourceByFilename(@PathVariable String filename, HttpServletRequest request) {
+	public ResponseEntity<Resource> findResourceByFilename(@PathVariable String filename, @RequestHeader("Authorization") String token) {
 		Resource resource = fileService.findResourceByFilename(filename);
-		File file = fileService.findByFilename(request.getHeader("Authorization"), filename);
+		File file = fileService.findByFilename(token, filename);
 		String contentType = file.getContentType();
 
 		return ResponseEntity
