@@ -1,7 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.models.mappers;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
@@ -45,19 +44,13 @@ public class UserMapper {
             .build();
     }
 
-    @SuppressWarnings("null") // Already handled
-    public UserLoginResponseDto toUserLoginResponseDto(User user, String accessToken, String refreshToken, LocalDateTime refreshTokenExpiresAt) {
+    public UserLoginResponseDto toUserLoginResponseDto(String accessToken, String refreshToken, User user) {
+        UserResponseDto userResponse = this.toUserResponseDto(user);
+
         return UserLoginResponseDto.builder()
-            .username(user.getUsername())
-            .avatarUrl(user.getAvatar().getUrl())
-            .email(user.getEmail())
-            .firstname(user.getFirstname())
-            .lastname(user.getLastname())
-            .phone(user.getPhone())
-            .birthdate(user.getBirthdate())
             .accessToken(accessToken)
             .refreshToken(refreshToken)
-            .refreshTokenExpiresAt(refreshTokenExpiresAt)
+            .user(userResponse)
             .build();
     }
 

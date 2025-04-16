@@ -12,7 +12,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +26,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,17 +55,23 @@ public class Course {
     private String author;
 
     @Nullable
-    @ManyToOne
     @JoinColumn(name = "file_id")
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private File thumbnail;
 
     @Nullable
     @Builder.Default
-    @Column(name = "recommended_requirements")
-    private List<String> recommendedRequirements = new ArrayList<>();
+    @ElementCollection
+    @Column(name = "requirement")
+    @CollectionTable(
+        name = "course_requirement_junction",
+        joinColumns = @JoinColumn(name = "course_id"))
+    private List<String> requirements = new ArrayList<>();
 
     @NonNull
-    private String category;
+    @JoinColumn(name = "category_id")
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Category category;
 
     @NonNull
     @Enumerated(EnumType.STRING)
@@ -74,18 +83,18 @@ public class Course {
 
     @Nullable
     @Builder.Default
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     @Nullable
     @Builder.Default
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Enrollment> enrollments = new ArrayList<>();
 
-    @NonNull
+    @Nullable
     @Builder.Default
     @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-    private LocalTime duration = LocalTime.of(0,0,0);
+    private LocalTime duration = LocalTime.of(0, 0, 0);
 
     @Nullable
     @Builder.Default

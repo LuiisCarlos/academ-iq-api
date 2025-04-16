@@ -15,10 +15,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidTokenException;
 import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenExpiredException;
@@ -40,8 +36,6 @@ public class TokenServiceImpl implements TokenService {
     private final String TOKEN_PREFIX = "Bearer ";
 
     private final RefreshTokenRepository refreshTokenRepository;
-
-    private final ObjectMapper objectMapper;
 
     private final JwtEncoder jwtEncoder;
 
@@ -128,15 +122,6 @@ public class TokenServiceImpl implements TokenService {
             return true;
         } catch (JwtException e) {
             return false;
-        }
-    }
-
-    public String extractTokenFromJson(String TokenJson) {
-        try {
-            JsonNode rootNode = objectMapper.readTree(TokenJson);
-            return rootNode.path("refreshToken").asText();
-        } catch (JsonProcessingException e) {
-            return null;
         }
     }
 

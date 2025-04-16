@@ -22,7 +22,7 @@ public class CourseMapper {
             .description(courseRequest.getDescription())
             .author(courseRequest.getAuthor())
             .thumbnail(thumbnail)
-            .recommendedRequirements(courseRequest.getRecommendedRequirements())
+            .requirements(courseRequest.getRequirements())
             .category(courseRequest.getCategory())
             .level(Level.valueOf(courseRequest.getLevel()))
             .build();
@@ -35,7 +35,7 @@ public class CourseMapper {
             .description(course.getDescription())
             .author(course.getAuthor())
             .thumbnailUrl(course.getThumbnail().getUrl())
-            .recommendedRequirements(course.getRecommendedRequirements())
+            .requirements(course.getRequirements())
             .category(course.getCategory())
             .sections(course.getSections().stream().map(sectionMapper::toSectionResponseDto).toList())
             .rating(course.getRating())

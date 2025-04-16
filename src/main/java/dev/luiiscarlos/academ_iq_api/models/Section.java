@@ -1,10 +1,14 @@
 package dev.luiiscarlos.academ_iq_api.models;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,13 +47,17 @@ public class Section {
     private String name;
 
     @Nullable
+    @Builder.Default
+    @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
+    private LocalTime duration = LocalTime.of(0, 0, 0);
+
+    @Nullable
     @ManyToMany
     @Builder.Default
     @JoinTable(
             name = "section_file_junction",
             joinColumns = { @JoinColumn(name = "section_id") },
-            inverseJoinColumns = { @JoinColumn(name = "file_id") }
-    )
+            inverseJoinColumns = { @JoinColumn(name = "file_id") })
     private List<File> videos = new ArrayList<>();
 
 }

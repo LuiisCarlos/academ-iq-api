@@ -111,7 +111,7 @@ public class CourseService {
             c.setName(courseRequest.getName());
             c.setDescription(courseRequest.getDescription());
             c.setAuthor(courseRequest.getAuthor());
-            c.setRecommendedRequirements(courseRequest.getRecommendedRequirements());
+            c.setRequirements(courseRequest.getRequirements());
             c.setCategory(courseRequest.getCategory());
             c.setLevel(Level.valueOf(courseRequest.getLevel()));
 

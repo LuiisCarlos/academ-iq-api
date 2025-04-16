@@ -1,5 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.models.dtos;
 
+import dev.luiiscarlos.academ_iq_api.models.Category;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,6 +15,6 @@ public class EnrollmentCourseResponseDto {
 
     private String thumbnailUrl;
 
-    private String category;
+    private Category category;
 
 }

@@ -55,12 +55,11 @@ public class User implements UserDetails {
     private String password;
 
     @NonNull
-    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "user_role_junction",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "role_id") }
-    )
+        name = "user_role_junction",
+        joinColumns = { @JoinColumn(name = "user_id") },
+        inverseJoinColumns = { @JoinColumn(name = "role_id") })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private Set<Role> authorities;
 
     @Nullable
@@ -85,7 +84,7 @@ public class User implements UserDetails {
 
     @NonNull
     @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Enrollment> enrollments = new ArrayList<>();
 
     @NonNull

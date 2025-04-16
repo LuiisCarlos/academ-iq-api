@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
+import dev.luiiscarlos.academ_iq_api.models.Category;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,7 +23,7 @@ public class CourseResponseDto {
 
     private String thumbnailUrl;
 
-    private String category;
+    private Category category;
 
     private String level;
 
@@ -34,7 +35,7 @@ public class CourseResponseDto {
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createdAt;
 
-    private List<String> recommendedRequirements;
+    private List<String> requirements;
 
     private List<SectionResponseDto> sections;
 

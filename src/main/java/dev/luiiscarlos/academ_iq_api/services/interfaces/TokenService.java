@@ -25,8 +25,6 @@ public interface TokenService {
 
     void invalidateRefreshToken(String token);
 
-    String extractTokenFromJson(String tokenJson);
-
     Instant getTokenExpiration(String token);
 
     String getTokenType(String token);

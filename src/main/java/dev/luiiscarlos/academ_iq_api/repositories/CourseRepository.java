@@ -12,7 +12,7 @@ import dev.luiiscarlos.academ_iq_api.models.Course;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-    List<Course> findByCategory(String category);
+    List<Course> findByCategoryName(String category);
 
     List<Course> findByName(String name);
 

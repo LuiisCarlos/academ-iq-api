@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class MailService {
 
     private final TokenServiceImpl tokenService;
 
@@ -65,7 +65,7 @@ public class EmailService {
                             "<a href='https://github.com/LuiisCarlos' target='_blank'>" +
                                 "<img src='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png' alt='GitHub Logo' class='github-logo' width='32px' height='32px'>" +
                             "</a>" +
-                            "<p>&copy; 2025 Academ-IQ. All rights reserved.</p>" +
+                            "<p>Copyright © 2023 Academ-IQ</p>" +
                         "</div>" +
                     "</div>" +
                 "</body>" +
