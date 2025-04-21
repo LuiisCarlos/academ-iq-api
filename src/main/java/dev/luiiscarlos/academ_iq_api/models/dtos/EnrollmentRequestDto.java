@@ -5,8 +5,6 @@ import lombok.Data;
 @Data
 public class EnrollmentRequestDto {
 
-    private Long courseId;
-
     private Integer rating;
 
     private Double progress;
@@ -23,24 +21,12 @@ public class EnrollmentRequestDto {
         return this.isFavorite;
     }
 
-    public void setFavorite(Boolean isFavorite) {
-        this.isFavorite = isFavorite;
-    }
-
     public Boolean isArchived() {
         return this.isArchived;
     }
 
-    public void setArchived(Boolean isArchived) {
-        this.isArchived = isArchived;
-    }
-
     public Boolean isCompleted() {
         return this.isCompleted;
-    }
-
-    public void setCompleted(Boolean isCompleted) {
-        this.isCompleted = isCompleted;
     }
 
 }

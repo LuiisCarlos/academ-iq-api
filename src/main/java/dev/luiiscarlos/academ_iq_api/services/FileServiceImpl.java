@@ -30,8 +30,6 @@ import dev.luiiscarlos.academ_iq_api.repositories.FileRepository;
 
 import jakarta.transaction.Transactional;
 
-//import lombok.RequiredArgsConstructor;
-
 @Service
 @Transactional
 public class FileServiceImpl implements FileService {
@@ -56,8 +54,10 @@ public class FileServiceImpl implements FileService {
 	/**
 	 * Initializes the storage location
 	 *
+	 * @throws IOException if the storage location can not be created
 	 * @throws FileStorageException if the storage location can not be created
 	 */
+	@Override
 	public void init() {
 		try {
             Files.createDirectories(ROOT_LOCATION);
@@ -70,7 +70,10 @@ public class FileServiceImpl implements FileService {
 	 * Retrieves all files
 	 *
 	 * @return the list of files
+	 *
+	 * @throws FileNotFoundException if the files can not be found
 	 */
+	@Override
 	public List<File> findAll() {
 		List<File> files = fileRepository.findAll();
 
@@ -84,25 +87,37 @@ public class FileServiceImpl implements FileService {
 	 * Retrieves a file by its id
 	 *
 	 * @param id the file id
+	 *
 	 * @return the file
+	 *
+	 * @throws FileNotFoundException if the file can not be found
 	 */
+	@Override
 	public File findById(Long id) {
 		return fileRepository.findById(id)
-			.orElseThrow(() -> new FileNotFoundException("Failed to find file: File not found with id " + id));
+			.orElseThrow(() -> new FileNotFoundException(
+				"Failed to find file: File not found with id " + id));
 	}
 
 	/**
 	 * Retrieves a file by its filename
 	 *
 	 * @param filename the file name
+	 *
 	 * @return the file
+	 *
+	 * @throws FileNotFoundException if the file can not be found
+	 * @throws InvalidFileTypeException if the file type is not valid
 	 */
+    @Override
 	public File findByFilename(String filename) {
 		File file = fileRepository.findByFilename(filename)
-			.orElseThrow(() -> new FileNotFoundException("Failed to find file: File not found with name " + filename));
+			.orElseThrow(() -> new FileNotFoundException(
+				"Failed to find file: File not found with name " + filename));
 
 		if (!file.isImage())
-			throw new InvalidFileTypeException("Failed to find file: Files with video content type can not be retrieve");
+			throw new InvalidFileTypeException(
+				"Failed to find file: Files with video content type can not be retrieve");
 
 		return file;
 	}
@@ -112,11 +127,17 @@ public class FileServiceImpl implements FileService {
 	 *
 	 * @param token the authentication token
 	 * @param filename the file name
+	 *
 	 * @return the file
+	 *
+	 * @throws FileNotFoundException if the file can not be found
+	 * @throws InvalidCredentialsException if the file can not be retrieved
 	 */
+	@Override
 	public File findByFilename(String token, String filename) {
 		File file = fileRepository.findByFilename(filename)
-			.orElseThrow(() -> new FileNotFoundException("Failed to find file: File not found with name " + filename));
+			.orElseThrow(() -> new FileNotFoundException(
+				"Failed to find file: File not found with name " + filename));
 
 		if ((token == null || token.isEmpty()) && !file.isImage())
 			throw new InvalidCredentialsException("Failed to find file: Access denied");
@@ -128,15 +149,20 @@ public class FileServiceImpl implements FileService {
 	 * Retrieves a resource by its filename
 	 *
 	 * @param filename the file name
+	 *
 	 * @return the resource
+	 *
+	 * @throws FileNotFoundException if the file can not be found
 	 */
+	@Override
 	public Resource findResourceByFilename(String filename) {
 		try {
             Path filePath = ROOT_LOCATION.resolve(filename);
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists() || !resource.isReadable())
-				throw new FileNotFoundException("Failed to find resource: File not found with name " + filename);
+				throw new FileNotFoundException(
+					"Failed to find resource: File not found with name " + filename);
 
 			return resource;
         } catch (MalformedURLException e) {
@@ -149,11 +175,17 @@ public class FileServiceImpl implements FileService {
 	 *
 	 * @param file the file
 	 * @param isImage the file type
+	 *
 	 * @return the file
+	 *
+	 * @throws FileStorageException if the file can not be saved
+	 * @throws InvalidFileTypeException if the file type is not valid
 	 */
-	@SuppressWarnings("null") // TODO: Review this
+	@Override
+	@SuppressWarnings("null")
 	public File save(MultipartFile file, boolean isImage) {
-		if (file.isEmpty() || file == null) throw new FileStorageException("Failed to save file: File is required");
+		if (file.isEmpty() || file == null)
+			throw new FileStorageException("Failed to save file: File is required");
 
         try (InputStream inputStream = file.getInputStream()) {
 			String filename = StringUtils.cleanPath(file.getOriginalFilename());
@@ -165,9 +197,11 @@ public class FileServiceImpl implements FileService {
             Files.copy(inputStream, ROOT_LOCATION.resolve(storedFilename),
                 StandardCopyOption.REPLACE_EXISTING);
 
-			String contentType = file.getContentType() == null ? "application/octet-stream" : file.getContentType();
+			String contentType = file.getContentType() == null
+				? "application/octet-stream"
+				: file.getContentType();
 
-			String urlFile = MvcUriComponentsBuilder
+			String fileUrl = MvcUriComponentsBuilder
 				.fromMethodName(FileController.class, "findResourceByFilename", storedFilename, null)
 				.build()
 				.toUriString();
@@ -177,7 +211,7 @@ public class FileServiceImpl implements FileService {
 				.contentType(contentType)
 				.size(file.getSize())
 				.isImage(isImage)
-				.url(urlFile)
+				.url(fileUrl)
 				.extension(StringUtils.getFilenameExtension(filename))
 				.build();
 
@@ -191,53 +225,68 @@ public class FileServiceImpl implements FileService {
 	 * Deletes a file by its filename
 	 *
 	 * @param filename the file name
+	 *
+	 * @throws FileNotFoundException if the file can not be deleted
+	 * @throws FileStorageException if the file can not be deleted
 	 */
 	public void deleteByFilename(String filename) {
 		File file = fileRepository.findByFilename(filename)
-            .orElseThrow(() -> new FileNotFoundException("Failed to delete file: File not found with name " + filename));
-
-		System.out.println("Deleting file: " + filename);
+            .orElseThrow(() -> new FileNotFoundException(
+				"Failed to delete file: File not found with name " + filename));
 
 		if (!file.isDefaultFile()) {
-			int deletedFiles = fileRepository.deleteByFilename(filename);
-			System.out.println("Número de archivos eliminados: " + deletedFiles);
-			System.out.println("File deleted in database: " + filename);
+			fileRepository.deleteByFilename(filename);
 			Path filePath = ROOT_LOCATION.resolve(filename);
 			try {
 				Files.deleteIfExists(filePath);
-				System.out.println("File deleted in storage: " + filename);
 			} catch (IOException e) {
 				throw new FileStorageException("Failed to delete file: " + e.getMessage());
 			}
 		}
-
-
 	}
 
 	/**
-	 * Validates an image
+	 * Validates if the file is an image
 	 *
-	 * @param image the image
-	 * @return true if the image is valid, false otherwise
+	 * @param multiPartfile the file to be validated
+	 *
+	 * @return true if the file is an image, false otherwise
 	 */
-	public boolean validateImage(MultipartFile image) {
-        String contentType = image.getContentType();
-        if (!Arrays.asList(ALLOWED_IMAGE_TYPES).contains(contentType))
-            return false;
-        return true;
-    }
+	private boolean isImageContentTypeValid(MultipartFile multiPartfile) {
+		return Arrays.asList(ALLOWED_IMAGE_TYPES).contains(multiPartfile.getContentType());
+	}
 
 	/**
-	 * Validates a video
+	 * Validates if the file is a video
 	 *
-	 * @param video the video
-	 * @return true if the video is valid, false otherwise
+	 * @param multiPartfile the file to be validated
+	 *
+	 * @return true if the file is a video, false otherwise
 	 */
-	public boolean validateVideo(MultipartFile video) {
-        String contentType = video.getContentType();
-        if (!Arrays.asList(ALLOWED_VIDEO_TYPES).contains(contentType))
-			return false;
-        return true;
-    }
+	private boolean isVideoContentTypeValid(MultipartFile multiPartfile) {
+		return Arrays.asList(ALLOWED_VIDEO_TYPES).contains(multiPartfile.getContentType());
+	}
+
+	/**
+	 * Validates if the file is a valid image or video
+	 *
+	 * @param multiPartfile the file to be validated
+	 *
+	 * @return true if the file is a valid image or video, false otherwise
+	 */
+	public boolean isValidImage(MultipartFile multiPartfile) {
+		return isImageContentTypeValid(multiPartfile) && !isVideoContentTypeValid(multiPartfile);
+	}
+
+	/**
+	 * Validates if the file is a valid video or image
+	 *
+	 * @param multiPartfile the file to be validated
+	 *
+	 * @return true if the file is a valid video or image, false otherwise
+	 */
+	public boolean isValidVideo(MultipartFile multiPartfile) {
+		return isVideoContentTypeValid(multiPartfile) && !isImageContentTypeValid(multiPartfile);
+	}
 
 }

@@ -18,6 +18,6 @@ public class SectionResponseDto {
     @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime duration;
 
-    private List<FileResponseDto> videos;
+    private List<LessonResponseDto> lessons;
 
 }
