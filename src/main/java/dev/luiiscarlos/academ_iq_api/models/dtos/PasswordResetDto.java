@@ -3,7 +3,7 @@ package dev.luiiscarlos.academ_iq_api.models.dtos;
 import lombok.Data;
 
 @Data
-public class UserResetPasswordDto {
+public class PasswordResetDto {
 
     private String password;
 

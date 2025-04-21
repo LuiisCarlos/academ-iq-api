@@ -9,8 +9,10 @@ import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
 
 public interface UserService {
 
-    List<User> findAll();
+    User save(User user);
 
+
+    List<User> findAll();
 
     User findById(Long id);
 
@@ -18,24 +20,23 @@ public interface UserService {
 
     FileResponseDto findAvatarById(Long id);
 
-    User save(User user);
+    User findByToken(String token);
+
+    FileResponseDto findAvatarByToken(String token);
+
 
     User updateById(Long id, User user);
 
     FileResponseDto updateAvatarById(Long id, MultipartFile avatar);
 
-    void deleteById(Long id);
-
-    void deleteAvatarById(Long id);
-
-
-    User findByToken(String token);
-
-    FileResponseDto findAvatarByToken(String token);
-
     User updateByToken(String token);
 
     FileResponseDto updateAvatarByToken(String token, MultipartFile avatar);
+
+
+    void deleteById(Long id);
+
+    void deleteAvatarById(Long id);
 
     void deleteByToken(String token);
 

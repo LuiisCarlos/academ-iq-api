@@ -66,6 +66,17 @@ public class UserMapper {
             .lastname(user.getLastname())
             .phone(user.getPhone())
             .birthdate(user.getBirthdate())
+            .dni(user.getDni())
+            .githubUrl(user.getGithubUrl())
+            .linkedinUrl(user.getLinkedinUrl())
+            .websiteUrl(user.getWebsiteUrl())
+            .jobArea(user.getJobArea())
+            .isTeamManager(user.isTeamManager())
+            .workExperience(user.getWorkExperience())
+            .studies(user.getStudies())
+            .wantToUpgrade(user.wantToUpgrade())
+            .companyName(user.getCompanyName())
+            .biography(user.getBiography())
             .build();
     }
 

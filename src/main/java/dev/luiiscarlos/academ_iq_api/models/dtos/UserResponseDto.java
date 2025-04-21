@@ -24,6 +24,28 @@ public class UserResponseDto {
 
     private String phone;
 
+    private String dni;
+
+    private String githubUrl;
+
+    private String linkedinUrl;
+
+    private String websiteUrl;
+
+    private String biography;
+
+    private String studies;
+
+    private String jobArea;
+
+    private String workExperience;
+
+    private String companyName;
+
+    private Boolean isTeamManager;
+
+    private Boolean wantToUpgrade;
+
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate birthdate;
 

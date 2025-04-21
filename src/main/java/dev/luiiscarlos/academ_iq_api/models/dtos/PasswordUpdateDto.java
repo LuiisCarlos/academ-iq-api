@@ -3,7 +3,7 @@ package dev.luiiscarlos.academ_iq_api.models.dtos;
 import lombok.Data;
 
 @Data
-public class PasswordUpateDto {
+public class PasswordUpdateDto {
 
     private String currentPassword;
 

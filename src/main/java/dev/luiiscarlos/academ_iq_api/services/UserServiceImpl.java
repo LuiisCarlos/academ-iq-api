@@ -19,7 +19,7 @@ import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.User;
 
 import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.PasswordUpateDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.PasswordUpdateDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.FileMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;
 import dev.luiiscarlos.academ_iq_api.services.interfaces.UserService;
@@ -43,8 +43,20 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Saves the user
+     *
+     * @param user the new user
+     *
+     * @return user the user
+     *
+     * @throws UserNotFoundException if the user does not exist
+     */
+    @Override
     public User save(User user) {
-        if (user == null) throw new UserNotFoundException("Failed to save user: User is null");
+        if (user == null)
+            throw new UserNotFoundException("Failed to save user: User is null");
+
         return userRepository.save(user);
     }
 
@@ -52,12 +64,15 @@ public class UserServiceImpl implements UserService {
      * Finds all users
      *
      * @return the list of users
+     *
+     * @throws UserNotFoundException if the user does not exist
      */
+    @Override
     public List<User> findAll() {
         List<User> users = userRepository.findAll();
 
         if (users.isEmpty())
-            throw new UserNotFoundException("Users not found");
+            throw new UserNotFoundException("Failed to find user: Users not found");
 
         return users;
     }
@@ -66,45 +81,64 @@ public class UserServiceImpl implements UserService {
      * Finds the user by its id
      *
      * @param id the id of the user
+     *
      * @return the user
+     *
+     * @throws UserNotFoundException if the user does not exist
      */
-    public User findById(Long id) {
-        return userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException("Failed to find user: User not found with id " + id));
+    @Override
+    public User findById(Long userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(
+                "Failed to find user: User not found with id " + userId));
     }
 
     /**
      * Finds the user by its username
      *
      * @param username the user name
+     *
      * @return the user
+     *
+     * @throws UserNotFoundException if the user does not exist
      */
+    @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-            .orElseThrow(() -> new UserNotFoundException("Failed to find user : User not found with username " + username));
+            .orElseThrow(() -> new UserNotFoundException(
+                "Failed to find user : User not found with username " + username));
     }
 
     /**
      * Finds the user by its email
      *
      * @param email The user's email
+     *
      * @return The user
+     *
+     * @throws UserNotFoundException if the user does not exist
      */
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("Failed to find user: User not found with email " + email));
+            .orElseThrow(() -> new UserNotFoundException(
+                "Failed to find user: User not found with email " + email));
     }
 
     /**
      * Finds the user's avatar by its id
      *
      * @param id the user's id
+     *
      * @return the user's avatar
+     *
+     * @throws UserNotFoundException if the user does not exist
      */
-    @SuppressWarnings("null") // * Already handled
-    public FileResponseDto findAvatarById(Long id) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException("Failed to find user's avatar: User not found with id " + id));
+    @Override
+    @SuppressWarnings("null")
+    public FileResponseDto findAvatarById(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(
+                "Failed to find user's avatar: User not found with id " + userId));
 
         File file = fileService.findByFilename(user.getAvatar().getFilename());
         return fileMapper.toFileResponseDto(file);
@@ -113,12 +147,16 @@ public class UserServiceImpl implements UserService {
     /**
      * Updates the user's information by its id
      *
-     * @param id the id of the user
+     * @param userId the id of the user
      * @param user the new user
+     *
      * @return the updated user
+     *
+     * @throws UserNotFoundException if the user does not exist
      */
-    public User updateById(Long id, User user) {
-        return userRepository.findById(id).map(u -> {
+    @Override
+    public User updateById(Long userId, User user) {
+        return userRepository.findById(userId).map(u -> {
             u.setUsername(user.getUsername());
             u.setEmail(user.getEmail());
             u.setFirstname(user.getFirstname());
@@ -126,23 +164,30 @@ public class UserServiceImpl implements UserService {
             u.setBirthdate(user.getBirthdate());
             u.setPhone(user.getPhone());
             return userRepository.save(u);
-        }).orElseThrow(() -> new UserNotFoundException("Failed to update user: User not found with id " + id));
+        }).orElseThrow(() -> new UserNotFoundException(
+            "Failed to update user: User not found with id " + userId));
     }
 
     /**
      * Updates the user's avatar by its id
      *
-     * @param id the id of the user
+     * @param userId the id of the user
      * @param avatar the new avatar
+     *
      * @return the updated avatar
+     *
+     * @throws UserNotFoundException if the user does not exist
      */
-    @SuppressWarnings("null") // * Already handled by setting a default File at user creation
-    public FileResponseDto updateAvatarById(Long id, MultipartFile avatar) {
-        if (avatar.isEmpty()) throw new FileStorageException("Failed to update user's avatar: Avatar is required");
-        if (!fileService.validateImage(avatar))
-            throw new InvalidFileTypeException("Failed to update avatar: Invalid file content type");
+    @Override
+    @SuppressWarnings("null")
+    public FileResponseDto updateAvatarById(Long userId, MultipartFile avatar) {
+        if (avatar.isEmpty()) throw new FileStorageException(
+            "Failed to update user's avatar: Avatar is required");
+        if (!fileService.isValidImage(avatar))
+            throw new InvalidFileTypeException(
+                "Failed to update avatar: Invalid file content type");
 
-        User user = userRepository.findById(id).map(u -> {
+        User user = userRepository.findById(userId).map(u -> {
             fileService.deleteByFilename(u.getAvatar().getFilename());
 
             File file = fileService.save(avatar, true);
@@ -150,7 +195,8 @@ public class UserServiceImpl implements UserService {
             u.setAvatar(file);
 
             return userRepository.save(u);
-        }).orElseThrow(() -> new UserNotFoundException("Failed to update user's avatar: User not found with id " + id));
+        }).orElseThrow(() -> new UserNotFoundException(
+            "Failed to update user's avatar: User not found with id " + userId));
 
         return fileMapper.toFileResponseDto(user.getAvatar());
     }
@@ -158,39 +204,55 @@ public class UserServiceImpl implements UserService {
     /**
      * Deletes the user by its id
      *
-     * @param id the id of the user
+     * @param userId the id of the user
+     *
+     * @throws UserNotFoundException if the user does not exist
      */
-    public void deleteById(Long id) {
-        if (!userRepository.existsById(id))
-            throw new UserNotFoundException("Failed to delete user: User not found with id " + id);
+    @Override
+    public void deleteById(Long userId) {
+        if (!userRepository.existsById(userId))
+            throw new UserNotFoundException(
+                "Failed to delete user: User not found with id " + userId);
 
-        userRepository.deleteById(id);
+        userRepository.deleteById(userId);
     }
 
     /**
      * Deletes the user's avatar by its id
      *
-     * @param id the id of the user
+     * @param userId the id of the user
+     *
+     * @throws UserNotFoundException if the user does not exist
      */
-    @SuppressWarnings("null") // * Already handled by setting a default File at user creation
-    public void deleteAvatarById(Long id) {
-        if (userRepository.existsById(id))
-            throw new UserNotFoundException("Failed to delete user's avatar: User not found with id " + id);
+    @Override
+    @SuppressWarnings("null")
+    public void deleteAvatarById(Long  userId) {
+        if (userRepository.existsById(userId))
+            throw new UserNotFoundException(
+                "Failed to delete user's avatar: User not found with id " + userId);
 
-        userRepository.findById(id).map(u -> {
+        userRepository.findById(userId).map(u -> {
             fileService.deleteByFilename(u.getAvatar().getFilename());
 
             u.setAvatar(fileService.findByFilename("default-user-avatar.png"));
             return userRepository.save(u);
-        }).orElseThrow(() -> new UserNotFoundException("Failed to delete user's avatar: User not found with id " + id));
+        }).orElseThrow(() -> new UserNotFoundException(
+            "Failed to delete user's avatar: User not found with id " + userId));
     }
 
     /**
      * Finds the user by the token
      *
      * @param token the user's token
+     *
      * @return the user
+     *
+     * @throws AuthCredentialsNotFoundException if the token does not exist
+     * @throws InvalidCredentialsException if the token is invalid
+     * @throws InvalidTokenException if the token is expired
+     * @throws UserNotFoundException if the user does not exist
      */
+    @Override
     public User findByToken(String token) {
         if (token == null)
             throw new AuthCredentialsNotFoundException("Failed to find user: Token is required");
@@ -201,19 +263,23 @@ public class UserServiceImpl implements UserService {
             throw new InvalidCredentialsException("Failed to find user: Invalid token");
 
         if (tokenService.getTokenExpiration(token).isBefore(Instant.now()))
-            throw new InvalidTokenException("Failed to refresh access token: Refresh token is expired");
+            throw new InvalidTokenException(
+                "Failed to refresh access token: Refresh token is expired");
 
         String username = tokenService.getTokenSubject(token);
         return userRepository.findByUsername(username)
-            .orElseThrow(() -> new UserNotFoundException("Failed to find user: User not found with username " + username));
+            .orElseThrow(() -> new UserNotFoundException(
+                "Failed to find user: User not found with username " + username));
     }
 
     /**
      * Finds the user's avatar by the token
      *
      * @param token the user's token
+     *
      * @return the user's avatar
      */
+    @Override
     public FileResponseDto findAvatarByToken(String token) {
         User user = this.findByToken(token);
         return fileMapper.toFileResponseDto(user.getAvatar());
@@ -223,8 +289,10 @@ public class UserServiceImpl implements UserService {
      * Updates the user's information by the token
      *
      * @param token the user's token
+     *
      * @return the updated user
      */
+    @Override
     public User updateByToken(String token) {
         User user = this.findByToken(token);
 
@@ -236,8 +304,10 @@ public class UserServiceImpl implements UserService {
      *
      * @param token the user's token
      * @param avatar the new avatar
+     *
      * @return the updated avatar
      */
+    @Override
     public FileResponseDto updateAvatarByToken(String token, MultipartFile avatar) {
         User user = this.findByToken(token);
 
@@ -248,23 +318,23 @@ public class UserServiceImpl implements UserService {
      * Updates the user's password by the token
      *
      * @param token the user's token
-     * @param passwordUpdate the current and new password
+     * @param passwordDto the current and new password
      */
-    public void updatePasswordByToken(String token, PasswordUpateDto passwordUpdate) {
+    public void updatePasswordByToken(String token, PasswordUpdateDto passwordDto) {
         User user = this.findByToken(token);
 
-        if (!passwordEncoder.matches(passwordUpdate.getCurrentPassword(), user.getPassword()))
+        if (!passwordEncoder.matches(passwordDto.getCurrentPassword(), user.getPassword()))
             throw new UserWithDifferentPasswordsException("Failed to update password: Invalid old password");
 
-        if (passwordUpdate.getNewPassword().equals(passwordUpdate.getCurrentPassword()))
+        if (passwordDto.getNewPassword().equals(passwordDto.getCurrentPassword()))
             throw new UserWithDifferentPasswordsException(
                 "Failed to update password: New password is the same as the old password");
 
-        if (!passwordUpdate.getNewPassword().equals(passwordUpdate.getConfirmPassword()))
+        if (!passwordDto.getNewPassword().equals(passwordDto.getConfirmPassword()))
             throw new UserWithDifferentPasswordsException(
                 "Failed to update password: New password does not match the confirm password");
 
-        user.setPassword("{bcrypt}" + passwordEncoder.encode(passwordUpdate.getNewPassword()));
+        user.setPassword("{bcrypt}" + passwordEncoder.encode(passwordDto.getNewPassword()));
     }
 
     /**
@@ -272,6 +342,7 @@ public class UserServiceImpl implements UserService {
      *
      * @param token the user's token
      */
+    @Override
     public void deleteByToken(String token) {
         User user = this.findByToken(token);
 
@@ -283,6 +354,7 @@ public class UserServiceImpl implements UserService {
      *
      * @param token the user's token
      */
+    @Override
     public void deleteAvatarByToken(String token) {
         User user = this.findByToken(token);
 
@@ -293,6 +365,7 @@ public class UserServiceImpl implements UserService {
      * Checks if a user exists by its username
      *
      * @param username the username of the user
+     *
      * @return true if the user exists, false otherwise
      */
     public Boolean existsByUsername(String username) {
