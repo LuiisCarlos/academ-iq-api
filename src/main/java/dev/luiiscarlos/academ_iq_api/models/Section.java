@@ -10,14 +10,15 @@ import org.springframework.lang.Nullable;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -52,12 +53,8 @@ public class Section {
     private LocalTime duration = LocalTime.of(0, 0, 0);
 
     @Nullable
-    @ManyToMany
     @Builder.Default
-    @JoinTable(
-            name = "section_file_junction",
-            joinColumns = { @JoinColumn(name = "section_id") },
-            inverseJoinColumns = { @JoinColumn(name = "file_id") })
-    private List<File> videos = new ArrayList<>();
+    @OneToMany(mappedBy = "section", fetch = FetchType.EAGER , cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Lesson> lessons = new ArrayList<>();
 
 }

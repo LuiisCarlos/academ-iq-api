@@ -61,7 +61,7 @@ public class Course {
 
     @Nullable
     @Builder.Default
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "requirement")
     @CollectionTable(
         name = "course_requirement_junction",
@@ -83,12 +83,12 @@ public class Course {
 
     @Nullable
     @Builder.Default
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL , orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
-
+    
     @Nullable
     @Builder.Default
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER , orphanRemoval = true)
     private List<Enrollment> enrollments = new ArrayList<>();
 
     @Nullable

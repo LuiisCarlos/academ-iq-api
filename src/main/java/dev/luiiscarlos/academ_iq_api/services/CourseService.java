@@ -1,29 +1,37 @@
 package dev.luiiscarlos.academ_iq_api.services;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.CourseAlreadyExistsEception;
 import dev.luiiscarlos.academ_iq_api.exceptions.CourseNotFoundException;
-import dev.luiiscarlos.academ_iq_api.exceptions.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidFileTypeException;
+import dev.luiiscarlos.academ_iq_api.models.Category;
 import dev.luiiscarlos.academ_iq_api.models.Course;
 import dev.luiiscarlos.academ_iq_api.models.File;
+import dev.luiiscarlos.academ_iq_api.models.Lesson;
 import dev.luiiscarlos.academ_iq_api.models.Level;
+import dev.luiiscarlos.academ_iq_api.models.Section;
 import dev.luiiscarlos.academ_iq_api.models.dtos.CourseRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.CourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.LessonRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.SectionRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
-import dev.luiiscarlos.academ_iq_api.models.mappers.FileMapper;
+import dev.luiiscarlos.academ_iq_api.repositories.CategoryRepository;
 import dev.luiiscarlos.academ_iq_api.repositories.CourseRepository;
 
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -31,133 +39,242 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
+    private final CategoryRepository categoryRepository;
+
     private final FileServiceImpl fileService;
 
     private final CourseMapper courseMapper;
 
-    private final FileMapper fileMapper;
-
     /**
      * Saves the course
      *
-     * @param courseRequest the course details
+     * @param courseDto the course details
+     * @param files the files to be saved
+     *
      * @return the course
+     *
+     * @throws CourseAlreadyExistsEception if the course already exists
+     * @throws CourseNotFoundException if the category does not exist
+     * @throws InvalidFileTypeException if the file is not a valid video
      */
-    public CourseResponseDto save(CourseRequestDto courseRequest) {
-        if (courseRepository.existsByName(courseRequest.getName()))
-            throw new CourseAlreadyExistsEception("Failed to save course: Course already exists");
+    @SuppressWarnings("null")
+    public CourseResponseDto save(CourseRequestDto courseDto, Map<String, MultipartFile> files) {
+        if (courseRepository.existsByName(courseDto.getName()))
+            throw new CourseAlreadyExistsEception(
+                "Failed to save course: Course already exists");
 
-        File file = fileService.findByFilename("default-course-thumbnail.jpg");
-        Course course = courseRepository.save(courseMapper.toCourse(courseRequest, file));
+        File thumbnail;
+        MultipartFile thumbPart = files.get("thumbnail");
+        if (thumbPart != null && !thumbPart.isEmpty())
+            thumbnail = fileService.save(thumbPart, false);
+        else
+            thumbnail = fileService.findByFilename("default-course-thumbnail.jpg");
 
+        Course course = Course.builder()
+            .name(courseDto.getName())
+            .description(courseDto.getDescription())
+            .author(courseDto.getAuthor())
+            .requirements(courseDto.getRequirements())
+            .category(categoryRepository.findById(courseDto.getCategoryId())
+                .orElseThrow(() -> new CourseNotFoundException(
+                    "Failed to save course: Category not found")))
+            .level(Level.valueOf(courseDto.getLevel()))
+            .thumbnail(thumbnail)
+            .sections(new ArrayList<>())
+            .build();
+
+        for (SectionRequestDto sectionDto : courseDto.getSections()) {
+            Section section = Section.builder()
+                .name(sectionDto.getName())
+                .course(course)
+                .duration(LocalTime.parse(sectionDto.getDuration()))
+                .lessons(new ArrayList<>())
+                .build();
+
+            for (LessonRequestDto lessonDto : sectionDto.getLessons()) {
+                MultipartFile multipartFile = files.get("file_" + lessonDto.getName());
+
+                if (multipartFile != null && !multipartFile.isEmpty()) {
+                    if (!fileService.isValidVideo(multipartFile))
+                        throw new InvalidFileTypeException(
+                            "Invalid video content type: " + multipartFile.getContentType());
+                }
+
+                File video = (multipartFile != null && !multipartFile.isEmpty())
+                        ? fileService.save(multipartFile, false)
+                        : null;
+
+                Lesson lesson = Lesson.builder()
+                        .name(lessonDto.getName())
+                        .file(video)
+                        .section(section)
+                        .build();
+
+                section.getLessons().add(lesson);
+            }
+            course.getSections().add(section);
+        }
+
+        course = courseRepository.save(course);
         return courseMapper.toCourseResponseDto(course);
-    }
-
-    public Course save(Course course) {
-        if (courseRepository == null)
-            throw new CourseNotFoundException("Failed to save course: Course is null");
-
-        return courseRepository.save(course);
     }
 
     /**
      * Find all courses
      *
      * @return the list of the courses
+     *
+     * @throws CourseNotFoundException if no courses are found
      */
     public List<CourseResponseDto> findAll() {
         List<Course> courses = courseRepository.findAll();
 
         if (courses.isEmpty())
-            throw new CourseNotFoundException("Failed to find courses: No courses found");
+            throw new CourseNotFoundException(
+                "Failed to find courses: No courses found");
 
         return courses.stream().map(courseMapper::toCourseResponseDto).toList();
+    }
+
+    /**
+     * Find all categories
+     *
+     * @return the list of the courses
+     *
+     * @throws CourseNotFoundException if no categories are found
+     */
+    public List<Category> findAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+
+        if (categories.isEmpty())
+            throw new CourseNotFoundException(
+                "Failed to find courses: No courses found");
+
+        return categories;
     }
 
     /**
      * Finds the course by its id
      *
      * @param id the id of the course
+     *
      * @return the course
+     *
+     * @throws CourseNotFoundException if the course is not found
      */
     public Course findById(Long id) {
         return courseRepository.findById(id)
-            .orElseThrow(() -> new CourseNotFoundException("Failed to find course: Course not found with id " + id));
+            .orElseThrow(() -> new CourseNotFoundException(
+                "Failed to find course: Course not found with id " + id));
     }
 
-    /**
-     * Finds the course's thumbnail by its id
-     *
-     * @param id the course's id
-     * @return the course's thumbnail
-     */
-    @SuppressWarnings("null") // * Already handled
-    public FileResponseDto findThumbnailById(Long id) {
-        Course course = courseRepository.findById(id)
-            .orElseThrow(() -> new CourseNotFoundException("Failed to find course: Course not found with id " + id));
-
-        File file = fileService.findByFilename(course.getThumbnail().getFilename());
-        return fileMapper.toFileResponseDto(file);
-    }
 
     /**
      * Updates the course by its id
      *
-     * @param RequestResponse the course details
-     * @return the course
-     */
-    public CourseResponseDto updateById(Long id, CourseRequestDto courseRequest) {
-        Course course =  courseRepository.findById(id).map(c -> {
-            c.setName(courseRequest.getName());
-            c.setDescription(courseRequest.getDescription());
-            c.setAuthor(courseRequest.getAuthor());
-            c.setRequirements(courseRequest.getRequirements());
-            c.setCategory(courseRequest.getCategory());
-            c.setLevel(Level.valueOf(courseRequest.getLevel()));
-
-            return courseRepository.save(c);
-        }).orElseThrow(() -> new CourseNotFoundException("Failed to find a course: Course not found with id " + id));
-
-        return courseMapper.toCourseResponseDto(course);
-    }
-
-    /**
-     * Updates the course's thumbnail by its id
-     *
      * @param id the id of the course
-     * @param thumbnail the new thumbnail
-     * @return the updated course
+     * @param courseDto the course details
+     * @param files the files to be saved
+     *
+     * @return the course
+     *
+     * @throws CourseNotFoundException if the course is not found
+     * @throws InvalidFileTypeException if the file is not a valid video
      */
-    @SuppressWarnings("null") // * Already handled
-    public CourseResponseDto updateThumbnailById(Long id, MultipartFile thumbnail) {
-        if (thumbnail.isEmpty())
-        throw new FileNotFoundException("Failed to save file: Thumbnail not found");
-        if (!fileService.validateImage(thumbnail))
-            throw new InvalidFileTypeException("Failed to update thumbnail: Invalid file content type");
+    @SuppressWarnings("null")
+    public CourseResponseDto updateById(
+            Long id,
+            CourseRequestDto courseDto,
+            Map<String, MultipartFile> files) {
+        Course course = courseRepository.findById(id)
+            .orElseThrow(() -> new CourseNotFoundException("Course not found with id: " + id));
 
-        Course course = courseRepository.findById(id).map(c -> {
-            fileService.deleteByFilename(c.getThumbnail().getFilename());
+        course.setName(courseDto.getName());
+        course.setDescription(courseDto.getDescription());
+        course.setAuthor(courseDto.getAuthor());
+        course.setRequirements(courseDto.getRequirements());
+        course.setLevel(Level.valueOf(courseDto.getLevel()));
+        course.setCategory(categoryRepository.findById(courseDto.getCategoryId())
+        .orElseThrow(() -> new CourseNotFoundException(
+            "Failed to save course: Category not found with id " + courseDto.getCategoryId())));
 
-            File file = fileService.save(thumbnail, true);
-            file.setUpdatedAt(LocalDateTime.now());
-            c.setThumbnail(file);
+        MultipartFile thumbPart = files.get("thumbnail");
 
-            return courseRepository.save(c);
-        }).orElseThrow(() -> new CourseNotFoundException("Failed to find a course: Course not found with id " + id));
+        List<String> filenamesToDelete = new ArrayList<>();
 
-        return courseMapper.toCourseResponseDto(course);
+        if (thumbPart != null && !thumbPart.isEmpty()) {
+            filenamesToDelete.add(course.getThumbnail().getFilename());
+
+            File thumbnail = fileService.save(thumbPart, false);
+            thumbnail.setUpdatedAt(LocalDateTime.now());
+            course.setThumbnail(thumbnail);
+        }
+
+        for (Section section : course.getSections()) {
+            for (Lesson lesson : section.getLessons()) {
+                File oldFile = lesson.getFile();
+                if (oldFile != null && !oldFile.isDefaultFile()) {
+                    lesson.setFile(null);
+                    filenamesToDelete.add(oldFile.getFilename());
+                }
+            }
+        }
+
+        course.getSections().clear();
+        for (SectionRequestDto sectionDto : courseDto.getSections()) {
+            Section section = Section.builder()
+                .name(sectionDto.getName())
+                .course(course)
+                .lessons(new ArrayList<>())
+                .build();
+
+            for (LessonRequestDto lessonDto : sectionDto.getLessons()) {
+                MultipartFile multipartFile = files.get("file_" + lessonDto.getName());
+
+                if (multipartFile != null && !multipartFile.isEmpty()) {
+                    if (!fileService.isValidVideo(multipartFile))
+                        throw new InvalidFileTypeException(
+                            "Invalid video content type: " + multipartFile.getContentType());
+                }
+
+                File video = (multipartFile != null && !multipartFile.isEmpty())
+                    ? fileService.save(multipartFile, false)
+                    : null;
+
+                Lesson lesson = Lesson.builder()
+                    .name(lessonDto.getName())
+                    .file(video)
+                    .section(section)
+                    .build();
+
+                section.getLessons().add(lesson);
+            }
+
+            course.getSections().add(section);
+        }
+
+        Course updated = courseRepository.save(course);
+
+        for (String filename : filenamesToDelete)
+            fileService.deleteByFilename(filename);
+
+        return courseMapper.toCourseResponseDto(updated);
     }
 
     /**
      * Deletes the course by its id
      *
      * @param id the id of the course
+     *
+     * @throws CourseNotFoundException if the course is not found
      */
     public void deleteById(Long id) {
         if (!courseRepository.existsById(id))
-            throw new CourseNotFoundException("Failed to find a course: Course not found with id " + id);
+            throw new CourseNotFoundException(
+                "Failed to find a course: Course not found with id " + id);
 
         courseRepository.deleteById(id);
     }
 
 }
+

@@ -2,7 +2,6 @@ package dev.luiiscarlos.academ_iq_api.models.dtos;
 
 import java.util.List;
 
-import dev.luiiscarlos.academ_iq_api.models.Category;
 import lombok.Data;
 
 @Data
@@ -16,8 +15,10 @@ public class CourseRequestDto {
 
     private List<String> requirements;
 
-    private Category category;
+    private long categoryId;
 
     private String level;
+
+    private List<SectionRequestDto> sections;
 
 }
