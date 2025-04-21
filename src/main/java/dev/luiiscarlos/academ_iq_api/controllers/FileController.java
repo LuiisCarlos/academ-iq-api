@@ -23,9 +23,18 @@ public class FileController {
 
 	private final FileServiceImpl fileService;
 
+	/**
+	 * Endpoint to get a file by its filename.
+	 *
+	 * @param filename the name of the file to be retrieved
+	 * @param token the authorization token (optional)
+	 * @return the file as a Resource wrapped in a ResponseEntity
+	 */
 	@SuppressWarnings("null")// <- Already handled
 	@GetMapping("/{filename:.+}")
-	public ResponseEntity<Resource> findResourceByFilename(@PathVariable String filename, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<Resource> findResourceByFilename(
+			@PathVariable String filename,
+			@RequestHeader( value = "Authorization", required = false) String token) {
 		Resource resource = fileService.findResourceByFilename(filename);
 		File file = fileService.findByFilename(token, filename);
 		String contentType = file.getContentType();

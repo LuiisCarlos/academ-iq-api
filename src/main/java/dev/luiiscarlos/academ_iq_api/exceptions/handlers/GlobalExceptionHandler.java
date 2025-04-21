@@ -1,5 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.exceptions.handlers;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -10,16 +11,19 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.*;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler({UserNotFoundException.class,
+	@ExceptionHandler({
+		UserNotFoundException.class,
 		RoleNotFoundException.class,
 		AuthCredentialsNotFoundException.class,
 		FileNotFoundException.class,
@@ -27,73 +31,142 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		CourseNotFoundException.class,
 		EnrollmentNotFoundException.class,
 		SectionNotFoundException.class})
-	public ResponseEntity<ErrorResponse> handleNotFound(Exception ex) {
-		return ResponseEntity
+	public ResponseEntity<ErrorResponse> handleNotFoundExceptions(Exception ex) {
+		String message = ex.getCause() != null
+			? ex.getCause().getLocalizedMessage()
+			: ex.getMessage();
+
+		ErrorResponse error = ErrorResponse.builder()
 			.status(HttpStatus.NOT_FOUND)
-			.body(ErrorResponse.builder()
-				.status(HttpStatus.NOT_FOUND)
-				.statusCode(HttpStatus.NOT_FOUND.value())
-				.message(ex.getMessage()).build());
+			.statusCode(HttpStatus.NOT_FOUND.value())
+			.message(message)
+			.build();
+
+		return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
 	}
 
-	@ExceptionHandler({UserAlreadyExistsException.class,
+	@ExceptionHandler({
+		UserAlreadyExistsException.class,
 		UserWithDifferentPasswordsException.class,
 		InvalidPasswordException.class,
 		FileStorageException.class,
 		InvalidTokenException.class,
 		CourseAlreadyExistsEception.class,
 		InvalidRatingException.class})
-	public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex) {
-		return ResponseEntity
+	public ResponseEntity<ErrorResponse> handleBadRequestExceptions(Exception ex) {
+		String message = ex.getCause() != null
+			? ex.getCause().getLocalizedMessage()
+			: ex.getMessage();
+
+		ErrorResponse error = ErrorResponse.builder()
 			.status(HttpStatus.BAD_REQUEST)
-			.body(ErrorResponse.builder()
-				.status(HttpStatus.BAD_REQUEST)
-				.statusCode(HttpStatus.BAD_REQUEST.value())
-				.message(ex.getMessage()).build());
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.message(message)
+			.build();
+
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 	}
 
-    @ExceptionHandler({AuthenticationException.class, InvalidCredentialsException.class})
-	public ResponseEntity<ErrorResponse> handleUnauthorized(Exception ex) {
-		return ResponseEntity
+    @ExceptionHandler({
+		AuthenticationException.class,
+		InvalidCredentialsException.class})
+	public ResponseEntity<ErrorResponse> handleUnauthorizedExceptions(Exception ex) {
+		String message = ex.getCause() != null
+			? ex.getCause().getLocalizedMessage()
+			: ex.getMessage();
+
+		ErrorResponse error = ErrorResponse.builder()
 			.status(HttpStatus.UNAUTHORIZED)
-			.body(ErrorResponse.builder()
-				.status(HttpStatus.UNAUTHORIZED)
-				.statusCode(HttpStatus.UNAUTHORIZED.value())
-				.message(ex.getMessage()).build());
+			.statusCode(HttpStatus.UNAUTHORIZED.value())
+			.message(message)
+			.build();
+
+		return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
 	}
 
-	@ExceptionHandler({JwtValidationException.class,
+	@ExceptionHandler({
+		JwtValidationException.class,
 		BadJwtException.class,
 		UserUnderageException.class,
 		RefreshTokenExpiredException.class,
 		AccessDeniedException.class,
 		UserAccountNotVerifiedException.class,
 		InvalidFileTypeException.class})
-	public ResponseEntity<ErrorResponse> handleForbidden(Exception ex) {
-		return ResponseEntity
+	public ResponseEntity<ErrorResponse> handleForbiddenExceptions(Exception ex) {
+		String message = ex.getCause() != null
+			? ex.getCause().getLocalizedMessage()
+			: ex.getMessage();
+
+		ErrorResponse error = ErrorResponse.builder()
 			.status(HttpStatus.FORBIDDEN)
-			.body(ErrorResponse.builder()
-				.status(HttpStatus.FORBIDDEN)
-				.statusCode(HttpStatus.FORBIDDEN.value())
-				.message(ex.getMessage()).build());
+			.statusCode(HttpStatus.FORBIDDEN.value())
+			.message(message)
+			.build();
+
+		return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(Exception ex) {
+		String message = "Failed to process request: " +
+			"Operation could not be completed due to data integrity constraints";
+
+		ErrorResponse error = ErrorResponse.builder()
+			.status(HttpStatus.CONFLICT)
+			.statusCode(HttpStatus.CONFLICT.value())
+			.message(message)
+			.build();
+
+		return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+	@ExceptionHandler(TransactionSystemException.class)
+    public ResponseEntity<ErrorResponse> handleTransactionExceptions(Exception ex) {
+		String message = "Failed to process database transaction: " +
+			"Operation could not be completed, please try again later";
+
+		ErrorResponse error = ErrorResponse.builder()
+			.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+			.message(message)
+			.build();
+
+		return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
+		String message = ex.getCause() != null
+			? ex.getCause().getLocalizedMessage()
+			: ex.getMessage();
+
+		ErrorResponse error = ErrorResponse.builder()
+			.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+			.message(message)
+			.build();
+
+		return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@Override
-	@ExceptionHandler({Exception.class})
 	protected ResponseEntity<Object> handleExceptionInternal(
-            @NonNull Exception ex,
-            @Nullable Object body,
-            @NonNull HttpHeaders headers,
+			@NonNull Exception ex,
+			@Nullable Object body,
+			@NonNull HttpHeaders headers,
 			@NonNull HttpStatusCode statusCode,
-            @NonNull WebRequest request) {
-		String message = ex.getCause() != null ? ex.getCause().getLocalizedMessage() : null;
-		return ResponseEntity
-			.status(statusCode)
-			.headers(headers)
-			.body(ErrorResponse.builder()
-				.status(HttpStatus.valueOf(statusCode.value()))
-				.statusCode(statusCode.value())
-				.message(message));
+			@NonNull WebRequest request) {
+		String message = ex.getCause() != null
+			? ex.getCause().getLocalizedMessage()
+			: ex.getMessage();
+
+		ErrorResponse error = ErrorResponse.builder()
+			.status(HttpStatus.valueOf(statusCode.value()))
+			.statusCode(statusCode.value())
+			.message(message)
+			.build();
+
+		return new ResponseEntity<>(error, headers, statusCode);
 	}
 
 }

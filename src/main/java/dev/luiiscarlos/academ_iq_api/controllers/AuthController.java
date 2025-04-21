@@ -15,7 +15,7 @@ import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserResetPasswordDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.PasswordResetDto;
 import dev.luiiscarlos.academ_iq_api.services.AuthServiceImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -36,19 +36,23 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserLoginResponseDto> login(@RequestHeader("Origin") String origin, @RequestBody UserLoginRequestDto loginRequest) {
+    public ResponseEntity<UserLoginResponseDto> login(
+            @RequestHeader("Origin") String origin,
+            @RequestBody UserLoginRequestDto userDto) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(authService.login(origin, loginRequest));
+            .body(authService.login(origin, userDto));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserRegisterResponseDto> register(@RequestHeader("Origin") String origin, @RequestBody UserRegisterRequestDto registerRequest) {
+    public ResponseEntity<UserRegisterResponseDto> register(
+            @RequestHeader("Origin") String origin,
+            @RequestBody UserRegisterRequestDto userDto) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(authService.register(origin, registerRequest));
+            .body(authService.register(origin, userDto));
     }
 
     @PostMapping("/logout")
@@ -57,7 +61,6 @@ public class AuthController {
 
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
-            .contentType(MediaType.APPLICATION_JSON)
             .build();
     }
 
@@ -71,7 +74,9 @@ public class AuthController {
     }
 
     @PostMapping("/recover-password")
-    public ResponseEntity<Void> recoverPassword(@RequestHeader("Origin") String origin, @RequestBody String email) {
+    public ResponseEntity<Void> recoverPassword(
+            @RequestHeader("Origin") String origin,
+            @RequestBody String email) {
         authService.recoverPassword(origin, email);
 
         return ResponseEntity
@@ -81,8 +86,10 @@ public class AuthController {
 
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestParam String token, @RequestBody UserResetPasswordDto resetPassword) {
-        authService.resetPassword(token, resetPassword);
+    public ResponseEntity<Void> resetPassword(
+            @RequestParam String token,
+            @RequestBody PasswordResetDto userDto) {
+        authService.resetPassword(token, userDto);
 
         return ResponseEntity
             .status(HttpStatus.OK)

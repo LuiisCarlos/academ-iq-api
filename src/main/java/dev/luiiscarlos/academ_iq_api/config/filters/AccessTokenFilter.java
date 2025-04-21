@@ -45,6 +45,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String token = request.getHeader("Authorization");
+        String path = request.getRequestURI();
 
         if (token != null && token.startsWith("Bearer")) {
             token = token.substring(7);
@@ -64,10 +65,15 @@ public class AccessTokenFilter extends OncePerRequestFilter {
                 return;
             }
 
-            if (!"access".equals(tokenType)) {
-                errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
-                    "Failed to validate Token: Invalid token type");
-                return;
+            if (isRefreshPath(path)) {
+                if (!"refresh".equals(tokenType))
+                    throw new RuntimeException("Failed to validate Token: Invalid token type");
+            } else {
+                if (!"access".equals(tokenType)) {
+                    errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
+                        "Failed to validate Token: Invalid token type");
+                    return;
+                }
             }
 
             Authentication authentication = new JwtAuthenticationToken(jwt);
@@ -75,6 +81,12 @@ public class AccessTokenFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isRefreshPath(String path) {
+        return path.startsWith("/api/v1/auth/refresh") ||
+            path.contains("/api/v1/auth/logout") ||
+            path.contains("/api/v1/auth/verify");
     }
 
 }

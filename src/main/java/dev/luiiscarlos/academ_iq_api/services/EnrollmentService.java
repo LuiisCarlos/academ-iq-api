@@ -26,11 +26,34 @@ public class EnrollmentService {
     private final CourseService courseService;
 
     /**
+     *
+     *
+     * @param userId the user's id
+     * @param courseId the course's id
+     */
+    public User updateEnrollmentById(Long userId, Long courseId, Enrollment enrollment) {
+        return null;
+    }
+
+    /**
+     *
+     *
+     * @param userId the user's id
+     * @param courseId the course's id
+     */
+    public void deleteEnrollmentById(Long userId, Long courseId) {
+
+    }
+
+    /**
      * Save a new enrollment and sets the relationship between user and course
      *
      * @param token the user's token
      * @param courseId the course's id
+     *
      * @return the user's enrollments
+     *
+     * @throws EnrollmentNotFoundException if the enrollment already exists
      */
     @SuppressWarnings("null") // Already handled
     public List<EnrollmentResponseDto> saveEnrollmentByToken(String token, Long courseId) {
@@ -56,7 +79,10 @@ public class EnrollmentService {
      * Finds the user's enrollments
      *
      * @param token the user's token
+     *
      * @return the user's enrollments
+     *
+     * @throws EnrollmentNotFoundException if the user has no enrollments
      */
     public List<EnrollmentResponseDto> findEnrollmentsByToken(String token) {
         User user = userService.findByToken(token);
@@ -73,30 +99,37 @@ public class EnrollmentService {
      * Updates the user's enrollment by its course id
      *
      * @param token the user's token
-     * @param enrollmentRequest the enrollment details
+     * @param courseId the enrollment course id
+     * @param enrollmentDto the enrollment details
+     *
      * @return the user's enrollments
+     *
+     * @throws EnrollmentNotFoundException if the enrollment does not exist
+     * @throws InvalidRatingException if the rating is not between 1 and 5
      */
-    @SuppressWarnings("null") // Already handled
-    public List<EnrollmentResponseDto> updateEnrollmentByToken(String token,
-            EnrollmentRequestDto enrollmentRequest) {
+    @SuppressWarnings("null")
+    public List<EnrollmentResponseDto> updateEnrollmentByToken(
+            String token,
+            Long courseId,
+            EnrollmentRequestDto enrollmentDto) {
         User user = userService.findByToken(token);
         List<Enrollment> enrollments = user.getEnrollments();
 
         Enrollment enrollment = enrollments.stream()
-            .filter(e -> e.getCourse().getId().equals(enrollmentRequest.getCourseId()))
+            .filter(e -> e.getCourse().getId().equals(courseId))
             .findFirst()
             .orElseThrow(() -> new EnrollmentNotFoundException(
-                "Failed to update enrollment: Enrollment not found with course id " + enrollmentRequest.getCourseId()));
+                "Failed to update enrollment: Enrollment not found with course id " + courseId));
 
-        if (enrollmentRequest.getRating() < 1 || enrollmentRequest.getRating() > 5)
+        if (enrollmentDto.getRating() < 1 || enrollmentDto.getRating() > 5)
             throw new InvalidRatingException("Failed to update enrollment: Rating must be between 1 and 5");
 
-        enrollment.setRating(enrollmentRequest.getRating());
-        enrollment.setComment(enrollmentRequest.getComment());
-        enrollment.setProgress(enrollmentRequest.getProgress());
-        enrollment.setFavorite(enrollmentRequest.isFavorite());
-        enrollment.setArchived(enrollmentRequest.isArchived());
-        enrollment.setCompleted(enrollmentRequest.isCompleted());
+        enrollment.setRating(enrollmentDto.getRating());
+        enrollment.setComment(enrollmentDto.getComment());
+        enrollment.setProgress(enrollmentDto.getProgress());
+        enrollment.setFavorite(enrollmentDto.isFavorite());
+        enrollment.setArchived(enrollmentDto.isArchived());
+        enrollment.setCompleted(enrollmentDto.isCompleted());
 
         List<Enrollment> courseEnrollments = enrollment.getCourse().getEnrollments();
         List<Integer> ratings = courseEnrollments.stream()
@@ -120,9 +153,13 @@ public class EnrollmentService {
      *
      * @param token the user's token
      * @param courseId the enrollment course id
+     *
+     * @return the user's enrollments
+     *
+     * @throws EnrollmentNotFoundException if the enrollment does not exist
      */
     @SuppressWarnings("null") // Already handled
-    public List<EnrollmentResponseDto> deleteEnrollmentByToken(String token, Long courseId) {
+    public void deleteEnrollmentByToken(String token, Long courseId) {
         User user = userService.findByToken(token);
         List<Enrollment> enrollments = user.getEnrollments();
 
@@ -133,9 +170,6 @@ public class EnrollmentService {
         enrollments.removeIf(e -> e.getCourse().getId().equals(courseId));
         user.setEnrollments(enrollments);
         userService.save(user);
-
-        return user.getEnrollments().stream()
-            .map(enrollmentMapper::toEnrollmentResponse)
-            .toList();
     }
+
 }

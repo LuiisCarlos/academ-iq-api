@@ -70,17 +70,58 @@ public class User implements UserDetails {
     @NonNull
     private String email;
 
-    @NonNull
+    @Nullable
     private String firstname;
 
-    @NonNull
+    @Nullable
     private String lastname;
 
     @NonNull
     private LocalDate birthdate;
 
     @Nullable
+    private String dni;
+
+    @Nullable
     private String phone;
+
+    @Nullable
+    @Column(name = "github_url")
+    private String githubUrl;
+
+    @Nullable
+    @Column(name = "linkedin_url")
+    private String linkedinUrl;
+
+    @Nullable
+    @Column(name = "website_url")
+    private String websiteUrl;
+
+    @Nullable
+    private String biography;
+
+    @Nullable
+    private String studies;
+
+    @Nullable
+    @Column(name = "job_area")
+    private String jobArea;
+
+    @Nullable
+    @Column(name = "work_experience")
+    private String workExperience;
+
+    @Nullable
+    @Column(name = "company_name")
+    private String companyName;
+
+    @Nullable
+    @Column(name = "is_team_manager")
+    private Boolean isTeamManager;
+
+    @Nullable
+    @Column(name = "want_to_upgrade")
+    private Boolean wantToUpgrade;
 
     @NonNull
     @Builder.Default
@@ -107,8 +148,12 @@ public class User implements UserDetails {
         return this.isVerified;
     }
 
-    public void setVerified(Boolean isVerified) {
-        this.isVerified = isVerified;
+    public Boolean isTeamManager() {
+        return this.isTeamManager;
+    }
+
+    public Boolean wantToUpgrade() {
+        return this.wantToUpgrade;
     }
 
 }

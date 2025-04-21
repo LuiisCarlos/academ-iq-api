@@ -20,9 +20,17 @@ public class MailService {
 
     private final JavaMailSender mailSender;
 
+    /**
+     * Send an email to the user with a link to verify their email address.
+     * The link will contain a token that will be used to verify the user's identity.
+     *
+     * @param origin the origin of the request (e.g. http://localhost:8888)
+     * @param user the user to send the email to
+     *
+     * @throws EmailSendingException if there is an error sending the email
+     */
     public void sendEmailVerification(String origin, User user) {
         try {
-            //MIME - HTML message
             String token = generateUrl("verify", origin, tokenService.generateVerificationToken(user));
 
             MimeMessage message = mailSender.createMimeMessage();
@@ -65,7 +73,7 @@ public class MailService {
                             "<a href='https://github.com/LuiisCarlos' target='_blank'>" +
                                 "<img src='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png' alt='GitHub Logo' class='github-logo' width='32px' height='32px'>" +
                             "</a>" +
-                            "<p>Copyright © 2023 Academ-IQ</p>" +
+                            "<p>Copyright © 2025 Academ-IQ</p>" +
                         "</div>" +
                     "</div>" +
                 "</body>" +
@@ -80,6 +88,15 @@ public class MailService {
         }
     }
 
+    /**
+     * Send an email to the user with a link to reset their password.
+     * The link will contain a token that will be used to verify the user's identity.
+     *
+     * @param origin the origin of the request (e.g. http://localhost:8888)
+     * @param user the user to send the email to
+     *
+     * @throws EmailSendingException if there is an error sending the email
+     */
     public void sendEmailPasswordRecover(String origin, User user) {
         try {
             String token = generateUrl("reset-password", origin, tokenService.generateRecoverPasswordToken(user));
@@ -122,7 +139,7 @@ public class MailService {
                             "<a href='https://github.com/LuiisCarlos' target='_blank'>" +
                                 "<img src='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png' alt='GitHub Logo' class='github-logo' width='32px' height='32px'>" +
                             "</a>" +
-                            "<p>&copy; 2025 Academ-IQ. All rights reserved.</p>" +
+                            "<p>Copyright © 2025 Academ-IQ</p>" +
                         "</div>" +
                     "</div>" +
                 "</body>" +
@@ -137,6 +154,15 @@ public class MailService {
         }
     }
 
+    /**
+     * Generate a URL with the given endpoint, origin, and token.
+     *
+     * @param endpoint the endpoint to append to the origin (e.g. "verify" or "reset-password")
+     * @param origin the origin of the request (e.g. http://localhost:8888)
+     * @param token the token to append to the URL
+     *
+     * @return the generated URL
+     */
     private String generateUrl(String endpoint, String origin, String token) {
         return origin + "/" +  endpoint + "?token=" + token;
     }
