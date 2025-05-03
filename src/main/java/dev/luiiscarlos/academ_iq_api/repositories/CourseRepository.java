@@ -12,12 +12,12 @@ import dev.luiiscarlos.academ_iq_api.models.Course;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-    List<Course> findByName(String name);
+    List<Course> findByTitle(String title);
 
     List<Course> findByDuration(LocalTime duration);
 
     List<Course> findByCreatedAt(LocalDateTime createdAt);
 
-    Boolean existsByName(String name);
+    Boolean existsByTitle(String title);
 
 }

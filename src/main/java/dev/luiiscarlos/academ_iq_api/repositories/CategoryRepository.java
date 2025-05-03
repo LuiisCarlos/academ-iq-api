@@ -10,6 +10,7 @@ import dev.luiiscarlos.academ_iq_api.models.Category;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
+    @SuppressWarnings("null") // TODO: Review this
     List<Category> findAll();
 
 }

@@ -19,11 +19,11 @@ import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
 import dev.luiiscarlos.academ_iq_api.models.Role;
 import dev.luiiscarlos.academ_iq_api.models.User;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.PasswordResetDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordResetDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserLoginRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserLoginResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserRegisterRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserRegisterResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.UserMapper;
 import dev.luiiscarlos.academ_iq_api.services.interfaces.AuthService;
 
@@ -57,20 +57,22 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Login a user
      *
-     * @param origin the origin of the request
+     * @param origin  the origin of the request
      * @param userDto the user to login
      *
      * @return the logged in user
      *
      * @throws UserAccountNotVerifiedException if the user account is not verified
-     * @throws InvalidCredentialsException if the username or password is invalid
+     * @throws InvalidCredentialsException     if the username or password is
+     *                                         invalid
      */
+    @SuppressWarnings("null")
     public UserLoginResponseDto login(String origin, UserLoginRequestDto userDto) {
         User user = userService.findByUsername(userDto.getUsername());
         if (!user.isVerified()) {
             mailService.sendEmailVerification(origin, user);
             throw new UserAccountNotVerifiedException(
-                "Failed to login: User account is not verified");
+                    "Failed to login: User account is not verified");
         }
 
         if (!passwordEncoder.matches(userDto.getPassword(),
@@ -88,23 +90,24 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Register a new user
      *
-     * @param origin the origin of the request
+     * @param origin  the origin of the request
      * @param userDto the user to register
      *
      * @return the registered user
      *
-     * @throws UserWithDifferentPasswordsException if the password and its confirmation do not match
-     * @throws UserAlreadyExistsException if the username already exists
-     * @throws UserUnderageException if the user is underage
+     * @throws UserWithDifferentPasswordsException if the password and its
+     *                                             confirmation do not match
+     * @throws UserAlreadyExistsException          if the username already exists
+     * @throws UserUnderageException               if the user is underage
      */
     public UserRegisterResponseDto register(String origin, UserRegisterRequestDto userDto) {
         if (!userDto.getPassword().equals(userDto.getConfirmPassword()))
             throw new UserWithDifferentPasswordsException(
-                "Failed to register user: Passwords do not match");
+                    "Failed to register user: Passwords do not match");
 
         if (userService.existsByUsername(userDto.getUsername()))
             throw new UserAlreadyExistsException(
-                "Failed to register user: Invalid username or password");
+                    "Failed to register user: Invalid username or password");
 
         if (LocalDate.parse(userDto.getBirthdate()).isAfter(LocalDate.now().minusYears(18)))
             throw new UserUnderageException("Failed to register user: User is underage");
@@ -131,25 +134,25 @@ public class AuthServiceImpl implements AuthService {
      * @return the new access token
      *
      * @throws AuthCredentialsNotFoundException if the token is null or blank
-     * @throws InvalidTokenException if the token is invalid or expired
+     * @throws InvalidTokenException            if the token is invalid or expired
      */
     public String refresh(String token) {
         if (token == null || token.isBlank())
             throw new AuthCredentialsNotFoundException(
-            "Failed to refresh access token: Refresh token is required");
+                    "Failed to refresh access token: Refresh token is required");
 
         token = token.startsWith("Bearer ") ? token.substring(7) : token;
 
         if (tokenService.getTokenExpiration(token).isBefore(Instant.now()))
             throw new InvalidTokenException(
-                "Failed to refresh access token: Refresh token is expired");
+                    "Failed to refresh access token: Refresh token is expired");
 
         if (!tokenService.isValidToken(token))
             throw new InvalidTokenException(
-                "Failed to refresh access token: Invalid refresh token");
+                    "Failed to refresh access token: Invalid refresh token");
 
         log.debug("User " + tokenService.getTokenSubject(token) +
-            " has successfully refreshed the access token at " + LocalDateTime.now());
+                " has successfully refreshed the access token at " + LocalDateTime.now());
 
         return tokenService.refreshAccessToken(token);
     }
@@ -160,13 +163,13 @@ public class AuthServiceImpl implements AuthService {
      * @param token the refresh token
      *
      * @throws AuthCredentialsNotFoundException if the token is null or blank
-     * @throws InvalidTokenException if the token is invalid or expired
+     * @throws InvalidTokenException            if the token is invalid or expired
      */
     @SuppressWarnings("null") // Already handled
     public void logout(String token) {
         if (token == null || token.isBlank())
             throw new AuthCredentialsNotFoundException(
-                "Failed to logout: Refresh token is required");
+                    "Failed to logout: Refresh token is required");
 
         token = token.startsWith("Bearer ") ? token.substring(7) : token;
 
@@ -188,12 +191,12 @@ public class AuthServiceImpl implements AuthService {
      * @param token the token
      *
      * @throws AuthCredentialsNotFoundException if the token is null or blank
-     * @throws InvalidTokenException if the token is invalid or expired
+     * @throws InvalidTokenException            if the token is invalid or expired
      */
     public void verify(String token) {
         if (token == null || token.isBlank())
             throw new AuthCredentialsNotFoundException(
-                "Failed to logout: Refresh token is required");
+                    "Failed to logout: Refresh token is required");
 
         if (!tokenService.isValidToken(token))
             throw new InvalidTokenException("Failed to verify the email: Invalid token");
@@ -208,18 +211,18 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userService.findByUsername(username);
 
-        user.setVerified(true);
+        user.setIsVerified(true);
         userService.save(user);
 
         log.debug("User " + user.getUsername() +
-            " has successfully verified the account at " + LocalDateTime.now());
+                " has successfully verified the account at " + LocalDateTime.now());
     }
 
     /**
-     *  If the user account is verified, can recover his password by its email
+     * If the user account is verified, can recover his password by its email
      *
      * @param origin the origin of the request
-     * @param email the user's email
+     * @param email  the user's email
      *
      * @throws UserAccountNotVerifiedException if the user account is not verified
      */
@@ -229,30 +232,32 @@ public class AuthServiceImpl implements AuthService {
         if (!user.isVerified()) {
             mailService.sendEmailVerification(origin, user);
             throw new UserAccountNotVerifiedException(
-                "Failed to recover password: User account is not verified. " +
-                "An email has been sent to verify the account");
+                    "Failed to recover password: User account is not verified. " +
+                            "An email has been sent to verify the account");
         }
 
         mailService.sendEmailPasswordRecover(origin, user);
 
         log.debug("User " + user.getUsername() +
-            " has requested to recover the password at " + LocalDateTime.now());
+                " has requested to recover the password at " + LocalDateTime.now());
     }
 
     /**
      * Change the password of the current user
      *
-     * @param token the recover token
+     * @param token       the recover token
      * @param passwordDto the new password and its confirmation
      *
-     * @throws AuthCredentialsNotFoundException if the token is null or blank
-     * @throws InvalidTokenException if the token is invalid or expired
-     * @throws UserWithDifferentPasswordsException if the password and its confirmation do not match
+     * @throws AuthCredentialsNotFoundException    if the token is null or blank
+     * @throws InvalidTokenException               if the token is invalid or
+     *                                             expired
+     * @throws UserWithDifferentPasswordsException if the password and its
+     *                                             confirmation do not match
      */
     public void resetPassword(String token, PasswordResetDto passwordDto) {
         if (token == null || token.isBlank())
             throw new AuthCredentialsNotFoundException(
-                "Failed to reset password: Recover token is required");
+                    "Failed to reset password: Recover token is required");
 
         if (!tokenService.isValidToken(token))
             throw new InvalidTokenException("Failed to reset password: Invalid token");
@@ -265,7 +270,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (!passwordDto.getPassword().equals(passwordDto.getConfirmPassword()))
             throw new UserWithDifferentPasswordsException(
-                "Failed to reset password: Passwords do not match");
+                    "Failed to reset password: Passwords do not match");
 
         String username = tokenService.getTokenSubject(token);
         User user = userService.findByUsername(username);
@@ -274,7 +279,7 @@ public class AuthServiceImpl implements AuthService {
         userService.save(user);
 
         log.debug("User " + user.getUsername() +
-            " has successfully reset the password at " + LocalDateTime.now());
+                " has successfully reset the password at " + LocalDateTime.now());
     }
 
 }

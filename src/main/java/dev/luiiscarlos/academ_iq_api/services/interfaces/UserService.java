@@ -29,7 +29,7 @@ public interface UserService {
 
     FileResponseDto updateAvatarById(Long id, MultipartFile avatar);
 
-    User updateByToken(String token);
+    User updateByToken(String token, User user);
 
     FileResponseDto updateAvatarByToken(String token, MultipartFile avatar);
 

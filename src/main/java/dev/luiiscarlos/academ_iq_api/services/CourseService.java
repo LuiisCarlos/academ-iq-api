@@ -18,10 +18,10 @@ import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.Lesson;
 import dev.luiiscarlos.academ_iq_api.models.Level;
 import dev.luiiscarlos.academ_iq_api.models.Section;
-import dev.luiiscarlos.academ_iq_api.models.dtos.CourseRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.CourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.LessonRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.SectionRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.lesson.LessonRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.CategoryRepository;
 import dev.luiiscarlos.academ_iq_api.repositories.CourseRepository;
@@ -49,19 +49,19 @@ public class CourseService {
      * Saves the course
      *
      * @param courseDto the course details
-     * @param files the files to be saved
+     * @param files     the files to be saved
      *
-     * @return the course
+     * @return an {@link CourseResponseDto} as the saved course
      *
      * @throws CourseAlreadyExistsEception if the course already exists
-     * @throws CourseNotFoundException if the category does not exist
-     * @throws InvalidFileTypeException if the file is not a valid video
+     * @throws CourseNotFoundException     if the category does not exist
+     * @throws InvalidFileTypeException    if the file is not a valid video
      */
     @SuppressWarnings("null")
     public CourseResponseDto save(CourseRequestDto courseDto, Map<String, MultipartFile> files) {
-        if (courseRepository.existsByName(courseDto.getName()))
+        if (courseRepository.existsByTitle(courseDto.getTitle()))
             throw new CourseAlreadyExistsEception(
-                "Failed to save course: Course already exists");
+                    "Failed to save course: Course already exists");
 
         File thumbnail;
         MultipartFile thumbPart = files.get("thumbnail");
@@ -71,25 +71,26 @@ public class CourseService {
             thumbnail = fileService.findByFilename("default-course-thumbnail.jpg");
 
         Course course = Course.builder()
-            .name(courseDto.getName())
-            .description(courseDto.getDescription())
-            .author(courseDto.getAuthor())
-            .requirements(courseDto.getRequirements())
-            .category(categoryRepository.findById(courseDto.getCategoryId())
-                .orElseThrow(() -> new CourseNotFoundException(
-                    "Failed to save course: Category not found")))
-            .level(Level.valueOf(courseDto.getLevel()))
-            .thumbnail(thumbnail)
-            .sections(new ArrayList<>())
-            .build();
+                .title(courseDto.getTitle())
+                .subtitle(courseDto.getSubtitle())
+                .description(courseDto.getDescription())
+                .author(courseDto.getAuthor())
+                .requirements(courseDto.getRequirements())
+                .category(categoryRepository.findById(courseDto.getCategoryId())
+                        .orElseThrow(() -> new CourseNotFoundException(
+                                "Failed to save course: Category not found")))
+                .level(Level.valueOf(courseDto.getLevel()))
+                .thumbnail(thumbnail)
+                .sections(new ArrayList<>())
+                .build();
 
         for (SectionRequestDto sectionDto : courseDto.getSections()) {
             Section section = Section.builder()
-                .name(sectionDto.getName())
-                .course(course)
-                .duration(LocalTime.parse(sectionDto.getDuration()))
-                .lessons(new ArrayList<>())
-                .build();
+                    .name(sectionDto.getName())
+                    .course(course)
+                    .duration(LocalTime.parse(sectionDto.getDuration()))
+                    .lessons(new ArrayList<>())
+                    .build();
 
             for (LessonRequestDto lessonDto : sectionDto.getLessons()) {
                 MultipartFile multipartFile = files.get("file_" + lessonDto.getName());
@@ -97,7 +98,7 @@ public class CourseService {
                 if (multipartFile != null && !multipartFile.isEmpty()) {
                     if (!fileService.isValidVideo(multipartFile))
                         throw new InvalidFileTypeException(
-                            "Invalid video content type: " + multipartFile.getContentType());
+                                "Invalid video content type: " + multipartFile.getContentType());
                 }
 
                 File video = (multipartFile != null && !multipartFile.isEmpty())
@@ -131,7 +132,7 @@ public class CourseService {
 
         if (courses.isEmpty())
             throw new CourseNotFoundException(
-                "Failed to find courses: No courses found");
+                    "Failed to find courses: No courses found");
 
         return courses.stream().map(courseMapper::toCourseResponseDto).toList();
     }
@@ -148,7 +149,7 @@ public class CourseService {
 
         if (categories.isEmpty())
             throw new CourseNotFoundException(
-                "Failed to find courses: No courses found");
+                    "Failed to find courses: No courses found");
 
         return categories;
     }
@@ -162,41 +163,40 @@ public class CourseService {
      *
      * @throws CourseNotFoundException if the course is not found
      */
-    public Course findById(Long id) {
-        return courseRepository.findById(id)
-            .orElseThrow(() -> new CourseNotFoundException(
-                "Failed to find course: Course not found with id " + id));
+    public Course findById(Long courseId) {
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(
+                        "Failed to find course: Course not found with id " + courseId));
     }
-
 
     /**
      * Updates the course by its id
      *
-     * @param id the id of the course
+     * @param courseId  the id of the course
      * @param courseDto the course details
-     * @param files the files to be saved
+     * @param files     the files to be saved
      *
      * @return the course
      *
-     * @throws CourseNotFoundException if the course is not found
+     * @throws CourseNotFoundException  if the course is not found
      * @throws InvalidFileTypeException if the file is not a valid video
      */
     @SuppressWarnings("null")
     public CourseResponseDto updateById(
-            Long id,
+            Long courseId,
             CourseRequestDto courseDto,
             Map<String, MultipartFile> files) {
-        Course course = courseRepository.findById(id)
-            .orElseThrow(() -> new CourseNotFoundException("Course not found with id: " + id));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException("Course not found with id: " + courseId));
 
-        course.setName(courseDto.getName());
+        course.setTitle(courseDto.getTitle());
         course.setDescription(courseDto.getDescription());
         course.setAuthor(courseDto.getAuthor());
         course.setRequirements(courseDto.getRequirements());
         course.setLevel(Level.valueOf(courseDto.getLevel()));
         course.setCategory(categoryRepository.findById(courseDto.getCategoryId())
-        .orElseThrow(() -> new CourseNotFoundException(
-            "Failed to save course: Category not found with id " + courseDto.getCategoryId())));
+                .orElseThrow(() -> new CourseNotFoundException(
+                        "Failed to save course: Category not found with id " + courseDto.getCategoryId())));
 
         MultipartFile thumbPart = files.get("thumbnail");
 
@@ -223,10 +223,10 @@ public class CourseService {
         course.getSections().clear();
         for (SectionRequestDto sectionDto : courseDto.getSections()) {
             Section section = Section.builder()
-                .name(sectionDto.getName())
-                .course(course)
-                .lessons(new ArrayList<>())
-                .build();
+                    .name(sectionDto.getName())
+                    .course(course)
+                    .lessons(new ArrayList<>())
+                    .build();
 
             for (LessonRequestDto lessonDto : sectionDto.getLessons()) {
                 MultipartFile multipartFile = files.get("file_" + lessonDto.getName());
@@ -234,18 +234,18 @@ public class CourseService {
                 if (multipartFile != null && !multipartFile.isEmpty()) {
                     if (!fileService.isValidVideo(multipartFile))
                         throw new InvalidFileTypeException(
-                            "Invalid video content type: " + multipartFile.getContentType());
+                                "Invalid video content type: " + multipartFile.getContentType());
                 }
 
                 File video = (multipartFile != null && !multipartFile.isEmpty())
-                    ? fileService.save(multipartFile, false)
-                    : null;
+                        ? fileService.save(multipartFile, false)
+                        : null;
 
                 Lesson lesson = Lesson.builder()
-                    .name(lessonDto.getName())
-                    .file(video)
-                    .section(section)
-                    .build();
+                        .name(lessonDto.getName())
+                        .file(video)
+                        .section(section)
+                        .build();
 
                 section.getLessons().add(lesson);
             }
@@ -268,13 +268,12 @@ public class CourseService {
      *
      * @throws CourseNotFoundException if the course is not found
      */
-    public void deleteById(Long id) {
-        if (!courseRepository.existsById(id))
+    public void deleteById(Long courseId) {
+        if (!courseRepository.existsById(courseId))
             throw new CourseNotFoundException(
-                "Failed to find a course: Course not found with id " + id);
+                    "Failed to find a course: Course not found with id " + courseId);
 
-        courseRepository.deleteById(id);
+        courseRepository.deleteById(courseId);
     }
 
 }
-

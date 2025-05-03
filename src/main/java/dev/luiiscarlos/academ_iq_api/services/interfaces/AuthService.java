@@ -1,10 +1,10 @@
 package dev.luiiscarlos.academ_iq_api.services.interfaces;
 
-import dev.luiiscarlos.academ_iq_api.models.dtos.PasswordResetDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterResponseDto;;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordResetDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserLoginRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserLoginResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserRegisterRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserRegisterResponseDto;;
 
 public interface AuthService {
 

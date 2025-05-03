@@ -19,7 +19,7 @@ import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.User;
 
 import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.PasswordUpdateDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordUpdateDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.FileMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;
 import dev.luiiscarlos.academ_iq_api.services.interfaces.UserService;
@@ -89,8 +89,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findById(Long userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException(
-                "Failed to find user: User not found with id " + userId));
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Failed to find user: User not found with id " + userId));
     }
 
     /**
@@ -105,8 +105,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-            .orElseThrow(() -> new UserNotFoundException(
-                "Failed to find user : User not found with username " + username));
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Failed to find user : User not found with username " + username));
     }
 
     /**
@@ -120,8 +120,8 @@ public class UserServiceImpl implements UserService {
      */
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException(
-                "Failed to find user: User not found with email " + email));
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Failed to find user: User not found with email " + email));
     }
 
     /**
@@ -137,8 +137,8 @@ public class UserServiceImpl implements UserService {
     @SuppressWarnings("null")
     public FileResponseDto findAvatarById(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException(
-                "Failed to find user's avatar: User not found with id " + userId));
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Failed to find user's avatar: User not found with id " + userId));
 
         File file = fileService.findByFilename(user.getAvatar().getFilename());
         return fileMapper.toFileResponseDto(file);
@@ -148,7 +148,7 @@ public class UserServiceImpl implements UserService {
      * Updates the user's information by its id
      *
      * @param userId the id of the user
-     * @param user the new user
+     * @param user   the new user
      *
      * @return the updated user
      *
@@ -165,7 +165,7 @@ public class UserServiceImpl implements UserService {
             u.setPhone(user.getPhone());
             return userRepository.save(u);
         }).orElseThrow(() -> new UserNotFoundException(
-            "Failed to update user: User not found with id " + userId));
+                "Failed to update user: User not found with id " + userId));
     }
 
     /**
@@ -181,11 +181,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @SuppressWarnings("null")
     public FileResponseDto updateAvatarById(Long userId, MultipartFile avatar) {
-        if (avatar.isEmpty()) throw new FileStorageException(
-            "Failed to update user's avatar: Avatar is required");
+        if (avatar.isEmpty())
+            throw new FileStorageException(
+                    "Failed to update user's avatar: Avatar is required");
         if (!fileService.isValidImage(avatar))
             throw new InvalidFileTypeException(
-                "Failed to update avatar: Invalid file content type");
+                    "Failed to update avatar: Invalid file content type");
 
         User user = userRepository.findById(userId).map(u -> {
             fileService.deleteByFilename(u.getAvatar().getFilename());
@@ -196,7 +197,7 @@ public class UserServiceImpl implements UserService {
 
             return userRepository.save(u);
         }).orElseThrow(() -> new UserNotFoundException(
-            "Failed to update user's avatar: User not found with id " + userId));
+                "Failed to update user's avatar: User not found with id " + userId));
 
         return fileMapper.toFileResponseDto(user.getAvatar());
     }
@@ -212,7 +213,7 @@ public class UserServiceImpl implements UserService {
     public void deleteById(Long userId) {
         if (!userRepository.existsById(userId))
             throw new UserNotFoundException(
-                "Failed to delete user: User not found with id " + userId);
+                    "Failed to delete user: User not found with id " + userId);
 
         userRepository.deleteById(userId);
     }
@@ -226,10 +227,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @SuppressWarnings("null")
-    public void deleteAvatarById(Long  userId) {
+    public void deleteAvatarById(Long userId) {
         if (userRepository.existsById(userId))
             throw new UserNotFoundException(
-                "Failed to delete user's avatar: User not found with id " + userId);
+                    "Failed to delete user's avatar: User not found with id " + userId);
 
         userRepository.findById(userId).map(u -> {
             fileService.deleteByFilename(u.getAvatar().getFilename());
@@ -237,7 +238,7 @@ public class UserServiceImpl implements UserService {
             u.setAvatar(fileService.findByFilename("default-user-avatar.png"));
             return userRepository.save(u);
         }).orElseThrow(() -> new UserNotFoundException(
-            "Failed to delete user's avatar: User not found with id " + userId));
+                "Failed to delete user's avatar: User not found with id " + userId));
     }
 
     /**
@@ -248,9 +249,9 @@ public class UserServiceImpl implements UserService {
      * @return the user
      *
      * @throws AuthCredentialsNotFoundException if the token does not exist
-     * @throws InvalidCredentialsException if the token is invalid
-     * @throws InvalidTokenException if the token is expired
-     * @throws UserNotFoundException if the user does not exist
+     * @throws InvalidCredentialsException      if the token is invalid
+     * @throws InvalidTokenException            if the token is expired
+     * @throws UserNotFoundException            if the user does not exist
      */
     @Override
     public User findByToken(String token) {
@@ -264,12 +265,12 @@ public class UserServiceImpl implements UserService {
 
         if (tokenService.getTokenExpiration(token).isBefore(Instant.now()))
             throw new InvalidTokenException(
-                "Failed to refresh access token: Refresh token is expired");
+                    "Failed to refresh access token: Refresh token is expired");
 
         String username = tokenService.getTokenSubject(token);
         return userRepository.findByUsername(username)
-            .orElseThrow(() -> new UserNotFoundException(
-                "Failed to find user: User not found with username " + username));
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Failed to find user: User not found with username " + username));
     }
 
     /**
@@ -288,21 +289,22 @@ public class UserServiceImpl implements UserService {
     /**
      * Updates the user's information by the token
      *
-     * @param token the user's token
+     * @param token   the user's token
+     * @param userDto the user's token
      *
      * @return the updated user
      */
     @Override
-    public User updateByToken(String token) {
+    public User updateByToken(String token, User updated) {
         User user = this.findByToken(token);
 
-        return updateById(user.getId(), user);
+        return updateById(user.getId(), updated);
     }
 
     /**
      * Updates the user's avatar by the token
      *
-     * @param token the user's token
+     * @param token  the user's token
      * @param avatar the new avatar
      *
      * @return the updated avatar
@@ -317,7 +319,7 @@ public class UserServiceImpl implements UserService {
     /**
      * Updates the user's password by the token
      *
-     * @param token the user's token
+     * @param token       the user's token
      * @param passwordDto the current and new password
      */
     public void updatePasswordByToken(String token, PasswordUpdateDto passwordDto) {
@@ -328,11 +330,11 @@ public class UserServiceImpl implements UserService {
 
         if (passwordDto.getNewPassword().equals(passwordDto.getCurrentPassword()))
             throw new UserWithDifferentPasswordsException(
-                "Failed to update password: New password is the same as the old password");
+                    "Failed to update password: New password is the same as the old password");
 
         if (!passwordDto.getNewPassword().equals(passwordDto.getConfirmPassword()))
             throw new UserWithDifferentPasswordsException(
-                "Failed to update password: New password does not match the confirm password");
+                    "Failed to update password: New password does not match the confirm password");
 
         user.setPassword("{bcrypt}" + passwordEncoder.encode(passwordDto.getNewPassword()));
     }

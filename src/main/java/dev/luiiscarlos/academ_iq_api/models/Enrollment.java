@@ -16,6 +16,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,18 +46,19 @@ public class Enrollment {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @Nullable
-    @Builder.Default
-    private Double progress = 0.0;
+    @Transient
+    private Double progress;
 
     @Nullable
     @Builder.Default
-    @Column(name = "rating")
-    private Integer rating = 0;
-
-    @Nullable
-    @Builder.Default
-    private String comment = "";
+    @Column(name = "progress_state", columnDefinition = "JSON")
+    private String progressState = """
+            {
+              "sections": [],
+              "currentSectionId": null,
+              "currentLessonId": null
+            }
+            """;
 
     @Nullable
     @Builder.Default
@@ -78,28 +81,21 @@ public class Enrollment {
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime enrolledAt = LocalDateTime.now();
 
+    @Nullable
+    @Column(name = "completed_at")
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime completedAt;
+
     public Boolean isFavorite() {
         return this.isFavorite;
-    }
-
-    public void setFavorite(Boolean isFavorite) {
-        this.isFavorite = isFavorite;
     }
 
     public Boolean isArchived() {
         return this.isArchived;
     }
 
-    public void setArchived(Boolean isArchived) {
-        this.isArchived = isArchived;
-    }
-
     public Boolean isCompleted() {
         return this.isCompleted;
-    }
-
-    public void setCompleted(Boolean isCompleted) {
-        this.isCompleted = isCompleted;
     }
 
 }

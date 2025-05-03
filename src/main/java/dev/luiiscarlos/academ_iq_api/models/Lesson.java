@@ -37,4 +37,5 @@ public class Lesson {
     @ManyToOne
     @JoinColumn(name = "file_id")
     private File file;
+
 }

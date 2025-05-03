@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.models.Category;
-import dev.luiiscarlos.academ_iq_api.models.dtos.CourseRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.CourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.services.CourseService;
 
