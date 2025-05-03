@@ -1,10 +1,11 @@
-package dev.luiiscarlos.academ_iq_api.models.dtos;
+package dev.luiiscarlos.academ_iq_api.models.dtos.enrollment;
 
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
+import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseProgressDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,11 +15,9 @@ public class EnrollmentResponseDto {
 
     private EnrollmentCourseResponseDto course;
 
-    private Double progress;
+    private double progress;
 
-    private String comment;
-
-    private Integer rating;
+    private CourseProgressDto progressState;
 
     private Boolean isFavorite;
 
@@ -26,7 +25,10 @@ public class EnrollmentResponseDto {
 
     private Boolean isCompleted;
 
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yy HH:mm:ss")
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime enrolledAt;
+
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime completedAt;
 
 }

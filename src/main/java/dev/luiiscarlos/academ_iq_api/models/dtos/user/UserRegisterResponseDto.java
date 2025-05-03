@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.models.dtos;
+package dev.luiiscarlos.academ_iq_api.models.dtos.user;
 
 import java.time.LocalDate;
 

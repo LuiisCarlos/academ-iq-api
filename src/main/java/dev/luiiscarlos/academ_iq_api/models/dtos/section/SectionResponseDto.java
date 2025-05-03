@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.models.dtos;
+package dev.luiiscarlos.academ_iq_api.models.dtos.section;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -6,12 +6,15 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
+import dev.luiiscarlos.academ_iq_api.models.dtos.lesson.LessonResponseDto;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
 public class SectionResponseDto {
+
+    private Long id;
 
     private String name;
 

@@ -1,7 +1,8 @@
-package dev.luiiscarlos.academ_iq_api.models.dtos;
+package dev.luiiscarlos.academ_iq_api.models.dtos.section;
 
 import java.util.List;
 
+import dev.luiiscarlos.academ_iq_api.models.dtos.lesson.LessonRequestDto;
 import lombok.Data;
 
 @Data

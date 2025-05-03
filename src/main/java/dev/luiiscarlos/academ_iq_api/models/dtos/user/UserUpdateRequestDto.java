@@ -1,26 +1,21 @@
-package dev.luiiscarlos.academ_iq_api.models.dtos;
-
-import java.time.LocalDate;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+package dev.luiiscarlos.academ_iq_api.models.dtos.user;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class UserResponseDto {
+public class UserUpdateRequestDto {
 
     private String username;
-
-    private String avatarUrl;
 
     private String email;
 
     private String firstname;
 
     private String lastname;
+
+    private String birthdate;
 
     private String phone;
 
@@ -46,7 +41,12 @@ public class UserResponseDto {
 
     private Boolean wantToUpgrade;
 
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
-    private LocalDate birthdate;
+    public Boolean isTeamManager() {
+        return this.isTeamManager;
+    }
+
+    public Boolean wantToUpgrade() {
+        return this.wantToUpgrade;
+    }
 
 }

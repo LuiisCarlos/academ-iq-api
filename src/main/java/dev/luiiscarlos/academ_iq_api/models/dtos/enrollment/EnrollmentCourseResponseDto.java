@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.models.dtos;
+package dev.luiiscarlos.academ_iq_api.models.dtos.enrollment;
 
 import dev.luiiscarlos.academ_iq_api.models.Category;
 
@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 @Builder
 public class EnrollmentCourseResponseDto {
+
+    private long id;
 
     private String name;
 

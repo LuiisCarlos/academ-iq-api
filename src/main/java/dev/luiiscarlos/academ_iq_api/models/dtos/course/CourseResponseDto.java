@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.models.dtos;
+package dev.luiiscarlos.academ_iq_api.models.dtos.course;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -8,12 +8,16 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.models.Category;
+import dev.luiiscarlos.academ_iq_api.models.dtos.rating.RatingResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionResponseDto;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
 public class CourseResponseDto {
+
+    private long id;
 
     private String name;
 
@@ -27,7 +31,9 @@ public class CourseResponseDto {
 
     private String level;
 
-    private Double rating;
+    private double averageRating;
+
+    private List<RatingResponseDto> ratings;
 
     @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime duration;
