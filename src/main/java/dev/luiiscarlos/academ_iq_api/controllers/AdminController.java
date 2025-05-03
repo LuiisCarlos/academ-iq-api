@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.models.Enrollment;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
-import dev.luiiscarlos.academ_iq_api.services.EnrollmentService;
 import dev.luiiscarlos.academ_iq_api.services.UserServiceImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -29,8 +27,6 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 
     private final UserServiceImpl userService;
-
-    private final EnrollmentService enrollmentService;
 
     @GetMapping
     public ResponseEntity<List<User>> findAll() {
@@ -78,17 +74,6 @@ public class AdminController {
             .body(userService.updateAvatarById(userId, file));
     }
 
-    @PutMapping("/{id}/enrollment/{courseId}")
-    public ResponseEntity<User> updateEnrollmentById(
-            @PathVariable("id") Long userId,
-            @PathVariable Long courseId,
-            @RequestBody Enrollment enrollment) {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(enrollmentService.updateEnrollmentById(userId, courseId, enrollment));
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(
             @PathVariable("id") Long userId) {
@@ -103,17 +88,6 @@ public class AdminController {
     public ResponseEntity<Void> deleteAvatarById(
             @PathVariable("id") Long userId) {
         userService.deleteAvatarById(userId);
-
-        return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .build();
-    }
-
-    @DeleteMapping("/{id}/enrollment/{courseId}")
-    public ResponseEntity<Void> deleteEnrollmentById(
-            @PathVariable("id") Long userId,
-            @PathVariable Long courseId) {
-        enrollmentService.deleteEnrollmentById(userId, courseId);
 
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)

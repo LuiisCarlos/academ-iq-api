@@ -51,10 +51,10 @@ public class User implements UserDetails {
     @NonNull
     private String username;
 
-    @NonNull
+    @Nullable
     private String password;
 
-    @NonNull
+    @Nullable
     @JoinTable(
         name = "user_role_junction",
         joinColumns = { @JoinColumn(name = "user_id") },
@@ -73,17 +73,17 @@ public class User implements UserDetails {
     @Nullable
     private String firstname;
 
-    @Nullable
+    @NonNull
     private String lastname;
 
     @NonNull
     private LocalDate birthdate;
 
-    @Nullable
-    private String dni;
+    @NonNull
+    private String phone;
 
     @Nullable
-    private String phone;
+    private String dni;
 
     @Nullable
     @Column(name = "github_url")
@@ -116,6 +116,10 @@ public class User implements UserDetails {
     private String companyName;
 
     @Nullable
+    @Builder.Default
+    private Integer hours = 0;
+
+    @Nullable
     @Column(name = "is_team_manager")
     private Boolean isTeamManager;
 
@@ -123,18 +127,18 @@ public class User implements UserDetails {
     @Column(name = "want_to_upgrade")
     private Boolean wantToUpgrade;
 
-    @NonNull
+    @Nullable
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Enrollment> enrollments = new ArrayList<>();
 
-    @NonNull
+    @Nullable
     @Builder.Default
     @Column(name = "registered_at")
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime registeredAt = LocalDateTime.now();
 
-    @NonNull
+    @Nullable
     @Builder.Default
     @Column(name = "is_verified")
     private Boolean isVerified = false;

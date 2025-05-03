@@ -8,28 +8,48 @@ import org.springframework.stereotype.Component;
 import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.Role;
 import dev.luiiscarlos.academ_iq_api.models.User;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserLoginResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserRegisterResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.UserResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.*;
 
 @Component
 public class UserMapper {
 
-    public User toUser(UserRegisterRequestDto registerRequest,
+    public User toUser(
+            UserRegisterRequestDto userDto,
             String encodedPassword,
             Set<Role> authorities,
-            File defaultAvatar) {
+            File avatar) {
         return User.builder()
-            .username(registerRequest.getUsername())
+            .username(userDto.getUsername())
             .password(encodedPassword)
             .authorities(authorities)
-            .avatar(defaultAvatar)
-            .email(registerRequest.getEmail())
-            .firstname(registerRequest.getFirstname())
-            .lastname(registerRequest.getLastname())
-            .phone(registerRequest.getPhone())
-            .birthdate(LocalDate.parse(registerRequest.getBirthdate()))
+            .avatar(avatar)
+            .email(userDto.getEmail())
+            .firstname(userDto.getFirstname())
+            .lastname(userDto.getLastname())
+            .phone(userDto.getPhone())
+            .birthdate(LocalDate.parse(userDto.getBirthdate()))
+            .build();
+    }
+
+    public User toUser(UserUpdateRequestDto userDto) {
+        return User.builder()
+            .username(userDto.getUsername())
+            .email(userDto.getEmail())
+            .firstname(userDto.getFirstname())
+            .lastname(userDto.getLastname())
+            .birthdate(LocalDate.parse(userDto.getBirthdate()))
+            .phone(userDto.getPhone())
+            .dni(userDto.getDni())
+            .githubUrl(userDto.getGithubUrl())
+            .linkedinUrl(userDto.getLinkedinUrl())
+            .websiteUrl(userDto.getWebsiteUrl())
+            .biography(userDto.getBiography())
+            .studies(userDto.getStudies())
+            .jobArea(userDto.getJobArea())
+            .workExperience(userDto.getWorkExperience())
+            .companyName(userDto.getCompanyName())
+            .isTeamManager(userDto.isTeamManager())
+            .wantToUpgrade(userDto.wantToUpgrade())
             .build();
     }
 
@@ -44,7 +64,10 @@ public class UserMapper {
             .build();
     }
 
-    public UserLoginResponseDto toUserLoginResponseDto(String accessToken, String refreshToken, User user) {
+    public UserLoginResponseDto toUserLoginResponseDto(
+            String accessToken,
+            String refreshToken,
+            User user) {
         UserResponseDto userResponse = this.toUserResponseDto(user);
 
         return UserLoginResponseDto.builder()
@@ -71,12 +94,14 @@ public class UserMapper {
             .linkedinUrl(user.getLinkedinUrl())
             .websiteUrl(user.getWebsiteUrl())
             .jobArea(user.getJobArea())
-            .isTeamManager(user.isTeamManager())
             .workExperience(user.getWorkExperience())
             .studies(user.getStudies())
-            .wantToUpgrade(user.wantToUpgrade())
             .companyName(user.getCompanyName())
             .biography(user.getBiography())
+            .hours(user.getHours())
+            .wantToUpgrade(user.wantToUpgrade())
+            .isTeamManager(user.isTeamManager())
+            .registeredAt(user.getRegisteredAt())
             .build();
     }
 

@@ -23,6 +23,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -46,9 +47,13 @@ public class Course {
     private Long id;
 
     @NonNull
-    private String name;
+    private String title;
+
+    @Nullable
+    private String subtitle;
 
     @NonNull
+    @Column(length = 700)
     private String description;
 
     @NonNull
@@ -77,15 +82,19 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private Level level;
 
+    @Transient
+    private Double averageRating;
+
     @Nullable
     @Builder.Default
-    private Double rating = 0.0;
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL , orphanRemoval = true)
+    private List<Rating> ratings = new ArrayList<>();
 
     @Nullable
     @Builder.Default
     @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL , orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
-    
+
     @Nullable
     @Builder.Default
     @OneToMany(mappedBy = "course", fetch = FetchType.EAGER , orphanRemoval = true)
@@ -101,5 +110,22 @@ public class Course {
     @Column(name = "created_at")
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public Double getAverageRating() {
+        return calculateAverageRating();
+    }
+
+
+    @SuppressWarnings("null")
+    private Double calculateAverageRating() {
+        if (ratings == null || ratings.isEmpty())
+            return 0.0;
+
+        double sum = 0.0;
+        for (Rating rating : ratings)
+            sum += rating.getRating();
+
+        return sum / ratings.size();
+    }
 
 }

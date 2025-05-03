@@ -11,7 +11,7 @@ public class EnrollmentCourseResponseDto {
 
     private long id;
 
-    private String name;
+    private String title;
 
     private String author;
 
