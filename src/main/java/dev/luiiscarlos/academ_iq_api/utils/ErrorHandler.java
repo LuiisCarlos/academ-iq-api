@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class ErrorHandler {
 
     public void setCustomErrorResponse(HttpServletResponse response, HttpStatus status, String message)
-    throws IOException {
+            throws IOException {
         response.setStatus(status.value());
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(status)

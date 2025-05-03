@@ -18,14 +18,14 @@ public class EnvConfiguration {
             .load();
     }
 
+    @PostConstruct
+    private void init() {
+        dotenv.entries().forEach(e -> System.setProperty(e.getKey(), e.getValue()));
+    }
+
     @Bean
     Dotenv dotenv() {
         return dotenv;
-    }
-
-    @PostConstruct
-    public void init() {
-        dotenv.entries().forEach(e -> System.setProperty(e.getKey(), e.getValue()));
     }
 
 }

@@ -31,16 +31,20 @@ public class AccessTokenFilter extends OncePerRequestFilter {
     private final ErrorHandler errorHandler;
 
     /**
-     * Filters the request and checks if the access token is valid and if it is, it sets the authentication
+     * Filters the request and checks if the access token is valid and if it is, it
+     * sets the authentication
      *
-     * @param request The request to filter
-     * @param response The response to send the error to
+     * @param request     The request to filter
+     * @param response    The response to send the error to
      * @param filterChain The filter chain to continue the filter
+     *
      * @throws ServletException If a servlet error occurs
-     * @throws IOException If an I/O error occurs
+     * @throws IOException      If an I/O error occurs
      */
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
+    @SuppressWarnings("null")
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
@@ -49,29 +53,29 @@ public class AccessTokenFilter extends OncePerRequestFilter {
 
         if (token != null && token.startsWith("Bearer")) {
             token = token.substring(7);
-            Instant expiresAt = tokenService.getTokenExpiration(token);
-            String tokenType = tokenService.getTokenType(token);
             Jwt jwt = tokenService.getJwtToken(token);
+            Instant expiresAt = jwt.getExpiresAt();
+            String tokenType = jwt.getClaimAsString("token_type");
 
             if (!tokenService.isValidToken(token)) {
                 errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
-                    "Failed to validate Token: Invalid access token");
+                        "Failed to validate Token: Invalid access token");
                 return;
             }
 
-            if (expiresAt.isBefore(Instant.now())){
+            if (expiresAt.isBefore(Instant.now())) {
                 errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
-                    "Failed to validate Token: Expired access token");
+                        "Failed to validate Token: Expired access token");
                 return;
             }
 
             if (isRefreshPath(path)) {
                 if (!"refresh".equals(tokenType))
-                    throw new RuntimeException("Failed to validate Token: Invalid token type");
+                    throw new RuntimeException("Failed to validate Token: Invalid token type"); // TODO: Review this
             } else {
                 if (!"access".equals(tokenType)) {
                     errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
-                        "Failed to validate Token: Invalid token type");
+                            "Failed to validate Token: Invalid token type");
                     return;
                 }
             }
@@ -84,9 +88,9 @@ public class AccessTokenFilter extends OncePerRequestFilter {
     }
 
     private boolean isRefreshPath(String path) {
-        return path.startsWith("/api/v1/auth/refresh") ||
-            path.contains("/api/v1/auth/logout") ||
-            path.contains("/api/v1/auth/verify");
+        return path.contains("/api/v1/auth/refresh") ||
+                path.contains("/api/v1/auth/logout") ||
+                path.contains("/api/v1/auth/verify");
     }
 
 }
