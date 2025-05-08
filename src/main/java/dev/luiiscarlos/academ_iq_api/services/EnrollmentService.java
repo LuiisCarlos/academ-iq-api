@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentUpdateDto;
 import dev.luiiscarlos.academ_iq_api.exceptions.EnrollmentNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.Course;
 import dev.luiiscarlos.academ_iq_api.models.Enrollment;
@@ -39,6 +39,7 @@ public class EnrollmentService {
      *
      * @param token    the authentication token of the user
      * @param courseId the ID of the course
+     * @param flags    a map containing optional enrollment flags
      *
      * @return an {@link EnrollmentResponseDto} containing the newly created
      *         enrollment
@@ -46,7 +47,7 @@ public class EnrollmentService {
      * @throws EnrollmentNotFoundException if the user is already enrolled in the
      *                                     course
      */
-    public EnrollmentResponseDto save(String token, Long courseId) {
+    public EnrollmentResponseDto save(String token, Long courseId, Map<String, Boolean> flags) {
         User user = userService.findByToken(token);
         Course course = courseService.findById(courseId);
 
@@ -55,6 +56,10 @@ public class EnrollmentService {
                     "Failed to save enrollment: User is already enrolled");
 
         Enrollment enrollment = enrollmentMapper.toEnrollment(user, course);
+
+        if (flags != null)
+            enrollment.setIsFavorite(flags.getOrDefault("isFavorite", false));
+
         enrollmentRepository.save(enrollment);
 
         return enrollmentMapper.toEnrollmentResponse(enrollment);
@@ -117,7 +122,7 @@ public class EnrollmentService {
      *                                     user and course
      */
     public EnrollmentResponseDto updateByUserIdAndCourseId(String token, Long courseId,
-            EnrollmentRequestDto enrollmentDto) {
+            EnrollmentUpdateDto enrollmentDto) {
         User user = userService.findByToken(token);
         Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId)
                 .orElseThrow(() -> new EnrollmentNotFoundException(
@@ -149,7 +154,7 @@ public class EnrollmentService {
      * @throws EnrollmentNotFoundException if no enrollment is found for the given
      *                                     user and course
      */
-    public void patchByUserIdAndCourseId(String token, Long courseId, Map<String, Object> updates) {
+    public EnrollmentResponseDto patchByUserIdAndCourseId(String token, Long courseId, Map<String, Boolean> updates) {
         User user = userService.findByToken(token);
         Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId)
                 .orElseThrow(() -> new EnrollmentNotFoundException(
@@ -164,7 +169,7 @@ public class EnrollmentService {
         if (updates.containsKey("isCompleted"))
             enrollment.setIsCompleted((boolean) updates.get("isCompleted"));
 
-        enrollmentRepository.save(enrollment);
+        return enrollmentMapper.toEnrollmentResponse(enrollmentRepository.save(enrollment));
     }
 
     /**

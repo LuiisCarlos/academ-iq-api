@@ -3,6 +3,8 @@ package dev.luiiscarlos.academ_iq_api.controllers;
 import java.util.List;
 import java.util.Map;
 
+import javax.print.attribute.standard.Media;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentUpdateDto;
 import dev.luiiscarlos.academ_iq_api.services.EnrollmentService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,14 +32,15 @@ public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
 
-    @PostMapping
+    @PostMapping("/{id}")
     public ResponseEntity<EnrollmentResponseDto> save(
             @RequestHeader("Authorization") String token,
-            @PathVariable("id") Long courseId) {
+            @PathVariable("id") Long courseId,
+            @RequestBody(required = false) Map<String, Boolean> flags) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(enrollmentService.save(token, courseId));
+                .body(enrollmentService.save(token, courseId, flags));
     }
 
     @GetMapping
@@ -63,7 +66,7 @@ public class EnrollmentController {
     public ResponseEntity<EnrollmentResponseDto> updateByUserIdAndCourseId(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId,
-            @RequestBody EnrollmentRequestDto enrollmentDto) {
+            @RequestBody EnrollmentUpdateDto enrollmentDto) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -71,15 +74,15 @@ public class EnrollmentController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> patchByUserIdAndCourseId(
+    public ResponseEntity<EnrollmentResponseDto> patchByUserIdAndCourseId(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId,
-            @RequestBody Map<String, Object> updates) {
-        enrollmentService.patchByUserIdAndCourseId(token, courseId, updates);
+            @RequestBody Map<String, Boolean> updates) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .build();
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(enrollmentService.patchByUserIdAndCourseId(token, courseId, updates));
     }
 
     /*@PatchMapping("/lessons")

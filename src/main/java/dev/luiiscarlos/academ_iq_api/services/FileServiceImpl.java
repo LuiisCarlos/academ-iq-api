@@ -34,9 +34,9 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class FileServiceImpl implements FileService {
 
-	public static final String[] ALLOWED_IMAGE_TYPES = new String[] {"image/jpeg", "image/png"};
+	public static final String[] ALLOWED_IMAGE_TYPES = new String[] { "image/jpeg", "image/png" };
 
-	public static final String[] ALLOWED_VIDEO_TYPES = new String[] {"video/mp4", "video/avi", "video/mkv"};
+	public static final String[] ALLOWED_VIDEO_TYPES = new String[] { "video/mp4", "video/avi", "video/mkv" };
 
 	private final Path ROOT_LOCATION;
 
@@ -44,9 +44,8 @@ public class FileServiceImpl implements FileService {
 	private final FileRepository fileRepository;
 
 	public FileServiceImpl(
-		@Value("${storage.root-location}") String rootLocation,
-		FileRepository fileRepository
-	) {
+			@Value("${storage.root-location}") String rootLocation,
+			FileRepository fileRepository) {
 		this.ROOT_LOCATION = Paths.get(rootLocation);
 		this.fileRepository = fileRepository;
 	}
@@ -54,16 +53,16 @@ public class FileServiceImpl implements FileService {
 	/**
 	 * Initializes the storage location
 	 *
-	 * @throws IOException if the storage location can not be created
+	 * @throws IOException          if the storage location can not be created
 	 * @throws FileStorageException if the storage location can not be created
 	 */
 	@Override
 	public void init() {
 		try {
-            Files.createDirectories(ROOT_LOCATION);
-        } catch (IOException e) {
-            throw new FileStorageException("Storage not initialized");
-        }
+			Files.createDirectories(ROOT_LOCATION);
+		} catch (IOException e) {
+			throw new FileStorageException("Storage not initialized");
+		}
 	}
 
 	/**
@@ -95,8 +94,8 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public File findById(Long id) {
 		return fileRepository.findById(id)
-			.orElseThrow(() -> new FileNotFoundException(
-				"Failed to find file: File not found with id " + id));
+				.orElseThrow(() -> new FileNotFoundException(
+						"Failed to find file: File not found with id " + id));
 	}
 
 	/**
@@ -106,18 +105,18 @@ public class FileServiceImpl implements FileService {
 	 *
 	 * @return the file
 	 *
-	 * @throws FileNotFoundException if the file can not be found
+	 * @throws FileNotFoundException    if the file can not be found
 	 * @throws InvalidFileTypeException if the file type is not valid
 	 */
-    @Override
+	@Override
 	public File findByFilename(String filename) {
 		File file = fileRepository.findByFilename(filename)
-			.orElseThrow(() -> new FileNotFoundException(
-				"Failed to find file: File not found with name " + filename));
+				.orElseThrow(() -> new FileNotFoundException(
+						"Failed to find file: File not found with name " + filename));
 
 		if (!file.isImage())
 			throw new InvalidFileTypeException(
-				"Failed to find file: Files with video content type can not be retrieve");
+					"Failed to find file: Files with video content type can not be retrieve");
 
 		return file;
 	}
@@ -125,19 +124,19 @@ public class FileServiceImpl implements FileService {
 	/**
 	 * Retrieves a file by its filename
 	 *
-	 * @param token the authentication token
+	 * @param token    the authentication token
 	 * @param filename the file name
 	 *
 	 * @return the file
 	 *
-	 * @throws FileNotFoundException if the file can not be found
+	 * @throws FileNotFoundException       if the file can not be found
 	 * @throws InvalidCredentialsException if the file can not be retrieved
 	 */
 	@Override
 	public File findByFilename(String token, String filename) {
 		File file = fileRepository.findByFilename(filename)
-			.orElseThrow(() -> new FileNotFoundException(
-				"Failed to find file: File not found with name " + filename));
+				.orElseThrow(() -> new FileNotFoundException(
+						"Failed to find file: File not found with name " + filename));
 
 		if ((token == null || token.isEmpty()) && !file.isImage())
 			throw new InvalidCredentialsException("Failed to find file: Access denied");
@@ -157,28 +156,28 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public Resource findResourceByFilename(String filename) {
 		try {
-            Path filePath = ROOT_LOCATION.resolve(filename);
-            Resource resource = new UrlResource(filePath.toUri());
+			Path filePath = ROOT_LOCATION.resolve(filename);
+			Resource resource = new UrlResource(filePath.toUri());
 
-            if (!resource.exists() || !resource.isReadable())
+			if (!resource.exists() || !resource.isReadable())
 				throw new FileNotFoundException(
-					"Failed to find resource: File not found with name " + filename);
+						"Failed to find resource: File not found with name " + filename);
 
 			return resource;
-        } catch (MalformedURLException e) {
-            throw new FileNotFoundException("Failed to find resource: " + e.getMessage());
-        }
+		} catch (MalformedURLException e) {
+			throw new FileNotFoundException("Failed to find resource: " + e.getMessage());
+		}
 	}
 
 	/**
 	 * Saves a file
 	 *
-	 * @param file the file
+	 * @param file    the file
 	 * @param isImage the file type
 	 *
 	 * @return the file
 	 *
-	 * @throws FileStorageException if the file can not be saved
+	 * @throws FileStorageException     if the file can not be saved
 	 * @throws InvalidFileTypeException if the file type is not valid
 	 */
 	@Override
@@ -187,38 +186,38 @@ public class FileServiceImpl implements FileService {
 		if (file.isEmpty() || file == null)
 			throw new FileStorageException("Failed to save file: File is required");
 
-        try (InputStream inputStream = file.getInputStream()) {
+		try (InputStream inputStream = file.getInputStream()) {
 			String filename = StringUtils.cleanPath(file.getOriginalFilename());
-        	String storedFilename = System.currentTimeMillis() + "_" + filename;
-            if (filename.contains(".."))
-                throw new FileStorageException(
-					"Failed to save file: File with relative path outside current directory"); // Change this msg
+			String storedFilename = System.currentTimeMillis() + "_" + filename;
+			if (filename.contains(".."))
+				throw new FileStorageException(
+						"Failed to save file: File with relative path outside current directory");
 
-            Files.copy(inputStream, ROOT_LOCATION.resolve(storedFilename),
-                StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(inputStream, ROOT_LOCATION.resolve(storedFilename),
+					StandardCopyOption.REPLACE_EXISTING);
 
 			String contentType = file.getContentType() == null
-				? "application/octet-stream"
-				: file.getContentType();
+					? "application/octet-stream"
+					: file.getContentType();
 
 			String fileUrl = MvcUriComponentsBuilder
-				.fromMethodName(FileController.class, "findResourceByFilename", storedFilename, null)
-				.build()
-				.toUriString();
+					.fromMethodName(FileController.class, "findResourceByFilename", storedFilename, null)
+					.build()
+					.toUriString();
 
 			File fileEntitiy = File.builder()
-				.filename(storedFilename)
-				.contentType(contentType)
-				.size(file.getSize())
-				.isImage(isImage)
-				.url(fileUrl)
-				.extension(StringUtils.getFilenameExtension(filename))
-				.build();
+					.filename(storedFilename)
+					.contentType(contentType)
+					.size(file.getSize())
+					.isImage(isImage)
+					.url(fileUrl)
+					.extension(StringUtils.getFilenameExtension(filename))
+					.build();
 
 			return fileRepository.save(fileEntitiy);
-        } catch (IOException e) {
-            throw new FileStorageException("Failed to store file: " + e.getMessage());
-        }
+		} catch (IOException e) {
+			throw new FileStorageException("Failed to store file: " + e.getMessage());
+		}
 	}
 
 	/**
@@ -227,12 +226,12 @@ public class FileServiceImpl implements FileService {
 	 * @param filename the file name
 	 *
 	 * @throws FileNotFoundException if the file can not be deleted
-	 * @throws FileStorageException if the file can not be deleted
+	 * @throws FileStorageException  if the file can not be deleted
 	 */
 	public void deleteByFilename(String filename) {
 		File file = fileRepository.findByFilename(filename)
-            .orElseThrow(() -> new FileNotFoundException(
-				"Failed to delete file: File not found with name " + filename));
+				.orElseThrow(() -> new FileNotFoundException(
+						"Failed to delete file: File not found with name " + filename));
 
 		if (!file.isDefaultFile()) {
 			fileRepository.deleteByFilename(filename);

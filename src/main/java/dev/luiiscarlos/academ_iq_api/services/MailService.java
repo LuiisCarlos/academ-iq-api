@@ -31,7 +31,7 @@ public class MailService {
      */
     public void sendEmailVerification(String origin, User user) {
         try {
-            String token = generateUrl("verify", origin, tokenService.generateVerificationToken(user));
+            String token = generateUrl("auth/verify", origin, tokenService.generateVerificationToken(user));
 
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -99,7 +99,7 @@ public class MailService {
      */
     public void sendEmailPasswordRecover(String origin, User user) {
         try {
-            String token = generateUrl("reset-password", origin, tokenService.generateRecoverPasswordToken(user));
+            String token = generateUrl("auth/reset-password", origin, tokenService.generateRecoverPasswordToken(user));
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 

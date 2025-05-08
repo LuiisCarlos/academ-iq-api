@@ -78,6 +78,7 @@ public class CourseMapper {
             .author(course.getAuthor())
             .thumbnailUrl(course.getThumbnail().getUrl())
             .category(course.getCategory())
+            .duration(course.getDuration())
             .build();
     }
 

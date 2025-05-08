@@ -149,9 +149,17 @@ public class CourseService {
 
         if (categories.isEmpty())
             throw new CourseNotFoundException(
-                    "Failed to find courses: No courses found");
+                    "Failed to find category: No categories found");
 
         return categories;
+    }
+
+    public Category findCategoryByName(String categoryName) {
+        Category category = categoryRepository.findByName(categoryName)
+                .orElseThrow(() -> new CourseNotFoundException(
+                        "Failed to find category: Category not found with name " + categoryName));
+
+        return category;
     }
 
     /**
