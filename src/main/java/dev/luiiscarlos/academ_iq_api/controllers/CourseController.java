@@ -68,6 +68,14 @@ public class CourseController {
             .body(courseService.findAllCategories());
     }
 
+    @GetMapping("categories/{category}")
+    public ResponseEntity<Category> findCategoryByName(@PathVariable("category") String categoryName ) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(courseService.findCategoryByName(categoryName));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<CourseResponseDto> updateById(
             @PathVariable("id") Long courseId,
