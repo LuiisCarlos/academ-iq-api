@@ -3,8 +3,6 @@ package dev.luiiscarlos.academ_iq_api.controllers;
 import java.util.List;
 import java.util.Map;
 
-import javax.print.attribute.standard.Media;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseProgressDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentUpdateDto;
 import dev.luiiscarlos.academ_iq_api.services.EnrollmentService;
@@ -73,6 +72,17 @@ public class EnrollmentController {
                 .body(enrollmentService.updateByUserIdAndCourseId(token, courseId, enrollmentDto));
     }
 
+    @PutMapping("/{id}/progress")
+    public ResponseEntity<EnrollmentResponseDto> updateProgressByUserIdAndCourseId(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") Long courseId,
+            @RequestBody CourseProgressDto progressDto) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(enrollmentService.updateProgressByUserIdAndCourseId(token, courseId, progressDto));
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<EnrollmentResponseDto> patchByUserIdAndCourseId(
             @RequestHeader("Authorization") String token,
@@ -84,21 +94,6 @@ public class EnrollmentController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(enrollmentService.patchByUserIdAndCourseId(token, courseId, updates));
     }
-
-    /*@PatchMapping("/lessons")
-    public ResponseEntity<Void> updateLessonProgress(
-            @PathVariable Long enrollmentId,
-            @RequestBody LessonProgressUpdateRequest request) {
-
-        enrollmentService.updateLessonProgress(
-                enrollmentId,
-                request.getSectionId(),
-                request.getLessonId(),
-                request.isCompleted(),
-                request.getVideoProgress());
-
-        return ResponseEntity.noContent().build();
-    }*/
 
     @DeleteMapping("/@me/{id}")
     public ResponseEntity<List<EnrollmentResponseDto>> deleteByUserIdAndCourseId(

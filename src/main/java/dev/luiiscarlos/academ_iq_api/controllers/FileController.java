@@ -34,9 +34,13 @@ public class FileController {
 	@GetMapping("/{filename:.+}")
 	public ResponseEntity<Resource> findResourceByFilename(
 			@PathVariable String filename,
-			@RequestHeader( value = "Authorization", required = false) String token) {
+			@RequestHeader(value = "Authorization", required = false) String token) {
 		Resource resource = fileService.findResourceByFilename(filename);
-		File file = fileService.findByFilename(token, filename);
+		File file;
+		file = fileService.findByFilename(filename);
+		/* if (token == null || token.isEmpty())
+		else
+			file = fileService.findByFilename(token, filename); */
 		String contentType = file.getContentType();
 
 		return ResponseEntity

@@ -6,6 +6,10 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseProgressDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentUpdateDto;
 import dev.luiiscarlos.academ_iq_api.exceptions.EnrollmentNotFoundException;
@@ -33,6 +37,8 @@ public class EnrollmentService {
     private final UserServiceImpl userService;
 
     private final CourseService courseService;
+
+    private final ObjectMapper objectMapper;
 
     /**
      * Creates a new enrollment for a user in a specific course
@@ -144,6 +150,34 @@ public class EnrollmentService {
     }
 
     /**
+     *
+     * @param token
+     * @param courseId
+     * @param progressDto
+     *
+     * @return
+     */
+    public EnrollmentResponseDto updateProgressByUserIdAndCourseId(
+            String token,
+            Long courseId,
+            CourseProgressDto progressDto) {
+        User user = userService.findByToken(token);
+        log.debug(progressDto.toString());
+        Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId).map(e -> {
+            try {
+                String progressJson = objectMapper.writeValueAsString(progressDto);
+                e.setProgressState(progressJson);
+                return enrollmentRepository.save(e);
+            } catch (JsonProcessingException ex) {
+                throw new IllegalStateException("Error al serializar el estado de progreso", ex);
+            }
+        }).orElseThrow(() -> new EnrollmentNotFoundException(
+            "Failed to update enrollment: Enrollment not found with course id " + courseId));
+
+        return enrollmentMapper.toEnrollmentResponse(enrollment);
+    }
+
+    /**
      * Partially updates enrollment properties (isFavorite, isArchived, isCompleted)
      * for a specific user and course.
      *
@@ -161,13 +195,13 @@ public class EnrollmentService {
                         "Failed to update enrollment: Enrollment not found with course id " + courseId));
 
         if (updates.containsKey("isFavorite"))
-            enrollment.setIsFavorite((boolean) updates.get("isFavorite"));
+            enrollment.setIsFavorite(updates.get("isFavorite"));
 
         if (updates.containsKey("isArchived"))
-            enrollment.setIsArchived((boolean) updates.get("isArchived"));
+            enrollment.setIsArchived(updates.get("isArchived"));
 
         if (updates.containsKey("isCompleted"))
-            enrollment.setIsCompleted((boolean) updates.get("isCompleted"));
+            enrollment.setIsCompleted(updates.get("isCompleted"));
 
         return enrollmentMapper.toEnrollmentResponse(enrollmentRepository.save(enrollment));
     }

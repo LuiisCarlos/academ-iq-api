@@ -11,7 +11,7 @@ public class SectionProgressDto {
 
     private Long sectionId;
 
-    private boolean isCompleted;
+    private boolean completed;
 
     private List<LessonProgressDto> lessons;
 

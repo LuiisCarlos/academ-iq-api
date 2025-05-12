@@ -12,7 +12,7 @@ public class LessonProgressDto {
 
     private Long lessonId;
 
-    private boolean isCompleted;
+    private boolean completed;
 
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime lastAccessed;

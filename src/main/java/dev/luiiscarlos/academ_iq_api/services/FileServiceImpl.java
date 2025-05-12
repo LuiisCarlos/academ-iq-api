@@ -114,9 +114,9 @@ public class FileServiceImpl implements FileService {
 				.orElseThrow(() -> new FileNotFoundException(
 						"Failed to find file: File not found with name " + filename));
 
-		if (!file.isImage())
+		/* if (!file.isImage())
 			throw new InvalidFileTypeException(
-					"Failed to find file: Files with video content type can not be retrieve");
+					"Failed to find file: Files with video content type can not be retrieve"); */
 
 		return file;
 	}
