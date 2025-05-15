@@ -79,7 +79,7 @@ public class User implements UserDetails {
     @NonNull
     private LocalDate birthdate;
 
-    @NonNull
+    @Nullable
     private String phone;
 
     @Nullable

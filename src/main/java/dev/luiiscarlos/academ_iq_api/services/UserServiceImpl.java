@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @SuppressWarnings("null")
-    public FileResponseDto updateAvatarById(Long userId, MultipartFile avatar) {
+    public FileResponseDto patchAvatarById(Long userId, MultipartFile avatar) {
         if (avatar.isEmpty())
             throw new FileStorageException(
                     "Failed to update user's avatar: Avatar is required");
@@ -310,10 +310,10 @@ public class UserServiceImpl implements UserService {
      * @return the updated avatar
      */
     @Override
-    public FileResponseDto updateAvatarByToken(String token, MultipartFile avatar) {
+    public FileResponseDto patchAvatarByToken(String token, MultipartFile avatar) {
         User user = this.findByToken(token);
 
-        return updateAvatarById(user.getId(), avatar);
+        return patchAvatarById(user.getId(), avatar);
     }
 
     /**

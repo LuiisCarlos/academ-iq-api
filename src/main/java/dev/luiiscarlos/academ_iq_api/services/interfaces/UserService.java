@@ -27,11 +27,11 @@ public interface UserService {
 
     User updateById(Long id, User user);
 
-    FileResponseDto updateAvatarById(Long id, MultipartFile avatar);
+    FileResponseDto patchAvatarById(Long id, MultipartFile avatar);
 
     User updateByToken(String token, User user);
 
-    FileResponseDto updateAvatarByToken(String token, MultipartFile avatar);
+    FileResponseDto patchAvatarByToken(String token, MultipartFile avatar);
 
 
     void deleteById(Long id);

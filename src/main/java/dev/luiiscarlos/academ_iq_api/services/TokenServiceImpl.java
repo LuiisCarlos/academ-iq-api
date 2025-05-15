@@ -73,10 +73,10 @@ public class TokenServiceImpl implements TokenService {
             rt.setExpiresAt(LocalDateTime.ofInstant(expiresAt, zoneId));
             return rt;
         }).orElse(RefreshToken.builder()
-            .token(token)
-            .user(user)
-            .expiresAt(LocalDateTime.ofInstant(expiresAt, zoneId))
-            .build());
+                .token(token)
+                .user(user)
+                .expiresAt(LocalDateTime.ofInstant(expiresAt, zoneId))
+                .build());
 
         return refreshTokenRepository.save(refreshToken);
     }
@@ -120,23 +120,25 @@ public class TokenServiceImpl implements TokenService {
      *
      * @return The new access token as a String.
      *
-     * @throws RefreshTokenNotFoundException If the refresh token is not found in the database.
-     * @throws InvalidCredentialsException If the refresh token is invalid or not found.
-     * @throws RefreshTokenExpiredException If the refresh token has expired.
+     * @throws RefreshTokenNotFoundException If the refresh token is not found in
+     *                                       the database.
+     * @throws InvalidCredentialsException   If the refresh token is invalid or not
+     *                                       found.
+     * @throws RefreshTokenExpiredException  If the refresh token has expired.
      */
     @Override
     public String refreshAccessToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-            .orElseThrow(() -> new RefreshTokenNotFoundException(
-                "Failed to refresh access token: Refresh token not found"));
+                .orElseThrow(() -> new RefreshTokenNotFoundException(
+                        "Failed to refresh access token: Refresh token not found"));
 
         if (!isValidToken(token))
             throw new InvalidCredentialsException(
-                "Failed to refresh access token: Invalid refresh token");
+                    "Failed to refresh access token: Invalid refresh token");
 
         if (refreshToken.getExpiresAt().isBefore(LocalDateTime.now()))
             throw new RefreshTokenExpiredException(
-                "Failed to refresh access token: Expired refresh token");
+                    "Failed to refresh access token: Expired refresh token");
 
         return generateAccessToken(refreshToken.getUser());
     }
@@ -176,13 +178,14 @@ public class TokenServiceImpl implements TokenService {
      *
      * @return The found RefreshToken object.
      *
-     * @throws RefreshTokenNotFoundException If the refresh token is not found in the database.
+     * @throws RefreshTokenNotFoundException If the refresh token is not found in
+     *                                       the database.
      */
     @Override
     public RefreshToken findByToken(String token) {
         return refreshTokenRepository.findByToken(token)
-            .orElseThrow(() -> new RefreshTokenNotFoundException(
-                "Failed to find refresh token: Refresh token not found"));
+                .orElseThrow(() -> new RefreshTokenNotFoundException(
+                        "Failed to find refresh token: Refresh token not found"));
     }
 
     /**
@@ -192,13 +195,14 @@ public class TokenServiceImpl implements TokenService {
      *
      * @return The found RefreshToken object.
      *
-     * @throws RefreshTokenNotFoundException If the refresh token is not found in the database.
+     * @throws RefreshTokenNotFoundException If the refresh token is not found in
+     *                                       the database.
      */
     @Override
     public String getTokenType(String token) {
         try {
             return jwtDecoder.decode(token).getClaimAsString("token_type");
-        } catch (JwtException ex){
+        } catch (JwtException ex) {
             throw new InvalidTokenException("Failed to validate token: Malformed Token");
         }
     }
@@ -216,7 +220,7 @@ public class TokenServiceImpl implements TokenService {
     public Instant getTokenExpiration(String token) {
         try {
             return jwtDecoder.decode(token).getExpiresAt();
-        } catch (JwtException ex){
+        } catch (JwtException ex) {
             throw new InvalidTokenException("Failed to validate token: Malformed Token");
         }
     }
@@ -233,7 +237,7 @@ public class TokenServiceImpl implements TokenService {
     public String getTokenSubject(String token) {
         try {
             return jwtDecoder.decode(token).getSubject();
-        } catch (JwtException ex){
+        } catch (JwtException ex) {
             throw new InvalidTokenException("Failed to validate token: Malformed Token");
         }
     }
@@ -251,18 +255,21 @@ public class TokenServiceImpl implements TokenService {
     public Jwt getJwtToken(String token) {
         try {
             return jwtDecoder.decode(token);
-        } catch (JwtException ex){
+        } catch (JwtException ex) {
             throw new InvalidTokenException("Failed to validate token: Malformed Token");
         }
     }
 
     /**
-     * Generates a token for the given user with the specified expiration time and token type.
-     * This method is used to create access, refresh, verification, and password recovery tokens.
+     * Generates a token for the given user with the specified expiration time and
+     * token type.
+     * This method is used to create access, refresh, verification, and password
+     * recovery tokens.
      *
-     * @param user The user for whom the token is generated.
+     * @param user      The user for whom the token is generated.
      * @param expiresAt The expiration time of the token as an Instant.
-     * @param tokenType The type of the token (e.g., "access", "refresh", "verify", "recover").
+     * @param tokenType The type of the token (e.g., "access", "refresh", "verify",
+     *                  "recover").
      *
      * @return The generated token as a String.
      */

@@ -1,5 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.services;
 
+import java.time.LocalDateTime;
+
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,9 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MailService {
@@ -86,6 +90,8 @@ public class MailService {
         } catch (MessagingException ex) {
             throw new EmailSendingException("Failed to send the confirmation email: " + ex.getMessage());
         }
+
+        log.debug("A verification e-mail has been sent to " + user.getUsername() + " at " + LocalDateTime.now());
     }
 
     /**
@@ -152,6 +158,8 @@ public class MailService {
         } catch (MessagingException ex) {
             throw new EmailSendingException("Failed to send the reset password email: " + ex.getMessage());
         }
+
+        log.debug("A recover password e-mail has been sent to " + user.getUsername() + " at " + LocalDateTime.now());
     }
 
     /**

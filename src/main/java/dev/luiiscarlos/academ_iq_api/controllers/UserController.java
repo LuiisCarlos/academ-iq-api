@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,14 +62,14 @@ public class UserController {
                 .body(userMapper.toUserResponseDto(userService.updateByToken(token, user)));
     }
 
-    @PutMapping(value = "/@me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/@me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<FileResponseDto> updateAvatarByToken(
             @RequestHeader("Authorization") String token,
             @RequestPart("avatar") MultipartFile file) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(userService.updateAvatarByToken(token, file));
+                .body(userService.patchAvatarByToken(token, file));
     }
 
     @DeleteMapping("/@me")

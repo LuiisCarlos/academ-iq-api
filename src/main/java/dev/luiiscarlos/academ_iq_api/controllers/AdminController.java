@@ -71,7 +71,7 @@ public class AdminController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(userService.updateAvatarById(userId, file));
+            .body(userService.patchAvatarById(userId, file));
     }
 
     @DeleteMapping("/{id}")

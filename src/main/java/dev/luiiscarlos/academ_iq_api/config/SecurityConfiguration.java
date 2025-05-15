@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import dev.luiiscarlos.academ_iq_api.config.filters.AccessTokenFilter;
 import dev.luiiscarlos.academ_iq_api.config.filters.ExceptionHandlingFilter;
-
+import dev.luiiscarlos.academ_iq_api.utils.ErrorHandler;
 import lombok.RequiredArgsConstructor;
 
 @EnableWebMvc
@@ -33,10 +34,11 @@ public class SecurityConfiguration {
 
     private final ExceptionHandlingFilter exceptionHandlingFilter;
 
-    private final AccessDeniedHandler accessDeniedHandler;
+    private final ErrorHandler errorHandler;
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, AccessDeniedHandler accessDeniedHandler)
+            throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
@@ -48,8 +50,8 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.GET, "/api/v1/courses/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/courses/{id}/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/courses/**").permitAll()
-                .requestMatchers("/api/v1/courses/**").hasAnyRole("ADMIN","ACADEMIQ_ADMIN")
-                .requestMatchers(HttpMethod.GET,"/api/v1/users/enrollments/@me/**").authenticated()
+                .requestMatchers("/api/v1/courses/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/enrollments/@me/**").authenticated()
                 .requestMatchers("/api/v1/users/@me/**").authenticated()
                 .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
                 .requestMatchers("/api/v1/files/**").permitAll()
@@ -62,7 +64,8 @@ public class SecurityConfiguration {
         http
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler));
+        http
+            .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler));
 
         http
             .addFilterBefore(exceptionHandlingFilter, UsernamePasswordAuthenticationFilter.class)
@@ -99,6 +102,14 @@ public class SecurityConfiguration {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
+                    "Failed to access resource: Access denied");
+        };
     }
 
 }

@@ -9,8 +9,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -36,12 +34,10 @@ public class Category {
     @Column(length = 5000)
     private String svg;
 
-    private String color;
-
     @Column(name = "short_description")
     private String shortDescription;
 
-    @Column(name = "long_description")
+    @Column(name = "long_description", length = 2000)
     private String longDescription;
 
     @Builder.Default
