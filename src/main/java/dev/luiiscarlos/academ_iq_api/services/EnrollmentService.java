@@ -3,15 +3,16 @@ package dev.luiiscarlos.academ_iq_api.services;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseProgressDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.CompletedLesson;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentUpdateDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.ProgressState;
 import dev.luiiscarlos.academ_iq_api.exceptions.EnrollmentNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.Course;
 import dev.luiiscarlos.academ_iq_api.models.Enrollment;
@@ -38,8 +39,6 @@ public class EnrollmentService {
 
     private final CourseService courseService;
 
-    private final ObjectMapper objectMapper;
-
     /**
      * Creates a new enrollment for a user in a specific course
      *
@@ -47,13 +46,12 @@ public class EnrollmentService {
      * @param courseId the ID of the course
      * @param flags    a map containing optional enrollment flags
      *
-     * @return an {@link EnrollmentResponseDto} containing the newly created
-     *         enrollment
+     * @return an {@link Enrollment} the newly created enrollment
      *
      * @throws EnrollmentNotFoundException if the user is already enrolled in the
      *                                     course
      */
-    public EnrollmentResponseDto save(String token, Long courseId, Map<String, Boolean> flags) {
+    public Enrollment create(String token, Long courseId, Map<String, Boolean> flags) {
         User user = userService.findByToken(token);
         Course course = courseService.findById(courseId);
 
@@ -61,14 +59,26 @@ public class EnrollmentService {
             throw new EnrollmentNotFoundException(
                     "Failed to save enrollment: User is already enrolled");
 
-        Enrollment enrollment = enrollmentMapper.toEnrollment(user, course);
+        Enrollment enrollment = Enrollment.builder()
+                .user(user)
+                .course(course)
+                .build();
 
         if (flags != null)
             enrollment.setIsFavorite(flags.getOrDefault("isFavorite", false));
 
-        enrollmentRepository.save(enrollment);
+        return enrollmentRepository.save(enrollment);
+    }
 
-        return enrollmentMapper.toEnrollmentResponse(enrollment);
+    public Enrollment findOrCreate(String token, Long courseId) {
+        User user = userService.findByToken(token);
+        Optional<Enrollment> existingEnrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId);
+
+        if (existingEnrollment.isPresent()) {
+            return existingEnrollment.get();
+        } else {
+            return create(token, courseId, null);
+        }
     }
 
     /**
@@ -115,69 +125,6 @@ public class EnrollmentService {
     }
 
     /**
-     * Updates the enrollment for a specific user and course
-     *
-     * @param token         the authentication token of the user
-     * @param courseId      the ID of the course
-     * @param enrollmentDto the updated enrollment data
-     *
-     * @return an {@link EnrollmentResponseDto} containing the updated enrollment
-     *         information
-     *
-     * @throws EnrollmentNotFoundException if no enrollment is found for the given
-     *                                     user and course
-     */
-    public EnrollmentResponseDto updateByUserIdAndCourseId(String token, Long courseId,
-            EnrollmentUpdateDto enrollmentDto) {
-        User user = userService.findByToken(token);
-        Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId)
-                .orElseThrow(() -> new EnrollmentNotFoundException(
-                        "Failed to update enrollment: Enrollment not found with course id " + courseId));
-
-        // enrollment.setProgress(enrollmentDto.getProgress()); // TODO: Review this
-        enrollment.setIsFavorite(enrollmentDto.isFavorite());
-        enrollment.setIsArchived(enrollmentDto.isArchived());
-
-        if (!enrollment.isCompleted() && enrollmentDto.isCompleted()) { // TODO: Review this
-            // user.setHours(user.getHours() +
-            // enrollment.getCourse().getDuration().getHour());
-            // userService.updateHours();
-            enrollment.setCompletedAt(LocalDateTime.now());
-            enrollment.setIsCompleted(enrollmentDto.isCompleted());
-        }
-
-        return enrollmentMapper.toEnrollmentResponse(enrollment);
-    }
-
-    /**
-     *
-     * @param token
-     * @param courseId
-     * @param progressDto
-     *
-     * @return
-     */
-    public EnrollmentResponseDto updateProgressByUserIdAndCourseId(
-            String token,
-            Long courseId,
-            CourseProgressDto progressDto) {
-        User user = userService.findByToken(token);
-        log.debug(progressDto.toString());
-        Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId).map(e -> {
-            try {
-                String progressJson = objectMapper.writeValueAsString(progressDto);
-                e.setProgressState(progressJson);
-                return enrollmentRepository.save(e);
-            } catch (JsonProcessingException ex) {
-                throw new IllegalStateException("Error al serializar el estado de progreso", ex);
-            }
-        }).orElseThrow(() -> new EnrollmentNotFoundException(
-            "Failed to update enrollment: Enrollment not found with course id " + courseId));
-
-        return enrollmentMapper.toEnrollmentResponse(enrollment);
-    }
-
-    /**
      * Partially updates enrollment properties (isFavorite, isArchived, isCompleted)
      * for a specific user and course.
      *
@@ -188,7 +135,7 @@ public class EnrollmentService {
      * @throws EnrollmentNotFoundException if no enrollment is found for the given
      *                                     user and course
      */
-    public EnrollmentResponseDto patchByUserIdAndCourseId(String token, Long courseId, Map<String, Boolean> updates) {
+    public Enrollment updateByUserIdAndCourseId(String token, Long courseId, Map<String, Boolean> updates) {
         User user = userService.findByToken(token);
         Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId)
                 .orElseThrow(() -> new EnrollmentNotFoundException(
@@ -200,10 +147,40 @@ public class EnrollmentService {
         if (updates.containsKey("isArchived"))
             enrollment.setIsArchived(updates.get("isArchived"));
 
-        if (updates.containsKey("isCompleted"))
-            enrollment.setIsCompleted(updates.get("isCompleted"));
+        return enrollmentRepository.save(enrollment);
+    }
 
-        return enrollmentMapper.toEnrollmentResponse(enrollmentRepository.save(enrollment));
+    /**
+     *
+     */
+    public Enrollment patchProgressState(String token, Long courseId, Map<String, Object> updates) {
+        Enrollment enrollment = findOrCreate(token, courseId);
+
+        ProgressState progress = enrollment.getProgressState();
+
+        Long sectionId = Long.valueOf( (int)updates.get("sectionId"));
+        Long lessonId = Long.valueOf( (int)updates.get("lessonId"));
+        Boolean isCompleted = (Boolean) updates.getOrDefault("isCompleted", false);
+
+        progress.setCurrentSectionId(sectionId);
+        progress.setCurrentLessonId(lessonId);
+
+        if (isCompleted) {
+            boolean alreadyCompleted = progress.getCompletedLessons().stream()
+                    .anyMatch(cl -> cl.getSectionId().equals(sectionId) && cl.getLessonId().equals(lessonId));
+
+            if (!alreadyCompleted) {
+                CompletedLesson completedLesson = new CompletedLesson();
+                completedLesson.setSectionId(sectionId);
+                completedLesson.setLessonId(lessonId);
+                completedLesson.setCompletedAt(LocalDateTime.now());
+                progress.getCompletedLessons().add(completedLesson);
+            }
+        }
+
+        checkCourseCompletion(enrollment);
+
+        return enrollmentRepository.save(enrollment);
     }
 
     /**
@@ -225,71 +202,40 @@ public class EnrollmentService {
         enrollmentRepository.deleteByUserIdAndCourseId(user.getId(), courseId);
     }
 
-    /*
-     * public void updateLessonProgress(
-     * Long enrollmentId,
-     * Long sectionId,
-     * Long lessonId,
-     * boolean isCompleted,
-     * double videoProgress) {
-     * Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
-     * .orElseThrow(() -> new EnrollmentNotFoundException("Enrollment not found"));
+    /**
      *
-     * CourseProgressDto progress;
-     *
-     * try {
-     * progress = objectMapper.readValue(enrollment.getProgress(),
-     * CourseProgressDto.class);
-     * } catch (JsonProcessingException e) {
-     * progress = initializeNewProgress();
-     * }
-     *
-     * // Buscar o crear la sección
-     * SectionProgressDto section = progress.getSections().stream()
-     * .filter(s -> s.getSectionId().equals(sectionId))
-     * .findFirst()
-     * .orElseGet(() -> {
-     * SectionProgressDto newSection = new SectionProgressDto();
-     * newSection.setSectionId(sectionId);
-     * newSection.setLessons(new ArrayList<>());
-     * progress.getSections().add(newSection);
-     * return newSection;
-     * });
-     *
-     * // Buscar o crear la lección
-     * LessonProgressDto lesson = section.getLessons().stream()
-     * .filter(l -> l.getLessonId().equals(lessonId))
-     * .findFirst()
-     * .orElseGet(() -> {
-     * LessonProgressDto newLesson = new LessonProgressDto();
-     * newLesson.setLessonId(lessonId);
-     * section.getLessons().add(newLesson);
-     * return newLesson;
-     * });
-     *
-     * // Actualizar datos de la lección
-     * lesson.setCompleted(isCompleted);
-     * lesson.setVideoProgress(videoProgress);
-     * lesson.setLastAccessed(LocalDateTime.now());
-     *
-     * // Verificar si todas las lecciones están completadas
-     * section.setCompleted(section.getLessons().stream().allMatch(LessonProgressDto
-     * ::isCompleted));
-     *
-     * // Guardar el progreso actualizado
-     * try {
-     * enrollment.setProgress(objectMapper.writeValueAsString(progress));
-     * enrollmentRepository.save(enrollment);
-     * } catch (JsonProcessingException e) {
-     * throw new IllegalStateException("Failed to serialize progress", e);
-     * }
-     * }
-     *
-     * private CourseProgressDto initializeNewProgress() {
-     * CourseProgressDto progress = new CourseProgressDto();
-     * progress.setSections(new ArrayList<>());
-     * return progress;
-     * }
+     * @param enrollment
      */
+    private void checkCourseCompletion(Enrollment enrollment) {
+        List<Long> allLessonIds = courseService.findAllLessonIdsById(enrollment.getCourse().getId());
+
+        if (allLessonIds.isEmpty()) {
+            enrollment.setIsCompleted(true);
+            enrollment.setCompletedAt(LocalDateTime.now());
+            enrollment.setProgress(1.0);
+            return;
+        }
+
+        Set<Long> completedLessonIds = enrollment.getProgressState().getCompletedLessons().stream()
+                .filter(cl -> cl.getSectionId() != null && cl.getLessonId() != null)
+                .map(CompletedLesson::getLessonId)
+                .collect(Collectors.toSet());
+
+        double progress = (double) completedLessonIds.size() / allLessonIds.size();
+        progress = Math.round(progress * 100.0) / 100.0;
+        enrollment.setProgress(progress);
+
+        boolean allLessonsCompleted = allLessonIds.stream()
+                .allMatch(completedLessonIds::contains);
+
+        if (allLessonsCompleted && !enrollment.isCompleted()) {
+            enrollment.setIsCompleted(true);
+            enrollment.setCompletedAt(LocalDateTime.now());
+            enrollment.setProgress(1.0);
+        } else if (!allLessonsCompleted && enrollment.isCompleted()) {
+            enrollment.setIsCompleted(false);
+            enrollment.setCompletedAt(null);
+        }
+    }
 
 }

@@ -115,7 +115,7 @@ public class AuthServiceImpl implements AuthService {
         String encodedPassword = ENCODED_PASSWORD_PREFIX + passwordEncoder.encode(userDto.getPassword());
 
         Role userRole = roleService.findByAuthority("USER");
-        File defaltAvatar = fileService.findByFilename("default-user-avatar.png");
+        File defaltAvatar = fileService.findByFilename("default-user-avatar_nsfvaz");
 
         User user = userMapper.toUser(userDto, encodedPassword, Set.of(userRole), defaltAvatar);
 

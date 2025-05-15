@@ -2,17 +2,9 @@ package dev.luiiscarlos.academ_iq_api.models.mappers;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import dev.luiiscarlos.academ_iq_api.models.Course;
 import dev.luiiscarlos.academ_iq_api.models.Enrollment;
-import dev.luiiscarlos.academ_iq_api.models.Section;
-import dev.luiiscarlos.academ_iq_api.models.User;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseProgressDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.lesson.LessonProgressDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionProgressDto;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,13 +15,13 @@ public class EnrollmentMapper {
 
     private final CourseMapper courseMapper;
 
-    private final ObjectMapper objectMapper;
+    // private final ObjectMapper objectMapper;
 
     public EnrollmentResponseDto toEnrollmentResponse(Enrollment enrollment) {
         return EnrollmentResponseDto.builder()
                 .course(courseMapper.toEnrollmentCourseResponseDto(enrollment.getCourse()))
-                .progress(this.getProgress(enrollment.getProgressState(), enrollment.getCourse()))
-                .progressState(this.parseProgressJson(enrollment.getProgressState()))
+                .progress(0)
+                .progressState(enrollment.getProgressState())
                 .isFavorite(enrollment.isFavorite())
                 .isArchived(enrollment.isArchived())
                 .isCompleted(enrollment.isCompleted())
@@ -38,14 +30,7 @@ public class EnrollmentMapper {
                 .build();
     }
 
-    public Enrollment toEnrollment(User user, Course course) {
-        return Enrollment.builder()
-                .user(user)
-                .course(course)
-                .build();
-    }
-
-    private CourseProgressDto parseProgressJson(String progress) {
+/*     private CourseProgressDto parseProgressJson(String progress) {
         if (progress == null || progress.isBlank())
             return null;
 
@@ -94,6 +79,6 @@ public class EnrollmentMapper {
         }
 
         return totalLessons;
-    }
+    } */
 
 }

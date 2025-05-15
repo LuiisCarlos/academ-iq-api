@@ -2,12 +2,15 @@ package dev.luiiscarlos.academ_iq_api.models;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
+import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.ProgressState;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +19,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,19 +48,12 @@ public class Enrollment {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @Transient
     private Double progress;
 
-    @Nullable
     @Builder.Default
-    @Column(name = "progress_state", columnDefinition = "JSON")
-    private String progressState = """
-            {
-              "sections": [],
-              "currentSectionId": null,
-              "currentLessonId": null
-            }
-            """;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private ProgressState progressState = new ProgressState();
 
     @Nullable
     @Builder.Default

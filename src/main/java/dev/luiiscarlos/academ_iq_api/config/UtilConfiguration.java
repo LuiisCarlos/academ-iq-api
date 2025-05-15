@@ -1,21 +1,14 @@
 package dev.luiiscarlos.academ_iq_api.config;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.web.access.AccessDeniedHandler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.cloudinary.Cloudinary;
 
-import dev.luiiscarlos.academ_iq_api.utils.ErrorHandler;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,20 +16,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UtilConfiguration {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy' 'HH:mm:ss");
-
-    private final ErrorHandler errorHandler;
+    // private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy' 'HH:mm:ss");
 
     @Bean
-    AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
-                    "Failed to access resource: Access denied");
-        };
+    Dotenv dotenv() {
+        Dotenv dotenv;
+
+        dotenv = Dotenv.configure().ignoreIfMissing() .load();
+        dotenv.entries().forEach(e -> System.setProperty(e.getKey(), e.getValue()));
+
+        return dotenv;
     }
 
-    @Bean
-    @Primary
+    /* @Bean
     ObjectMapper objectMapper() {
         JavaTimeModule javaTimeModule = new JavaTimeModule();
 
@@ -48,6 +40,19 @@ public class UtilConfiguration {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         return mapper;
+    } */
+
+    @Bean
+    Cloudinary cloudinary(Dotenv dotenv) {
+        Map<String, Object> config = new HashMap<>();
+
+        config.put("cloud_name", dotenv.get("CLOUD_API_NAME"));
+        config.put("api_key", dotenv.get("CLOUD_API_KEY"));
+        config.put("api_secret", dotenv.get("CLOUD_API_SECRET"));
+        config.put("secure", true);             // HTTPS
+        config.put("connect_timeout", 30000);   // 30 segundos
+
+        return new Cloudinary(config);
     }
 
 }

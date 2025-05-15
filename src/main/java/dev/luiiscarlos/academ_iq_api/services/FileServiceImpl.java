@@ -1,69 +1,44 @@
 package dev.luiiscarlos.academ_iq_api.services;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.FileStorageException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exceptions.InvalidFileTypeException;
-import dev.luiiscarlos.academ_iq_api.controllers.FileController;
 import dev.luiiscarlos.academ_iq_api.exceptions.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.File;
-import dev.luiiscarlos.academ_iq_api.services.interfaces.FileService;
 import dev.luiiscarlos.academ_iq_api.repositories.FileRepository;
 
 import jakarta.transaction.Transactional;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Transactional
-public class FileServiceImpl implements FileService {
+@RequiredArgsConstructor
+public class FileServiceImpl {
 
 	public static final String[] ALLOWED_IMAGE_TYPES = new String[] { "image/jpeg", "image/png" };
 
 	public static final String[] ALLOWED_VIDEO_TYPES = new String[] { "video/mp4", "video/avi", "video/mkv" };
 
-	private final Path ROOT_LOCATION;
+	private final Cloudinary cloudinary;
 
-	@Autowired
 	private final FileRepository fileRepository;
-
-	public FileServiceImpl(
-			@Value("${storage.root-location}") String rootLocation,
-			FileRepository fileRepository) {
-		this.ROOT_LOCATION = Paths.get(rootLocation);
-		this.fileRepository = fileRepository;
-	}
-
-	/**
-	 * Initializes the storage location
-	 *
-	 * @throws IOException          if the storage location can not be created
-	 * @throws FileStorageException if the storage location can not be created
-	 */
-	@Override
-	public void init() {
-		try {
-			Files.createDirectories(ROOT_LOCATION);
-		} catch (IOException e) {
-			throw new FileStorageException("Storage not initialized");
-		}
-	}
 
 	/**
 	 * Retrieves all files
@@ -72,7 +47,6 @@ public class FileServiceImpl implements FileService {
 	 *
 	 * @throws FileNotFoundException if the files can not be found
 	 */
-	@Override
 	public List<File> findAll() {
 		List<File> files = fileRepository.findAll();
 
@@ -91,7 +65,6 @@ public class FileServiceImpl implements FileService {
 	 *
 	 * @throws FileNotFoundException if the file can not be found
 	 */
-	@Override
 	public File findById(Long id) {
 		return fileRepository.findById(id)
 				.orElseThrow(() -> new FileNotFoundException(
@@ -108,15 +81,10 @@ public class FileServiceImpl implements FileService {
 	 * @throws FileNotFoundException    if the file can not be found
 	 * @throws InvalidFileTypeException if the file type is not valid
 	 */
-	@Override
 	public File findByFilename(String filename) {
 		File file = fileRepository.findByFilename(filename)
 				.orElseThrow(() -> new FileNotFoundException(
 						"Failed to find file: File not found with name " + filename));
-
-		/* if (!file.isImage())
-			throw new InvalidFileTypeException(
-					"Failed to find file: Files with video content type can not be retrieve"); */
 
 		return file;
 	}
@@ -132,7 +100,6 @@ public class FileServiceImpl implements FileService {
 	 * @throws FileNotFoundException       if the file can not be found
 	 * @throws InvalidCredentialsException if the file can not be retrieved
 	 */
-	@Override
 	public File findByFilename(String token, String filename) {
 		File file = fileRepository.findByFilename(filename)
 				.orElseThrow(() -> new FileNotFoundException(
@@ -145,27 +112,36 @@ public class FileServiceImpl implements FileService {
 	}
 
 	/**
-	 * Retrieves a resource by its filename
+	 * Retrieves a Cloudinary resource URL by its filename (public_id)
 	 *
-	 * @param filename the file name
+	 * @param filename the public_id of the file in Cloudinary
 	 *
-	 * @return the resource
+	 * @return the Resource (URL) pointing to Cloudinary's CDN
 	 *
-	 * @throws FileNotFoundException if the file can not be found
+	 * @throws FileNotFoundException if the file doesn't exist in the database
 	 */
-	@Override
 	public Resource findResourceByFilename(String filename) {
+		File file = fileRepository.findByFilename(filename)
+				.orElseThrow(() -> new FileNotFoundException(
+						"Failed to find resource: File not found with name " + filename));
+
 		try {
-			Path filePath = ROOT_LOCATION.resolve(filename);
-			Resource resource = new UrlResource(filePath.toUri());
+			String fileUrl;
 
-			if (!resource.exists() || !resource.isReadable())
-				throw new FileNotFoundException(
-						"Failed to find resource: File not found with name " + filename);
+			if (file.isImage()) {
+				fileUrl = cloudinary.url()
+						.resourceType("image")
+						.format(file.getExtension())
+						.generate(filename);
+			} else {
+				fileUrl = cloudinary.url()
+						.resourceType("raw")
+						.generate(filename);
+			}
 
-			return resource;
+			return new UrlResource(new URL(fileUrl));
 		} catch (MalformedURLException e) {
-			throw new FileNotFoundException("Failed to find resource: " + e.getMessage());
+			throw new FileNotFoundException("Failed to generate Cloudinary URL: " + e.getMessage());
 		}
 	}
 
@@ -180,53 +156,47 @@ public class FileServiceImpl implements FileService {
 	 * @throws FileStorageException     if the file can not be saved
 	 * @throws InvalidFileTypeException if the file type is not valid
 	 */
-	@Override
-	@SuppressWarnings("null")
 	public File save(MultipartFile file, boolean isImage) {
 		if (file.isEmpty() || file == null)
 			throw new FileStorageException("Failed to save file: File is required");
 
-		try (InputStream inputStream = file.getInputStream()) {
-			String filename = StringUtils.cleanPath(file.getOriginalFilename());
-			String storedFilename = System.currentTimeMillis() + "_" + filename;
-			if (filename.contains(".."))
-				throw new FileStorageException(
-						"Failed to save file: File with relative path outside current directory");
+		try {
+			Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+					"resource_type",
+					isImage ? "image" : "raw",
+					"folder",
+					"uploads"));
 
-			Files.copy(inputStream, ROOT_LOCATION.resolve(storedFilename),
-					StandardCopyOption.REPLACE_EXISTING);
+			String publicId = (String) uploadResult.get("public_id");
+			String secureUrl = (String) uploadResult.get("secure_url");
+			String originalFilename = file.getOriginalFilename();
+			String fileNameOnly = publicId.contains("/")
+					? publicId.substring(publicId.lastIndexOf("/") + 1)
+					: publicId;
 
-			String contentType = file.getContentType() == null
-					? "application/octet-stream"
-					: file.getContentType();
-
-			String fileUrl = MvcUriComponentsBuilder
-					.fromMethodName(FileController.class, "findResourceByFilename", storedFilename, null)
-					.build()
-					.toUriString();
-
-			File fileEntitiy = File.builder()
-					.filename(storedFilename)
-					.contentType(contentType)
+			File fileEntity = File.builder()
+					.filename(fileNameOnly)
+					.contentType(file.getContentType())
 					.size(file.getSize())
 					.isImage(isImage)
-					.url(fileUrl)
-					.extension(StringUtils.getFilenameExtension(filename))
+					.url(secureUrl)
+					.extension(StringUtils.getFilenameExtension(originalFilename))
 					.build();
 
-			return fileRepository.save(fileEntitiy);
+			return fileRepository.save(fileEntity);
 		} catch (IOException e) {
-			throw new FileStorageException("Failed to store file: " + e.getMessage());
+			throw new FileStorageException("Failed to upload file to Cloudinary: " + e.getMessage());
 		}
 	}
 
 	/**
-	 * Deletes a file by its filename
+	 * Deletes a file from Cloudinary and the database by its filename (public_id in
+	 * Cloudinary)
 	 *
-	 * @param filename the file name
+	 * @param filename the public_id of the file in Cloudinary
 	 *
-	 * @throws FileNotFoundException if the file can not be deleted
-	 * @throws FileStorageException  if the file can not be deleted
+	 * @throws FileNotFoundException if the file doesn't exist in the database
+	 * @throws FileStorageException  if the file can't be deleted from Cloudinary
 	 */
 	public void deleteByFilename(String filename) {
 		File file = fileRepository.findByFilename(filename)
@@ -234,12 +204,19 @@ public class FileServiceImpl implements FileService {
 						"Failed to delete file: File not found with name " + filename));
 
 		if (!file.isDefaultFile()) {
-			fileRepository.deleteByFilename(filename);
-			Path filePath = ROOT_LOCATION.resolve(filename);
 			try {
-				Files.deleteIfExists(filePath);
+				Map<?, ?> result = cloudinary.uploader().destroy(filename, ObjectUtils.asMap(
+						"resource_type",
+						file.isImage() ? "image" : "raw",
+						"invalidate",
+						true));
+
+				if (!"ok".equals(result.get("result")))
+					throw new FileStorageException("Cloudinary deletion failed for file: " + filename);
+
+				fileRepository.deleteByFilename(filename);
 			} catch (IOException e) {
-				throw new FileStorageException("Failed to delete file: " + e.getMessage());
+				throw new FileStorageException("Failed to delete file from Cloudinary: " + e.getMessage());
 			}
 		}
 	}

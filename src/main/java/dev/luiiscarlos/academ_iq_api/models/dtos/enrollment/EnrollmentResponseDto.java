@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseProgressDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,7 +16,7 @@ public class EnrollmentResponseDto {
 
     private double progress;
 
-    private CourseProgressDto progressState;
+    private ProgressState progressState;
 
     private Boolean isFavorite;
 

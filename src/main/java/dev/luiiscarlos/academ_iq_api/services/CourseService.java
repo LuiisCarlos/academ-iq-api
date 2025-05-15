@@ -132,9 +132,18 @@ public class CourseService {
 
         if (courses.isEmpty())
             throw new CourseNotFoundException(
-                    "Failed to find courses: No courses found");
+                    "No courses found");
 
         return courses.stream().map(courseMapper::toCourseResponseDto).toList();
+    }
+
+    public List<Long> findAllLessonIdsById(Long courseId) {
+        List<Long> lessonsIds = courseRepository.findAllLessonIdsById(courseId);
+
+        if (lessonsIds.isEmpty())
+            throw new CourseNotFoundException("No lessons found with course id: " + courseId);
+
+        return lessonsIds;
     }
 
     /**
