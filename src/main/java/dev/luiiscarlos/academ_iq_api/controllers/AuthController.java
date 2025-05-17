@@ -28,7 +28,8 @@ public class AuthController {
     private final AuthServiceImpl authService;
 
     @GetMapping("/refresh")
-    public ResponseEntity<String> refresh(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<String> refresh(@RequestParam String token) {
+        System.out.println("Token: " + token); // TODO
         return ResponseEntity
             .status(HttpStatus.OK)
             .contentType(MediaType.APPLICATION_JSON)

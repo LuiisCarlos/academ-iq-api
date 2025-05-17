@@ -58,13 +58,13 @@ public class AccessTokenFilter extends OncePerRequestFilter {
             String tokenType = jwt.getClaimAsString("token_type");
 
             if (!tokenService.isValidToken(token)) {
-                errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
+                errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
                         "Failed to validate Token: Invalid access token");
                 return;
             }
 
             if (expiresAt.isBefore(Instant.now())) {
-                errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
+                errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
                         "Failed to validate Token: Expired access token");
                 return;
             }
@@ -74,7 +74,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
                     throw new RuntimeException("Failed to validate Token: Invalid token type"); // TODO: Review this
             } else {
                 if (!"access".equals(tokenType)) {
-                    errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
+                    errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
                             "Failed to validate Token: Invalid token type");
                     return;
                 }

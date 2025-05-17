@@ -141,15 +141,8 @@ public class AuthServiceImpl implements AuthService {
             throw new AuthCredentialsNotFoundException(
                     "Failed to refresh access token: Refresh token is required");
 
-        token = token.startsWith("Bearer ") ? token.substring(7) : token;
-
-        if (tokenService.getTokenExpiration(token).isBefore(Instant.now()))
-            throw new InvalidTokenException(
-                    "Failed to refresh access token: Refresh token is expired");
-
-        if (!tokenService.isValidToken(token))
-            throw new InvalidTokenException(
-                    "Failed to refresh access token: Invalid refresh token");
+        if (!"refresh".equals(tokenService.getTokenType(token)))
+            throw new InvalidTokenException("Failed to refresh access token: Invalid token type");
 
         log.debug("User " + tokenService.getTokenSubject(token) +
                 " has successfully refreshed the access token at " + LocalDateTime.now());
