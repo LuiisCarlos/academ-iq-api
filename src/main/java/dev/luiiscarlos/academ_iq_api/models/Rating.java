@@ -31,24 +31,21 @@ import lombok.NoArgsConstructor;
 public class Rating {
 
     @Id
-    @Nullable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NonNull
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @Nullable
+    @NonNull
     private Integer rating;
 
-    @Nullable
+    @NonNull
     private String comment;
 
     @Nullable

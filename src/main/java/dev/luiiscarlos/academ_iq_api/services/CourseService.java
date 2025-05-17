@@ -21,6 +21,7 @@ import dev.luiiscarlos.academ_iq_api.models.Section;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.lesson.LessonRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.rating.RatingResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.CategoryRepository;
@@ -58,7 +59,7 @@ public class CourseService {
      * @throws InvalidFileTypeException    if the file is not a valid video
      */
     @SuppressWarnings("null")
-    public CourseResponseDto save(CourseRequestDto courseDto, Map<String, MultipartFile> files) {
+    public CourseResponseDto create(CourseRequestDto courseDto, Map<String, MultipartFile> files) {
         if (courseRepository.existsByTitle(courseDto.getTitle()))
             throw new CourseAlreadyExistsEception(
                     "Failed to save course: Course already exists");
