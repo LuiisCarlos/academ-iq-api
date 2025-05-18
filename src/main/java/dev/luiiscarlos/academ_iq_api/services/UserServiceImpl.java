@@ -163,6 +163,18 @@ public class UserServiceImpl implements UserService {
             u.setLastname(user.getLastname());
             u.setBirthdate(user.getBirthdate());
             u.setPhone(user.getPhone());
+            u.setBiography(user.getBiography());
+            u.setDni(user.getDni());
+            u.setGithubUrl(user.getGithubUrl());
+            u.setLinkedinUrl(user.getLinkedinUrl());
+            u.setWebsiteUrl(user.getWebsiteUrl());
+            u.setStudies(user.getStudies());
+            u.setJobArea(user.getJobArea());
+            u.setWorkExperience(user.getWorkExperience());
+            u.setCompanyName(user.getCompanyName());
+            u.setIsTeamManager(user.getIsTeamManager());
+            u.setWantToUpgrade(user.getWantToUpgrade());
+            u.setUpdatedAt(LocalDateTime.now());
             return userRepository.save(u);
         }).orElseThrow(() -> new UserNotFoundException(
                 "Failed to update user: User not found with id " + userId));

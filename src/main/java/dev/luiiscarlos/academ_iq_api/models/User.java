@@ -140,6 +140,12 @@ public class User implements UserDetails {
 
     @Nullable
     @Builder.Default
+    @Column(name = "updated_at")
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @Nullable
+    @Builder.Default
     @Column(name = "is_verified")
     private Boolean isVerified = false;
 

@@ -48,7 +48,8 @@ public class Enrollment {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    private Double progress;
+    @Builder.Default
+    private Double progress = 0.0;
 
     @Builder.Default
     @JdbcTypeCode(SqlTypes.JSON)

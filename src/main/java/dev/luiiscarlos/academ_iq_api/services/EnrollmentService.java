@@ -3,7 +3,6 @@ package dev.luiiscarlos.academ_iq_api.services;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.CompletedLesson;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentUpdateDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.ProgressState;
 import dev.luiiscarlos.academ_iq_api.exceptions.EnrollmentNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.Course;
@@ -70,15 +68,16 @@ public class EnrollmentService {
         return enrollmentRepository.save(enrollment);
     }
 
+    /**
+     *
+     * @param token
+     * @param courseId
+     * @return
+     */
     public Enrollment findOrCreate(String token, Long courseId) {
         User user = userService.findByToken(token);
-        Optional<Enrollment> existingEnrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId);
-
-        if (existingEnrollment.isPresent()) {
-            return existingEnrollment.get();
-        } else {
-            return create(token, courseId, null);
-        }
+        return enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId)
+                .orElseGet(() -> create(token, courseId, null));
     }
 
     /**
@@ -155,18 +154,17 @@ public class EnrollmentService {
      */
     public Enrollment patchProgressState(String token, Long courseId, Map<String, Object> updates) {
         Enrollment enrollment = findOrCreate(token, courseId);
+        ProgressState progressState = enrollment.getProgressState();
 
-        ProgressState progress = enrollment.getProgressState();
+        Long sectionId = Long.valueOf((int) updates.get("sectionId"));
+        Long lessonId = Long.valueOf((int) updates.get("lessonId"));
+        Boolean isCompleted = (Boolean) updates.get("isCompleted");
 
-        Long sectionId = Long.valueOf( (int)updates.get("sectionId"));
-        Long lessonId = Long.valueOf( (int)updates.get("lessonId"));
-        Boolean isCompleted = (Boolean) updates.getOrDefault("isCompleted", false);
-
-        progress.setCurrentSectionId(sectionId);
-        progress.setCurrentLessonId(lessonId);
+        progressState.setCurrentSectionId(sectionId);
+        progressState.setCurrentLessonId(lessonId);
 
         if (isCompleted) {
-            boolean alreadyCompleted = progress.getCompletedLessons().stream()
+            boolean alreadyCompleted = progressState.getCompletedLessons().stream()
                     .anyMatch(cl -> cl.getSectionId().equals(sectionId) && cl.getLessonId().equals(lessonId));
 
             if (!alreadyCompleted) {
@@ -174,8 +172,11 @@ public class EnrollmentService {
                 completedLesson.setSectionId(sectionId);
                 completedLesson.setLessonId(lessonId);
                 completedLesson.setCompletedAt(LocalDateTime.now());
-                progress.getCompletedLessons().add(completedLesson);
+                progressState.getCompletedLessons().add(completedLesson);
             }
+        } else {
+            progressState.getCompletedLessons().removeIf(cl -> cl.getSectionId().equals(sectionId)
+                    && cl.getLessonId().equals(lessonId));
         }
 
         checkCourseCompletion(enrollment);

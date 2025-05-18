@@ -5,8 +5,6 @@ import java.time.LocalTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
-import dev.luiiscarlos.academ_iq_api.models.Category;
-
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,7 +20,9 @@ public class EnrollmentCourseResponseDto {
 
     private String thumbnailUrl;
 
-    private Category category;
+    private String category;
+
+    private String categorySvg;
 
     @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime duration;

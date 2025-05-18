@@ -14,7 +14,7 @@ public class EnrollmentResponseDto {
 
     private EnrollmentCourseResponseDto course;
 
-    private double progress;
+    private Double progress;
 
     private ProgressState progressState;
 
