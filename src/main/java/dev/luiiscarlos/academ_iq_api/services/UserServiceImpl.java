@@ -175,6 +175,7 @@ public class UserServiceImpl implements UserService {
             u.setIsTeamManager(user.getIsTeamManager());
             u.setWantToUpgrade(user.getWantToUpgrade());
             u.setUpdatedAt(LocalDateTime.now());
+
             return userRepository.save(u);
         }).orElseThrow(() -> new UserNotFoundException(
                 "Failed to update user: User not found with id " + userId));
@@ -337,7 +338,7 @@ public class UserServiceImpl implements UserService {
     public void updatePasswordByToken(String token, PasswordUpdateDto passwordDto) {
         User user = this.findByToken(token);
 
-        if (!passwordEncoder.matches(passwordDto.getCurrentPassword(), user.getPassword()))
+        if (!passwordEncoder.matches(passwordDto.getCurrentPassword(), user.getPassword().substring(8)))
             throw new UserWithDifferentPasswordsException("Failed to update password: Invalid old password");
 
         if (passwordDto.getNewPassword().equals(passwordDto.getCurrentPassword()))

@@ -174,9 +174,6 @@ public class EnrollmentService {
                 completedLesson.setCompletedAt(LocalDateTime.now());
                 progressState.getCompletedLessons().add(completedLesson);
             }
-        } else {
-            progressState.getCompletedLessons().removeIf(cl -> cl.getSectionId().equals(sectionId)
-                    && cl.getLessonId().equals(lessonId));
         }
 
         checkCourseCompletion(enrollment);
@@ -221,6 +218,9 @@ public class EnrollmentService {
                 .filter(cl -> cl.getSectionId() != null && cl.getLessonId() != null)
                 .map(CompletedLesson::getLessonId)
                 .collect(Collectors.toSet());
+
+        completedLessonIds.size();
+        allLessonIds.size();
 
         double progress = (double) completedLessonIds.size() / allLessonIds.size();
         progress = Math.round(progress * 100.0) / 100.0;
