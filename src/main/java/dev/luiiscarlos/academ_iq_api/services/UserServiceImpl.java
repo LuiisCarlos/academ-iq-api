@@ -228,6 +228,11 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(
                     "Failed to delete user: User not found with id " + userId);
 
+        tokenService.deleteByUserId(userId);
+        userRepository.findById(userId).map(u -> {
+            fileService.deleteByFilename(u.getAvatar().getFilename());
+            return u;
+        });
         userRepository.deleteById(userId);
     }
 

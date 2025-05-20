@@ -36,9 +36,9 @@ public class FileServiceImpl {
 
 	public static final String[] ALLOWED_VIDEO_TYPES = new String[] { "video/mp4", "video/avi", "video/mkv" };
 
-	private final Cloudinary cloudinary;
-
 	private final FileRepository fileRepository;
+
+	private final Cloudinary cloudinary;
 
 	/**
 	 * Retrieves all files
@@ -205,7 +205,7 @@ public class FileServiceImpl {
 
 		if (!file.isDefaultFile()) {
 			try {
-				Map<?, ?> result = cloudinary.uploader().destroy(filename, ObjectUtils.asMap(
+				Map<?, ?> result = cloudinary.uploader().destroy("uploads/" + filename, ObjectUtils.asMap(
 						"resource_type",
 						file.isImage() ? "image" : "raw",
 						"invalidate",
