@@ -4,7 +4,16 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+### Maven ###
+.mvn/
+
+### Custom ###
+.env
+*.log
+data/
+logs/
+
+### IDES ###
 .apt_generated
 .classpath
 .factorypath
@@ -13,13 +22,11 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
 .idea
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -29,10 +36,4 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
 .vscode/
-
-### Maven ###
-.mvn/
-
-*.env

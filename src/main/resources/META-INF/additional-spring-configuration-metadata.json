@@ -1,0 +1,7 @@
+{"properties": [
+  {
+    "name": "storage.root-location",
+    "type": "java.lang.String",
+    "description": "This is the storage root location for the storage"
+  }
+]}
