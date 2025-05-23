@@ -146,6 +146,13 @@ public class EnrollmentService {
         if (updates.containsKey("isArchived"))
             enrollment.setIsArchived(updates.get("isArchived"));
 
+        if (updates.containsKey("isCompleted")) {
+            enrollment.setIsCompleted(updates.get("isCompleted"));
+            enrollment.setProgress(1.0);
+            enrollment.setCompletedAt(LocalDateTime.now());
+        }
+
+
         return enrollmentRepository.save(enrollment);
     }
 
@@ -225,18 +232,6 @@ public class EnrollmentService {
         double progress = (double) completedLessonIds.size() / allLessonIds.size();
         progress = Math.round(progress * 100.0) / 100.0;
         enrollment.setProgress(progress);
-
-        boolean allLessonsCompleted = allLessonIds.stream()
-                .allMatch(completedLessonIds::contains);
-
-        if (allLessonsCompleted && !enrollment.isCompleted()) {
-            enrollment.setIsCompleted(true);
-            enrollment.setCompletedAt(LocalDateTime.now());
-            enrollment.setProgress(1.0);
-        } else if (!allLessonsCompleted && enrollment.isCompleted()) {
-            enrollment.setIsCompleted(false);
-            enrollment.setCompletedAt(null);
-        }
     }
 
 }
