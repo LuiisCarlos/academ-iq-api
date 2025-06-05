@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.models.User;
-import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.file.FileResponseDto;
 import dev.luiiscarlos.academ_iq_api.services.UserServiceImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -31,27 +31,27 @@ public class AdminController {
     @GetMapping
     public ResponseEntity<List<User>> findAll() {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(userService.findAll());
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> findById(
             @PathVariable("id") Long userId) {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(userService.findById(userId));
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userService.findById(userId));
     }
 
     @GetMapping("/{id}/avatar")
     public ResponseEntity<FileResponseDto> findAvatarById(
             @PathVariable("id") Long userId) {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(userService.findAvatarById(userId));
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userService.findAvatarById(userId));
     }
 
     @PutMapping("/{id}")
@@ -59,9 +59,9 @@ public class AdminController {
             @PathVariable("id") Long userId,
             @RequestBody User user) {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(userService.updateById(userId, user));
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userService.updateById(userId, user));
     }
 
     @PutMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -69,9 +69,9 @@ public class AdminController {
             @PathVariable("id") Long userId,
             @RequestPart("avatar") MultipartFile file) {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(userService.patchAvatarById(userId, file));
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userService.patchAvatarById(userId, file));
     }
 
     @DeleteMapping("/{id}")
@@ -80,8 +80,8 @@ public class AdminController {
         userService.deleteById(userId);
 
         return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .build();
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
     @DeleteMapping("/{id}/avatar")
@@ -90,8 +90,8 @@ public class AdminController {
         userService.deleteAvatarById(userId);
 
         return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .build();
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
 }

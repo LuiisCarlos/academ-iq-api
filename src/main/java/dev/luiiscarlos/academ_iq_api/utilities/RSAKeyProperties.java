@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.utils;
+package dev.luiiscarlos.academ_iq_api.utilities;
 
 import org.springframework.stereotype.Component;
 

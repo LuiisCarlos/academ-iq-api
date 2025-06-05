@@ -17,8 +17,7 @@ import dev.luiiscarlos.academ_iq_api.exceptions.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.UserWithDifferentPasswordsException;
 import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.User;
-
-import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.file.FileResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordUpdateDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.FileMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;

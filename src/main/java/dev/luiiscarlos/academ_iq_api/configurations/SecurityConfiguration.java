@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.config;
+package dev.luiiscarlos.academ_iq_api.configurations;
 
 import java.util.List;
 
@@ -10,6 +10,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,9 +24,18 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import dev.luiiscarlos.academ_iq_api.config.filters.AccessTokenFilter;
-import dev.luiiscarlos.academ_iq_api.config.filters.ExceptionHandlingFilter;
-import dev.luiiscarlos.academ_iq_api.utils.ErrorHandler;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
+
+import dev.luiiscarlos.academ_iq_api.configurations.filters.AccessTokenFilter;
+import dev.luiiscarlos.academ_iq_api.configurations.filters.ExceptionHandlingFilter;
+import dev.luiiscarlos.academ_iq_api.utilities.ErrorHandler;
+import dev.luiiscarlos.academ_iq_api.utilities.RSAKeyProperties;
+
 import lombok.RequiredArgsConstructor;
 
 @EnableWebMvc
@@ -36,42 +49,53 @@ public class SecurityConfiguration {
 
     private final ErrorHandler errorHandler;
 
+    private final RSAKeyProperties RSAKeys;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AccessDeniedHandler accessDeniedHandler)
             throws Exception {
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                .requestMatchers("/actuator/**").hasAnyRole("ADMIN", "ENDPOINT_ADMIN")
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/courses/categories/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/courses/{id}/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/courses/**").permitAll()
-                .requestMatchers("/api/v1/courses/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/v1/users/enrollments/@me/**").authenticated()
-                .requestMatchers("/api/v1/users/@me/**").authenticated()
-                .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
-                .requestMatchers("/api/v1/files/**").permitAll()
-                .anyRequest().authenticated());
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/actuator/**").hasAnyRole("ADMIN", "ENDPOINT_ADMIN")
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/courses/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/courses/{id}/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/courses/**").permitAll()
+                        .requestMatchers("/api/v1/courses/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/enrollments/@me/**").authenticated()
+                        .requestMatchers("/api/v1/users/@me/**").authenticated()
+                        .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
+                        .requestMatchers("/api/v1/files/**").permitAll()
+                        .anyRequest().authenticated());
 
-        http
-            .oauth2ResourceServer(server -> server
+        http.oauth2ResourceServer(server -> server
                 .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
-        http
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http
-            .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler));
+        http.exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler));
 
-        http
-            .addFilterBefore(exceptionHandlingFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(accessTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(exceptionHandlingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(accessTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withPublicKey(RSAKeys.getPublicKey()).build();
+    }
+
+    @Bean
+    JwtEncoder jwtEncoder() {
+        JWK jwk = new RSAKey.Builder(RSAKeys.getPublicKey())
+                .privateKey(RSAKeys.getPrivateKey())
+                .build();
+        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+        return new NimbusJwtEncoder(jwks);
     }
 
     @Bean

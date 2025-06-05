@@ -1,6 +1,5 @@
 package dev.luiiscarlos.academ_iq_api.controllers;
 
-
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,26 +26,24 @@ public class FileController {
 	 * Endpoint to get a file by its filename.
 	 *
 	 * @param filename the name of the file to be retrieved
-	 * @param token the authorization token (optional)
+	 * @param token    the authorization token (optional)
+	 *
 	 * @return the file as a Resource wrapped in a ResponseEntity
 	 */
-	@SuppressWarnings("null")// <- Already handled
+	@SuppressWarnings("null") // <- Already handled
 	@GetMapping("/{filename:.+}")
 	public ResponseEntity<Resource> findResourceByFilename(
 			@PathVariable String filename,
 			@RequestHeader(value = "Authorization", required = false) String token) {
 		Resource resource = fileService.findResourceByFilename(filename);
-		File file;
-		file = fileService.findByFilename(filename);
-		/* if (token == null || token.isEmpty())
-		else
-			file = fileService.findByFilename(token, filename); */
+		File file = fileService.findByFilename(filename);
+
 		String contentType = file.getContentType();
 
 		return ResponseEntity
-            .status(HttpStatus.OK)
-			.contentType(MediaType.parseMediaType(contentType))
-			.body(resource);
+				.status(HttpStatus.OK)
+				.contentType(MediaType.parseMediaType(contentType))
+				.body(resource);
 	}
 
 }

@@ -29,11 +29,10 @@ public class AuthController {
 
     @GetMapping("/refresh")
     public ResponseEntity<String> refresh(@RequestParam String token) {
-        System.out.println("Token: " + token); // TODO
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(authService.refresh(token));
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(authService.refresh(token));
     }
 
     @PostMapping("/login")
@@ -41,9 +40,9 @@ public class AuthController {
             @RequestHeader("Origin") String origin,
             @RequestBody UserLoginRequestDto userDto) {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(authService.login(origin, userDto));
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(authService.login(origin, userDto));
     }
 
     @PostMapping("/register")
@@ -51,9 +50,9 @@ public class AuthController {
             @RequestHeader("Origin") String origin,
             @RequestBody UserRegisterRequestDto userDto) {
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(authService.register(origin, userDto));
+                .status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(authService.register(origin, userDto));
     }
 
     @PostMapping("/logout")
@@ -61,8 +60,8 @@ public class AuthController {
         authService.logout(token);
 
         return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .build();
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
     @GetMapping("/verify")
@@ -70,8 +69,8 @@ public class AuthController {
         authService.verify(token);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .build();
+                .status(HttpStatus.OK)
+                .build();
     }
 
     @PostMapping("/recover-password")
@@ -81,10 +80,9 @@ public class AuthController {
         authService.recoverPassword(origin, email);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .build();
+                .status(HttpStatus.OK)
+                .build();
     }
-
 
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(
@@ -93,8 +91,8 @@ public class AuthController {
         authService.resetPassword(token, userDto);
 
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .build();
+                .status(HttpStatus.OK)
+                .build();
     }
 
 }

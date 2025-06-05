@@ -1,19 +1,5 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### Maven ###
+# IDE files/directories
 .mvn/
-
-### Custom ###
-.env
-*.log
-data/
-logs/
-
-### IDES ###
 .apt_generated
 .classpath
 .factorypath
@@ -21,12 +7,10 @@ logs/
 .settings
 .springBeans
 .sts4-cache
-
 .idea
 *.iws
 *.iml
 *.ipr
-
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -35,5 +19,16 @@ logs/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-
 .vscode/
+
+# Build directories
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Custom files
+.env
+*.log
+data/
+logs/

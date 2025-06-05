@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.models.dtos;
+package dev.luiiscarlos.academ_iq_api.models.dtos.file;
 
 import lombok.Builder;
 import lombok.Data;

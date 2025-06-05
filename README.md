@@ -1,6 +1,6 @@
-# Academ IQ API
+# Academ-IQ API 1.0.0
 
-Academ IQ API is a backend application developed in Java using Spring Boot. It provides a RESTful API for managing courses, user enrollments, lesson progress, and features related to an educational platform.
+Academ-IQ API is a backend application developed in Java using Spring Boot. It provides a RESTful API for managing courses, user enrollments, lesson progress, and features related to an educational platform.
 
 ## Main Features
 
@@ -18,16 +18,17 @@ Academ IQ API is a backend application developed in Java using Spring Boot. It p
   - `models/`: Entities and DTOs.
   - `repositories/`: Interfaces for data access.
   - `services/`: Business logic (e.g., [`EnrollmentService`](src/main/java/dev/luiiscarlos/academ_iq_api/services/EnrollmentService.java)).
-  - `config/`: Security configuration and utilities.
+  - `configurations/`: Security configuration and utilities.
   - `exceptions/`: Custom exceptions.
-  - `utils/`: Various utilities.
+  - `utilities/`: Various utilities.
 - `src/main/resources/`: Configuration files and initial data.
 - `test/`: Unit and integration tests.
 
 ## Requirements
 
-- Java 17+
+- Java 21+
 - Maven
+- Docker
 
 ## Running Locally
 

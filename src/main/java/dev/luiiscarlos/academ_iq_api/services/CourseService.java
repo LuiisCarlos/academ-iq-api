@@ -21,7 +21,6 @@ import dev.luiiscarlos.academ_iq_api.models.Section;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.lesson.LessonRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.rating.RatingResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.CategoryRepository;

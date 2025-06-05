@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.config.filters;
+package dev.luiiscarlos.academ_iq_api.configurations.filters;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -13,8 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import dev.luiiscarlos.academ_iq_api.services.TokenServiceImpl;
-import dev.luiiscarlos.academ_iq_api.utils.ErrorHandler;
-
+import dev.luiiscarlos.academ_iq_api.utilities.ErrorHandler;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

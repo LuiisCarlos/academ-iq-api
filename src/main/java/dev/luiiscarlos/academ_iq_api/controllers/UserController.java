@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.models.User;
-import dev.luiiscarlos.academ_iq_api.models.dtos.FileResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserUpdateRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.file.FileResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordUpdateDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.UserMapper;

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -21,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import dev.luiiscarlos.academ_iq_api.models.Category;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.rating.RatingRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.services.CourseService;
 
@@ -41,41 +39,41 @@ public class CourseController {
             @RequestPart("course") CourseRequestDto courseDto,
             @RequestParam Map<String, MultipartFile> files) {
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(courseService.create(courseDto, files));
+                .status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(courseService.create(courseDto, files));
     }
 
     @GetMapping
     public ResponseEntity<List<CourseResponseDto>> findAll() {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(courseService.findAll());
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(courseService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CourseResponseDto> findById(@PathVariable("id") Long courseId) {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(courseMapper.toCourseResponseDto(courseService.findById(courseId)));
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(courseMapper.toCourseResponseDto(courseService.findById(courseId)));
     }
 
     @GetMapping("/categories")
     public ResponseEntity<List<Category>> findAllCategories() {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(courseService.findAllCategories());
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(courseService.findAllCategories());
     }
 
     @GetMapping("categories/{category}")
-    public ResponseEntity<Category> findCategoryByName(@PathVariable("category") String categoryName ) {
+    public ResponseEntity<Category> findCategoryByName(@PathVariable("category") String categoryName) {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(courseService.findCategoryByName(categoryName));
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(courseService.findCategoryByName(categoryName));
     }
 
     @PutMapping("/{id}")
@@ -84,9 +82,9 @@ public class CourseController {
             @RequestPart("course") CourseRequestDto courseDto,
             @RequestParam Map<String, MultipartFile> files) {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(courseService.updateById(courseId, courseDto, files));
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(courseService.updateById(courseId, courseDto, files));
     }
 
     @DeleteMapping("/{id}")
@@ -94,8 +92,8 @@ public class CourseController {
         courseService.deleteById(courseId);
 
         return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .build();
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
 }

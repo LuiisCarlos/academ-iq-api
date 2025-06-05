@@ -29,77 +29,77 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EnrollmentController {
 
-    private final EnrollmentService enrollmentService;
+        private final EnrollmentService enrollmentService;
 
-    private final EnrollmentMapper enrollmentMapper;
+        private final EnrollmentMapper enrollmentMapper;
 
-    @PostMapping("/{id}")
-    public ResponseEntity<EnrollmentResponseDto> create(
-            @RequestHeader("Authorization") String token,
-            @PathVariable("id") Long courseId,
-            @RequestBody(required = false) Map<String, Boolean> flags) {
-        Enrollment enrollment = enrollmentService.create(token, courseId, flags);
+        @PostMapping("/{id}")
+        public ResponseEntity<EnrollmentResponseDto> create(
+                        @RequestHeader("Authorization") String token,
+                        @PathVariable("id") Long courseId,
+                        @RequestBody(required = false) Map<String, Boolean> flags) {
+                Enrollment enrollment = enrollmentService.create(token, courseId, flags);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(enrollmentMapper.toEnrollmentResponse(enrollment));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(enrollmentMapper.toEnrollmentResponse(enrollment));
+        }
 
-    @GetMapping
-    public ResponseEntity<List<EnrollmentResponseDto>> findAllByUserId(
-            @RequestHeader("Authorization") String token) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(enrollmentService.findAllByUserId(token));
-    }
+        @GetMapping
+        public ResponseEntity<List<EnrollmentResponseDto>> findAllByUserId(
+                        @RequestHeader("Authorization") String token) {
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(enrollmentService.findAllByUserId(token));
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EnrollmentResponseDto> findByUserIdAndCourseId(
-            @RequestHeader("Authorization") String token,
-            @PathVariable("id") Long courseId) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(enrollmentService.findByUserIdAndCourseId(token, courseId));
-    }
+        @GetMapping("/{id}")
+        public ResponseEntity<EnrollmentResponseDto> findByUserIdAndCourseId(
+                        @RequestHeader("Authorization") String token,
+                        @PathVariable("id") Long courseId) {
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(enrollmentService.findByUserIdAndCourseId(token, courseId));
+        }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<EnrollmentResponseDto> updateByUserIdAndCourseId(
-            @RequestHeader("Authorization") String token,
-            @PathVariable("id") Long courseId,
-            @RequestBody Map<String, Boolean> updates) {
-        Enrollment enrollment = enrollmentService.updateByUserIdAndCourseId(token, courseId, updates);
+        @PutMapping("/{id}")
+        public ResponseEntity<EnrollmentResponseDto> updateByUserIdAndCourseId(
+                        @RequestHeader("Authorization") String token,
+                        @PathVariable("id") Long courseId,
+                        @RequestBody Map<String, Boolean> updates) {
+                Enrollment enrollment = enrollmentService.updateByUserIdAndCourseId(token, courseId, updates);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(enrollmentMapper.toEnrollmentResponse(enrollment));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(enrollmentMapper.toEnrollmentResponse(enrollment));
+        }
 
-    @PatchMapping("/{id}/progress")
-    public ResponseEntity<EnrollmentResponseDto> patchProgressState(
-            @RequestHeader("Authorization") String token,
-            @PathVariable("id") Long courseId,
-            @RequestBody Map<String, Object> updates) {
-        Enrollment enrollment = enrollmentService.patchProgressState(token, courseId, updates);
+        @PatchMapping("/{id}/progress")
+        public ResponseEntity<EnrollmentResponseDto> patchProgressState(
+                        @RequestHeader("Authorization") String token,
+                        @PathVariable("id") Long courseId,
+                        @RequestBody Map<String, Object> updates) {
+                Enrollment enrollment = enrollmentService.patchProgressState(token, courseId, updates);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(enrollmentMapper.toEnrollmentResponse(enrollment));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(enrollmentMapper.toEnrollmentResponse(enrollment));
+        }
 
-    @DeleteMapping("/@me/{id}")
-    public ResponseEntity<List<EnrollmentResponseDto>> deleteByUserIdAndCourseId(
-            @RequestHeader("Authorization") String token,
-            @PathVariable("id") Long courseId) {
-        enrollmentService.deleteByUserIdAndCourseId(token, courseId);
+        @DeleteMapping("/@me/{id}")
+        public ResponseEntity<List<EnrollmentResponseDto>> deleteByUserIdAndCourseId(
+                        @RequestHeader("Authorization") String token,
+                        @PathVariable("id") Long courseId) {
+                enrollmentService.deleteByUserIdAndCourseId(token, courseId);
 
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .build();
-    }
+                return ResponseEntity
+                                .status(HttpStatus.NO_CONTENT)
+                                .build();
+        }
 
 }
