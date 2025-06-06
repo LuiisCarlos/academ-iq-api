@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -46,13 +44,10 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     private String username;
 
-    @Nullable
     private String password;
 
-    @Nullable
     @JoinTable(
         name = "user_role_junction",
         joinColumns = { @JoinColumn(name = "user_id") },
@@ -61,7 +56,7 @@ public class User implements UserDetails {
     private Set<Role> authorities;
 
     @ManyToOne
-    @JoinColumn(name = "avatar")
+    @JoinColumn(name = "file_id")
     private File avatar;
 
     private String email;
@@ -103,12 +98,6 @@ public class User implements UserDetails {
     @Builder.Default
     private Integer hours = 0;
 
-    @Column(name = "is_team_manager")
-    private Boolean isTeamManager;
-
-    @Column(name = "want_to_upgrade")
-    private Boolean wantToUpgrade;
-
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Enrollment> enrollments = new ArrayList<>();
@@ -123,9 +112,15 @@ public class User implements UserDetails {
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @Column(name = "is_manager")
+    private Boolean manager;
+
+    @Column(name = "want_to_upgrade")
+    private Boolean wantToUpgrade;
+
     @Builder.Default
     @Column(name = "is_verified")
-    private Boolean isVerified = false;
+    private Boolean verified = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -133,11 +128,11 @@ public class User implements UserDetails {
     }
 
     public Boolean isVerified() {
-        return this.isVerified;
+        return this.verified;
     }
 
-    public Boolean isTeamManager() {
-        return this.isTeamManager;
+    public Boolean isManager() {
+        return this.manager;
     }
 
     public Boolean wantToUpgrade() {

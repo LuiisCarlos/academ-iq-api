@@ -17,28 +17,25 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.models.Category;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
-import dev.luiiscarlos.academ_iq_api.services.CategoryService;
 import dev.luiiscarlos.academ_iq_api.services.CourseService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/courses")
+@RequestMapping("/v1/courses")
 public class CourseController {
 
     private final CourseService courseService;
 
     private final CourseMapper courseMapper;
 
-    private final CategoryService categoryService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CourseResponseDto> save(
+    public ResponseEntity<CourseResponseDto> create(
             @RequestPart("course") CourseRequestDto courseDto,
             @RequestParam Map<String, MultipartFile> files) {
         return ResponseEntity
@@ -61,22 +58,6 @@ public class CourseController {
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(courseMapper.toCourseResponseDto(courseService.findById(courseId)));
-    }
-
-    @GetMapping("/categories")
-    public ResponseEntity<List<Category>> findAllCategories() {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(categoryService.findAllCategories());
-    }
-
-    @GetMapping("categories/{category}")
-    public ResponseEntity<Category> findCategoryByName(@PathVariable("category") String categoryName) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(categoryService.findCategoryByName(categoryName));
     }
 
     @PutMapping("/{id}")

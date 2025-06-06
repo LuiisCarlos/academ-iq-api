@@ -1,38 +1,30 @@
 package dev.luiiscarlos.academ_iq_api.models.mappers;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import dev.luiiscarlos.academ_iq_api.models.File;
-import dev.luiiscarlos.academ_iq_api.models.Role;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.*;
 
 @Component
 public class UserMapper {
 
-    public User toUser(
-            UserRegisterRequestDto userDto,
-            String encodedPassword,
-            Set<Role> authorities,
-            File avatar) {
+    public User toModel(UserRegisterRequestDto userDto) {
+        String fullname = String.format("%s %s", userDto.getUsername(), userDto.getLastname());
+
         return User.builder()
                 .username(userDto.getUsername())
-                .password(encodedPassword)
-                .authorities(authorities)
-                .avatar(avatar)
                 .email(userDto.getEmail())
-                .fullname(userDto.getUsername() + " " + userDto.getLastname())
+                .fullname(fullname)
                 .firstname(userDto.getFirstname())
                 .lastname(userDto.getLastname())
                 .phone(userDto.getPhone())
-                .birthdate(LocalDate.parse(userDto.getBirthdate()))
+                .birthdate(userDto.getBirthdate())
                 .build();
     }
 
-    public User toUser(UserUpdateRequestDto userDto) {
+    public User toModel(UserUpdateRequestDto userDto) {
         return User.builder()
                 .username(userDto.getUsername())
                 .email(userDto.getEmail())
@@ -49,12 +41,12 @@ public class UserMapper {
                 .jobArea(userDto.getJobArea())
                 .workExperience(userDto.getWorkExperience())
                 .companyName(userDto.getCompanyName())
-                .isTeamManager(userDto.isTeamManager())
+                .manager(userDto.isManager())
                 .wantToUpgrade(userDto.wantToUpgrade())
                 .build();
     }
 
-    public UserRegisterResponseDto toUserRegisterResponseDto(User user) {
+    public UserRegisterResponseDto toRegisterResponseDto(User user) {
         return UserRegisterResponseDto.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -65,20 +57,20 @@ public class UserMapper {
                 .build();
     }
 
-    public UserLoginResponseDto toUserLoginResponseDto(
+    public LoginResponseDto toLoginResponseDto(
             String accessToken,
             String refreshToken,
             User user) {
-        UserResponseDto userResponse = this.toUserResponseDto(user);
+        UserResponseDto userResponse = this.toResponseDto(user);
 
-        return UserLoginResponseDto.builder()
+        return LoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .user(userResponse)
                 .build();
     }
 
-    public UserResponseDto toUserResponseDto(User user) {
+    public UserResponseDto toResponseDto(User user) {
         return UserResponseDto.builder()
                 .username(user.getUsername())
                 .avatarUrl(user.getAvatar().getUrl())
@@ -98,7 +90,7 @@ public class UserMapper {
                 .biography(user.getBiography())
                 .hours(user.getHours())
                 .wantToUpgrade(user.wantToUpgrade())
-                .isTeamManager(user.isTeamManager())
+                .manager(user.isManager())
                 .registeredAt(user.getRegisteredAt())
                 .build();
     }

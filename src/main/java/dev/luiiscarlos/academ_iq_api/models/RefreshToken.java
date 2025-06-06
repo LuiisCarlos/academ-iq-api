@@ -2,12 +2,9 @@ package dev.luiiscarlos.academ_iq_api.models;
 
 import java.time.LocalDateTime;
 
-import org.springframework.lang.NonNull;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
-import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

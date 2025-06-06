@@ -10,12 +10,17 @@ public class ErrorMessages {
 
     public static final String USER_NOT_FOUND = "User '%s' not found";
 
+    public static final String USER_NOT_VERIFIED = "User account '%s' is not verified";
+
+
     public static final String COURSE_NOT_FOUND = "Course with ID '%d' not found";
 
     public static final String COURSE_NOT_FOUND_BY_NAME = "Course with name '%s' not found";
 
     public static final String CATEGORY_NOT_FOUND = "Category '%s' does not exist";
 
+
+    public static final String REFRESH_TOKEN_NOT_FOUND = "Refresh token not found";
 
 
     public static final String FILE_MISSING = "File upload failed: no file provided";
@@ -64,11 +69,16 @@ public class ErrorMessages {
 
     public static final String INVALID_CREDENTIALS = "Invalid username or password";
 
-    public static final String TOKEN_EXPIRED = "Authentication failed: token expired";
 
-    public static final String TOKEN_INVALID = "Authentication failed: invalid token";
+    public static final String EXPIRED_TOKEN = "Authentication failed: token expired";
 
-    public static final String TOKEN_TYPE_INVALID = "Authentication failed: invalid token type";
+    public static final String INVALID_TOKEN = "Authentication failed: invalid token";
+
+    public static final String REQUIRED_TOKEN = "Authentication failed: token";
+
+    public static final String MALFORMED_TOKEN = "Authentication failed: Malformed token";
+
+    public static final String INVALID_TOKEN_TYPE = "Authentication failed: invalid token type";
 
 
     public static final String COURSE_ALREADY_EXISTS = "Course '%s' already exists";

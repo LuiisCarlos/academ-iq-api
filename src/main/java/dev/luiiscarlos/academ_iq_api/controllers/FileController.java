@@ -11,23 +11,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.luiiscarlos.academ_iq_api.models.File;
-import dev.luiiscarlos.academ_iq_api.services.FileServiceImpl;
+import dev.luiiscarlos.academ_iq_api.services.FileService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("api/v1/files")
 @RequiredArgsConstructor
+@RequestMapping("/v1/files")
 public class FileController {
 
-	private final FileServiceImpl fileService;
+	private final FileService fileService;
 
 	/**
 	 * Endpoint to get a file by its filename.
 	 *
 	 * @param filename the name of the file to be retrieved
 	 * @param token    the authorization token (optional)
-	 *
 	 * @return the file as a Resource wrapped in a ResponseEntity
 	 */
 	@GetMapping("/{filename:.+}")

@@ -44,10 +44,10 @@ public class SecurityConfiguration {
     /**
      * Configures the security filter chain for the application
      *
-     * @param http the HttpSecurity object to configure
+     * @param http                the HttpSecurity object to configure
      * @param accessDeniedHandler the handler for access denied exceptions
-     * @param exceptionFilter the filter for handling exceptions
-     * @param accessTokenFilter the filter for handling access tokens
+     * @param exceptionFilter     the filter for handling exceptions
+     * @param accessTokenFilter   the filter for handling access tokens
      * @return the configured SecurityFilterChain
      * @throws Exception if an error occurs during configuration
      */
@@ -111,6 +111,7 @@ public class SecurityConfiguration {
                 .privateKey(RSAKeys.getPrivateKey())
                 .build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+
         return new NimbusJwtEncoder(jwks);
     }
 
@@ -135,35 +136,36 @@ public class SecurityConfiguration {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+
         return jwtAuthenticationConverter;
     }
 
     /**
      * Creates a CorsConfigurationSource bean that configures CORS settings
-     * to allow all origins, methods, and headers, with credentials allowed
      *
      * @return a CorsConfigurationSource instance
      */
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(List.of("*"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
+        corsConfiguration.setAllowedOriginPatterns(List.of("*"));
+        corsConfiguration.setAllowedMethods(List.of("*"));
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", corsConfiguration);
+
         return source;
     }
 
     /**
      * Creates an AccessDeniedHandler bean that handles access denied exceptions
-     * by setting a custom error response with a 403 Forbidden status
      *
      * @param errorHandler the error handler to use for setting the error response
      * @return an AccessDeniedHandler instance

@@ -25,15 +25,15 @@ import dev.luiiscarlos.academ_iq_api.services.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/users/@me/enrollments")
 @RequiredArgsConstructor
+@RequestMapping("/v1/enrollments")
 public class EnrollmentController {
 
         private final EnrollmentService enrollmentService;
 
         private final EnrollmentMapper enrollmentMapper;
 
-        @PostMapping("/{id}")
+        @PostMapping("/@me/{id}")
         public ResponseEntity<EnrollmentResponseDto> create(
                         @RequestHeader("Authorization") String token,
                         @PathVariable("id") Long courseId,
@@ -55,7 +55,7 @@ public class EnrollmentController {
                                 .body(enrollmentService.findAllByUserId(token));
         }
 
-        @GetMapping("/{id}")
+        @GetMapping("/@me/{id}")
         public ResponseEntity<EnrollmentResponseDto> findByUserIdAndCourseId(
                         @RequestHeader("Authorization") String token,
                         @PathVariable("id") Long courseId) {
@@ -65,7 +65,7 @@ public class EnrollmentController {
                                 .body(enrollmentService.findByUserIdAndCourseId(token, courseId));
         }
 
-        @PutMapping("/{id}")
+        @PutMapping("/@me/{id}")
         public ResponseEntity<EnrollmentResponseDto> updateByUserIdAndCourseId(
                         @RequestHeader("Authorization") String token,
                         @PathVariable("id") Long courseId,
@@ -78,7 +78,7 @@ public class EnrollmentController {
                                 .body(enrollmentMapper.toEnrollmentResponse(enrollment));
         }
 
-        @PatchMapping("/{id}/progress")
+        @PatchMapping("/@me/{id}/progress")
         public ResponseEntity<EnrollmentResponseDto> patchProgressState(
                         @RequestHeader("Authorization") String token,
                         @PathVariable("id") Long courseId,

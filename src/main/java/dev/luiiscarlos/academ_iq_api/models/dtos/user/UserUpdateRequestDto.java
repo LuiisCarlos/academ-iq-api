@@ -37,12 +37,12 @@ public class UserUpdateRequestDto {
 
     private String companyName;
 
-    private Boolean isTeamManager;
+    private Boolean manager;
 
     private Boolean wantToUpgrade;
 
-    public Boolean isTeamManager() {
-        return this.isTeamManager;
+    public Boolean isManager() {
+        return this.manager;
     }
 
     public Boolean wantToUpgrade() {

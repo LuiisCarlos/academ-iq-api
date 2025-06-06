@@ -45,7 +45,7 @@ public class UserResponseDto {
 
     private Integer hours;
 
-    private Boolean isTeamManager;
+    private Boolean manager;
 
     private Boolean wantToUpgrade;
 

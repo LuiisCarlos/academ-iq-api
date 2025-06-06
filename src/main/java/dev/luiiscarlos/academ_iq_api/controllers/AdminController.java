@@ -22,8 +22,8 @@ import dev.luiiscarlos.academ_iq_api.services.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@RequestMapping("/v1/admin")
 public class AdminController {
 
     private final UserServiceImpl userService;

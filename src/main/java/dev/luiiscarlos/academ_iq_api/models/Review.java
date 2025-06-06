@@ -2,9 +2,6 @@ package dev.luiiscarlos.academ_iq_api.models;
 
 import java.time.LocalDateTime;
 
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 

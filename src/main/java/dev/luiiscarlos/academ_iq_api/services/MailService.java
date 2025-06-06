@@ -33,7 +33,7 @@ public class MailService {
      *
      * @throws EmailSendingException if there is an error sending the email
      */
-    public void sendEmailVerification(String origin, User user) {
+    public void sendMailVerification(User user, String origin) {
         try {
             String token = generateUrl("auth/verify", origin, tokenService.generateVerificationToken(user));
 
@@ -103,7 +103,7 @@ public class MailService {
      *
      * @throws EmailSendingException if there is an error sending the email
      */
-    public void sendEmailPasswordRecover(String origin, User user) {
+    public void sendMailPasswordRecover(User user, String origin) {
         try {
             String token = generateUrl("auth/reset-password", origin, tokenService.generateRecoverPasswordToken(user));
             MimeMessage message = mailSender.createMimeMessage();

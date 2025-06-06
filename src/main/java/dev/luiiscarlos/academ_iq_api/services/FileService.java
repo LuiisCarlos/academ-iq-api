@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class FileServiceImpl {
+public class FileService {
 
 	public static final String[] ALLOWED_IMAGE_TYPES = new String[] { "image/jpeg", "image/png" };
 

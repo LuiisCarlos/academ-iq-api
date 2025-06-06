@@ -3,6 +3,8 @@ package dev.luiiscarlos.academ_iq_api.repositories;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import dev.luiiscarlos.academ_iq_api.models.User;
@@ -13,6 +15,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
     Optional<User> findByEmail(String email);
+
+    @Query("SELECT u FROM User u JOIN u.refreshTokens rt WHERE rt.token = :token")
+    Optional<User> findByToken(@Param("token") String token);
 
     Boolean existsByUsername(String username);
 

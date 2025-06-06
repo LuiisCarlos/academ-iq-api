@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class RatingService {
+public class ReviewService {
 
     private final ReviewRepository ratingRepository;
 

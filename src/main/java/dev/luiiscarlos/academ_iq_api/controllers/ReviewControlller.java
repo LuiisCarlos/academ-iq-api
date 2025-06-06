@@ -12,24 +12,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dev.luiiscarlos.academ_iq_api.models.dtos.rating.ReviewRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.rating.ReviewResponseDto;
-import dev.luiiscarlos.academ_iq_api.services.RatingService;
+import dev.luiiscarlos.academ_iq_api.services.ReviewService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
-@RequestMapping("/api/v1/ratings")
 @RequiredArgsConstructor
-public class RatingControlller {
+@RequestMapping("/v1/reviews")
+public class ReviewControlller {
 
-    private final RatingService ratingService;
+    private final ReviewService reviewService;
 
     @PostMapping("/{id}")
     public ResponseEntity<ReviewResponseDto> create(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId,
             @RequestBody ReviewRequestDto requestDto) {
-        ReviewResponseDto responseDto = ratingService.save(token, courseId, requestDto);
+        ReviewResponseDto responseDto = reviewService.save(token, courseId, requestDto);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -41,7 +41,7 @@ public class RatingControlller {
     public ResponseEntity<ReviewResponseDto> retrieve(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId) {
-        ReviewResponseDto responseDto = ratingService.findByUserIdAndCourseId(token, courseId);
+        ReviewResponseDto responseDto = reviewService.findByUserIdAndCourseId(token, courseId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

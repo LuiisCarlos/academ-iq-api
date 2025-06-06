@@ -11,21 +11,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.luiiscarlos.academ_iq_api.models.User;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.Credentials;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordResetDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserLoginRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserLoginResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.LoginResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserRegisterRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserRegisterResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.mappers.UserMapper;
 import dev.luiiscarlos.academ_iq_api.services.AuthServiceImpl;
+
+import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@RequestMapping("/v1/auth")
 public class AuthController {
 
     private final AuthServiceImpl authService;
+
+    private final UserMapper userMapper;
 
     @GetMapping("/refresh")
     public ResponseEntity<String> refresh(@RequestParam String token) {
@@ -36,23 +42,28 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserLoginResponseDto> login(
+    public ResponseEntity<LoginResponseDto> login(
             @RequestHeader("Origin") String origin,
-            @RequestBody UserLoginRequestDto userDto) {
+            @RequestBody Credentials credentials) {
+
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(authService.login(origin, userDto));
+                .body(authService.login(credentials, origin));
     }
 
     @PostMapping("/register")
     public ResponseEntity<UserRegisterResponseDto> register(
             @RequestHeader("Origin") String origin,
-            @RequestBody UserRegisterRequestDto userDto) {
+            @Valid @RequestBody UserRegisterRequestDto userDto) {
+        User user = userMapper.toModel(userDto);
+        UserRegisterResponseDto responseDto = userMapper
+                .toRegisterResponseDto(authService.register(user, origin));
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(authService.register(origin, userDto));
+                .body(responseDto);
     }
 
     @PostMapping("/logout")

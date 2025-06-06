@@ -5,9 +5,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
@@ -45,6 +42,17 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    private User instructor;
+
+    @ManyToOne
+    @JoinColumn(name = "file_id")
+    private File thumbnail;
+
+    @JoinColumn(name = "category_id")
+    @ManyToOne
+    private Category category;
+
     private String title;
 
     private String subtitle;
@@ -52,24 +60,13 @@ public class Course {
     @Column(length = 700)
     private String description;
 
-    @ManyToOne
-    private User instructor;
-
-    @JoinColumn(name = "file_id")
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private File thumbnail;
-
     @Builder.Default
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "requirement")
     @CollectionTable(
-        name = "course_requirement_junction",
+        name = "requirements",
         joinColumns = @JoinColumn(name = "course_id"))
     private List<String> requirements = new ArrayList<>();
-
-    @JoinColumn(name = "category_id")
-    @ManyToOne
-    private Category category;
 
     @Enumerated(EnumType.STRING)
     private Level level;

@@ -2,7 +2,6 @@ package dev.luiiscarlos.academ_iq_api.models;
 
 import org.springframework.security.core.GrantedAuthority;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

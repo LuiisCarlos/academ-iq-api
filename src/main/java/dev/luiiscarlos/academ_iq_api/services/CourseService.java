@@ -40,7 +40,7 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
-    private final FileServiceImpl fileService;
+    private final FileService fileService;
 
     private final CourseMapper courseMapper;
 

@@ -1,7 +1,5 @@
 package dev.luiiscarlos.academ_iq_api.models;
 
-import org.springframework.lang.Nullable;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

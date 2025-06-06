@@ -27,7 +27,7 @@ public class UtilityConfiguration {
     }
 
     /**
-     * Creates and configure a Cloudinary bean to upload files to the cloud
+     * Creates and configure a Cloudinary bean to upload files
      *
      * @param dotenv the environment variables needed for configuration
      * @return a cloudinary instance

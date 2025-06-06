@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.ErrorHandler;
 import dev.luiiscarlos.academ_iq_api.exceptions.ErrorMessages;
+import dev.luiiscarlos.academ_iq_api.exceptions.token.InvalidTokenTypeException;
 import dev.luiiscarlos.academ_iq_api.services.interfaces.TokenService;
 
 import jakarta.servlet.FilterChain;
@@ -49,41 +50,33 @@ public class AccessTokenFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String token = request.getHeader("Authorization");
-        String path = request.getRequestURI();
+        String endpoint = request.getRequestURI();
 
-        if (token != null && token.startsWith("Bearer")) {
-            token = token.substring(7);
+        tokenService.validate(token, null);
 
-            Jwt jwt = tokenService.getJwtToken(token);
-            Instant expiresAt = jwt.getExpiresAt();
-            String tokenType = jwt.getClaimAsString("token_type");
+        Jwt jwt = tokenService.decode(token);
+        Instant expiresAt = jwt.getExpiresAt();
+        String tokenType = jwt.getClaimAsString("token_type");
 
-            if (!tokenService.isValidToken(token)) {
-                errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
-                        ErrorMessages.TOKEN_INVALID);
-                return;
-            }
-
-            if (expiresAt.isBefore(Instant.now())) {
-                errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
-                        ErrorMessages.TOKEN_EXPIRED);
-                return;
-            }
-
-            if (isRefreshPath(path)) {
-                if (!"refresh".equals(tokenType))
-                    throw new RuntimeException(ErrorMessages.TOKEN_TYPE_INVALID); // TODO: Review this
-            } else {
-                if (!"access".equals(tokenType)) {
-                    errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
-                            ErrorMessages.TOKEN_TYPE_INVALID);
-                    return;
-                }
-            }
-
-            Authentication authentication = new JwtAuthenticationToken(jwt);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (expiresAt.isBefore(Instant.now())) {
+            errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
+                    ErrorMessages.EXPIRED_TOKEN);
+            return;
         }
+
+        if (isRefreshPath(endpoint)) {
+            if (!"refresh".equals(tokenType))
+                throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
+        } else {
+            if (!"access".equals(tokenType)) {
+                errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
+                        ErrorMessages.INVALID_TOKEN_TYPE);
+                return;
+            }
+        }
+
+        Authentication authentication = new JwtAuthenticationToken(jwt);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }

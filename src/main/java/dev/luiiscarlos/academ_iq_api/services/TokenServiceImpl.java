@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -15,8 +16,10 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
-import dev.luiiscarlos.academ_iq_api.exceptions.auth.InvalidCredentialsException;
+import dev.luiiscarlos.academ_iq_api.exceptions.ErrorMessages;
+import dev.luiiscarlos.academ_iq_api.exceptions.auth.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.token.InvalidTokenException;
+import dev.luiiscarlos.academ_iq_api.exceptions.token.InvalidTokenTypeException;
 import dev.luiiscarlos.academ_iq_api.exceptions.token.RefreshTokenExpiredException;
 import dev.luiiscarlos.academ_iq_api.exceptions.token.RefreshTokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
@@ -39,14 +42,11 @@ public class TokenServiceImpl implements TokenService {
 
     private final JwtDecoder jwtDecoder;
 
-    /**
-     * Generates an access token for the given user.
-     *
-     * @param user The user for whom the access token is generated.
-     *
-     * @return The generated access token as a String.
-     */
-    @Override
+    public RefreshToken findByToken(String token) {
+        return refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new RefreshTokenNotFoundException(ErrorMessages.REFRESH_TOKEN_NOT_FOUND));
+    }
+
     public String generateAccessToken(User user) {
         Instant expiresAt = Instant.now().plus(1, ChronoUnit.HOURS);
         String tokenType = "access";
@@ -54,13 +54,6 @@ public class TokenServiceImpl implements TokenService {
         return generateToken(user, expiresAt, tokenType);
     }
 
-    /**
-     * Generates a refresh token for the given user.
-     * If a refresh token already exists for the user, it updates the existing one.
-     *
-     * @param user The user for whom the refresh token is generated.
-     */
-    @Override
     public RefreshToken generateRefreshToken(User user) {
         Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
         ZoneId zoneId = ZoneId.of("Europe/Madrid");
@@ -81,15 +74,6 @@ public class TokenServiceImpl implements TokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-    /**
-     * Generates a verification token for the given user.
-     * This token is used for email verification.
-     *
-     * @param user The user for whom the verification token is generated.
-     *
-     * @return The generated verification token as a String.
-     */
-    @Override
     public String generateVerificationToken(User user) {
         Instant expiresAt = Instant.now().plus(24, ChronoUnit.HOURS);
         String tokenType = "verify";
@@ -97,15 +81,6 @@ public class TokenServiceImpl implements TokenService {
         return generateToken(user, expiresAt, tokenType);
     }
 
-    /**
-     * Generates a password recovery token for the given user.
-     * This token is used for password recovery.
-     *
-     * @param user The user for whom the password recovery token is generated.
-     *
-     * @return The generated password recovery token as a String.
-     */
-    @Override
     public String generateRecoverPasswordToken(User user) {
         Instant expiresAt = Instant.now().plus(30, ChronoUnit.MINUTES);
         String tokenType = "recover";
@@ -113,165 +88,87 @@ public class TokenServiceImpl implements TokenService {
         return generateToken(user, expiresAt, tokenType);
     }
 
-    /**
-     * Refreshes the access token using the provided refresh token.
-     *
-     * @param token The refresh token used to generate a new access token.
-     *
-     * @return The new access token as a String.
-     *
-     * @throws RefreshTokenNotFoundException If the refresh token is not found in
-     *                                       the database.
-     * @throws InvalidCredentialsException   If the refresh token is invalid or not
-     *                                       found.
-     * @throws RefreshTokenExpiredException  If the refresh token has expired.
-     */
-    @Override
     public String refreshAccessToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RefreshTokenNotFoundException(
-                        "Failed to refresh access token: Refresh token not found"));
+                .orElseThrow(() -> new RefreshTokenNotFoundException(ErrorMessages.REFRESH_TOKEN_NOT_FOUND));
 
-        if (!isValidToken(token))
-            throw new InvalidCredentialsException(
-                    "Failed to refresh access token: Invalid refresh token");
-
-        if (refreshToken.getExpiresAt().isBefore(LocalDateTime.now()))
-            throw new RefreshTokenExpiredException(
-                    "Failed to refresh access token: Expired refresh token");
+        this.validate(token, "refresh");
 
         return generateAccessToken(refreshToken.getUser());
     }
 
-    /**
-     * Validates the provided token.
-     *
-     * @param token The token to be validated.
-     *
-     * @return true if the token is valid, false otherwise.
-     */
-    @Override
-    public boolean isValidToken(String token) {
+    public Jwt decode(String token) {
+        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+
         try {
-            jwtDecoder.decode(token);
-            return true;
-        } catch (JwtException e) {
-            return false;
+            return jwtDecoder.decode(token);
+        } catch (JwtException ex) {
+            throw new InvalidTokenException(ErrorMessages.MALFORMED_TOKEN);
         }
     }
 
-    /**
-     * Invalidates the provided refresh token.
-     *
-     * @param token The refresh token to be invalidated.
-     */
-    @Override
-    public void invalidateRefreshToken(String token) {
+    public String getSubject(String token) {
+        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+
+        try {
+            return jwtDecoder.decode(token).getSubject();
+        } catch (JwtException ex) {
+            throw new InvalidTokenException(ErrorMessages.MALFORMED_TOKEN);
+        }
+    }
+
+    public Instant getExpiresAt(String token) {
+        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+
+        try {
+            return jwtDecoder.decode(token).getExpiresAt();
+        } catch (JwtException ex) {
+            throw new InvalidTokenException(ErrorMessages.MALFORMED_TOKEN);
+        }
+    }
+
+    public String getTokenType(String token) {
+        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+
+        try {
+            return jwtDecoder.decode(token).getClaimAsString("token_type");
+        } catch (JwtException ex) {
+            throw new InvalidTokenException(ErrorMessages.MALFORMED_TOKEN);
+        }
+    }
+
+    public void validate(String token, @Nullable String tokenType) {
+        if (token.isBlank() || token == null)
+            throw new AuthCredentialsNotFoundException(ErrorMessages.REQUIRED_TOKEN);
+
+        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+
+        Instant expiresAt = this.getExpiresAt(token);
+        String type = this.getTokenType(token);
+
+        if (expiresAt == null || expiresAt.isBefore(Instant.now()))
+            throw new RefreshTokenExpiredException(ErrorMessages.EXPIRED_TOKEN);
+
+        if (tokenType == null || !tokenType.equals(type))
+            throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
+    }
+
+    public void invalidate(String token) {
         if (refreshTokenRepository.existsByToken(token))
             refreshTokenRepository.deleteByToken(token);
     }
 
     /**
-     * Finds a refresh token by its value.
-     *
-     * @param token The value of the refresh token to be found.
-     *
-     * @return The found RefreshToken object.
-     *
-     * @throws RefreshTokenNotFoundException If the refresh token is not found in
-     *                                       the database.
-     */
-    @Override
-    public RefreshToken findByToken(String token) {
-        return refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RefreshTokenNotFoundException(
-                        "Failed to find refresh token: Refresh token not found"));
-    }
-
-    /**
-     * Finds a refresh token by its ID.
-     *
-     * @param id The id of the refresh token to be found.
-     *
-     * @return The found RefreshToken object.
-     *
-     * @throws RefreshTokenNotFoundException If the refresh token is not found in
-     *                                       the database.
-     */
-    @Override
-    public String getTokenType(String token) {
-        try {
-            return jwtDecoder.decode(token).getClaimAsString("token_type");
-        } catch (JwtException ex) {
-            throw new InvalidTokenException("Failed to validate token: Malformed Token");
-        }
-    }
-
-    /**
-     * Gets the expiration time of the provided token.
-     *
-     * @param token The token whose expiration time is to be retrieved.
-     *
-     * @return The expiration time of the token as an Instant.
-     *
-     * @throws InvalidTokenException If the token is malformed or invalid.
-     */
-    @Override
-    public Instant getTokenExpiration(String token) {
-        try {
-            return jwtDecoder.decode(token).getExpiresAt();
-        } catch (JwtException ex) {
-            throw new InvalidTokenException("Failed to validate token: Malformed Token");
-        }
-    }
-
-    /**
-     * Gets the subject of the provided token.
-     *
-     * @param token The token whose subject is to be retrieved.
-     *
-     * @return The subject of the token as a String.
-     *
-     * @throws InvalidTokenException If the token is malformed or invalid.
-     */
-    public String getTokenSubject(String token) {
-        try {
-            return jwtDecoder.decode(token).getSubject();
-        } catch (JwtException ex) {
-            throw new InvalidTokenException("Failed to validate token: Malformed Token");
-        }
-    }
-
-    /**
-     * Gets the Jwt object from the provided token.
-     *
-     * @param token The token to be decoded.
-     *
-     * @return The decoded Jwt object.
-     *
-     * @throws InvalidTokenException If the token is malformed or invalid.
-     */
-    @Override
-    public Jwt getJwtToken(String token) {
-        try {
-            return jwtDecoder.decode(token);
-        } catch (JwtException ex) {
-            throw new InvalidTokenException("Failed to validate token: Malformed Token");
-        }
-    }
-
-    /**
      * Generates a token for the given user with the specified expiration time and
-     * token type.
+     * token type
      * This method is used to create access, refresh, verification, and password
-     * recovery tokens.
+     * recovery tokens
      *
-     * @param user      The user for whom the token is generated.
-     * @param expiresAt The expiration time of the token as an Instant.
-     * @param tokenType The type of the token (e.g., "access", "refresh", "verify",
-     *                  "recover").
-     *
-     * @return The generated token as a String.
+     * @param user      the user for whom the token is generated
+     * @param expiresAt the expiration time of the token as an Instant
+     * @param tokenType the type of the token (e.g., "access", "refresh", "verify",
+     *                  "recover")
+     * @return the generated token as a String
      */
     private String generateToken(User user, Instant expiresAt, String tokenType) {
         Instant now = Instant.now();
@@ -290,10 +187,6 @@ public class TokenServiceImpl implements TokenService {
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-    }
-
-    public void deleteByUserId(Long userId) {
-        refreshTokenRepository.deleteByUserId(userId);
     }
 
 }

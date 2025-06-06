@@ -1,8 +1,14 @@
 package dev.luiiscarlos.academ_iq_api.models.dtos.user;
 
+import java.time.LocalDate;
+
+import dev.luiiscarlos.academ_iq_api.utilities.annotations.Adult;
+import dev.luiiscarlos.academ_iq_api.utilities.annotations.PasswordMatches;
+
 import lombok.Data;
 
 @Data
+@PasswordMatches
 public class UserRegisterRequestDto {
 
     private String username;
@@ -19,6 +25,7 @@ public class UserRegisterRequestDto {
 
     private String phone;
 
-    private String birthdate;
+    @Adult
+    private LocalDate birthdate;
 
 }
