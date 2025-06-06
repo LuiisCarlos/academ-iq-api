@@ -28,56 +28,39 @@ import lombok.NoArgsConstructor;
 public class File {
 
     @Id
-    @Nullable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     private String filename;
 
-    @Nullable
     @Column(name = "content_type")
     private String contentType;
 
-    @NonNull
     private Long size;
 
-    @NonNull
     private String url;
 
-    @Nullable
     private String extension;
 
-    @NonNull
     @Builder.Default
     @Column(name = "is_image")
-    private Boolean isImage = true;
+    private Boolean image = true;
 
-    @Nullable
     @Builder.Default
-    @Column(name = "is_default_file")
-    private Boolean isDefaultFile = false;
+    @Column(name = "is_default")
+    private Boolean primary = false;
 
-    @Nullable
     @Builder.Default
     @Column(name = "updated_at")
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     public Boolean isImage() {
-        return this.isImage;
+        return this.image;
     }
 
-    public void setImage(Boolean isImage) {
-        this.isImage = isImage;
-    }
-
-    public Boolean isDefaultFile() {
-        return this.isDefaultFile;
-    }
-
-    public void setDefaultFile(Boolean isDefaultFile) {
-        this.isDefaultFile = isDefaultFile;
+    public Boolean isPrimary() {
+        return this.primary;
     }
 
 }

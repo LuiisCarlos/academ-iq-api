@@ -35,24 +35,19 @@ import lombok.NoArgsConstructor;
 public class Section {
 
     @Id
-    @Nullable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Nullable
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @NonNull
     private String name;
 
-    @Nullable
     @Builder.Default
     @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime duration = LocalTime.of(0, 0, 0);
 
-    @Nullable
     @Builder.Default
     @OneToMany(mappedBy = "section", fetch = FetchType.EAGER , cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lesson> lessons = new ArrayList<>();

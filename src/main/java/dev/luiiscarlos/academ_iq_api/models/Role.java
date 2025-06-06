@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 public class Role implements GrantedAuthority {
 
     @Id
-    @Column(name = "role_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

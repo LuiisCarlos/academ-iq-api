@@ -30,7 +30,6 @@ public class FileController {
 	 *
 	 * @return the file as a Resource wrapped in a ResponseEntity
 	 */
-	@SuppressWarnings("null") // <- Already handled
 	@GetMapping("/{filename:.+}")
 	public ResponseEntity<Resource> findResourceByFilename(
 			@PathVariable String filename,

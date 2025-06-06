@@ -12,8 +12,10 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import dev.luiiscarlos.academ_iq_api.services.TokenServiceImpl;
-import dev.luiiscarlos.academ_iq_api.utilities.ErrorHandler;
+import dev.luiiscarlos.academ_iq_api.exceptions.ErrorHandler;
+import dev.luiiscarlos.academ_iq_api.exceptions.ErrorMessages;
+import dev.luiiscarlos.academ_iq_api.services.interfaces.TokenService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,18 +27,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AccessTokenFilter extends OncePerRequestFilter {
 
-    private final TokenServiceImpl tokenService;
+    private final TokenService tokenService;
 
     private final ErrorHandler errorHandler;
 
     /**
-     * Filters the request and checks if the access token is valid and if it is, it
-     * sets the authentication
+     * Filters the request and checks if the access token is valid and if it is,
+     * it sets the authentication
      *
      * @param request     The request to filter
      * @param response    The response to send the error to
      * @param filterChain The filter chain to continue the filter
-     *
      * @throws ServletException If a servlet error occurs
      * @throws IOException      If an I/O error occurs
      */
@@ -52,29 +53,30 @@ public class AccessTokenFilter extends OncePerRequestFilter {
 
         if (token != null && token.startsWith("Bearer")) {
             token = token.substring(7);
+
             Jwt jwt = tokenService.getJwtToken(token);
             Instant expiresAt = jwt.getExpiresAt();
             String tokenType = jwt.getClaimAsString("token_type");
 
             if (!tokenService.isValidToken(token)) {
                 errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
-                        "Failed to validate Token: Invalid access token");
+                        ErrorMessages.TOKEN_INVALID);
                 return;
             }
 
             if (expiresAt.isBefore(Instant.now())) {
                 errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
-                        "Failed to validate Token: Expired access token");
+                        ErrorMessages.TOKEN_EXPIRED);
                 return;
             }
 
             if (isRefreshPath(path)) {
                 if (!"refresh".equals(tokenType))
-                    throw new RuntimeException("Failed to validate Token: Invalid token type"); // TODO: Review this
+                    throw new RuntimeException(ErrorMessages.TOKEN_TYPE_INVALID); // TODO: Review this
             } else {
                 if (!"access".equals(tokenType)) {
                     errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
-                            "Failed to validate Token: Invalid token type");
+                            ErrorMessages.TOKEN_TYPE_INVALID);
                     return;
                 }
             }
@@ -86,10 +88,16 @@ public class AccessTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Checks if the path is a refresh path
+     *
+     * @param path The path to check
+     * @return true if the path is a refresh path, false otherwise
+     */
     private boolean isRefreshPath(String path) {
-        return path.contains("/api/v1/auth/refresh") ||
-                path.contains("/api/v1/auth/logout") ||
-                path.contains("/api/v1/auth/verify");
+        return path.contains("/auth/refresh") ||
+                path.contains("/auth/logout") ||
+                path.contains("/auth/verify");
     }
 
 }

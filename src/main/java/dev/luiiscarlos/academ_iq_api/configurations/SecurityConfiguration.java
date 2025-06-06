@@ -32,27 +32,31 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
 import dev.luiiscarlos.academ_iq_api.configurations.filters.AccessTokenFilter;
-import dev.luiiscarlos.academ_iq_api.configurations.filters.ExceptionHandlingFilter;
-import dev.luiiscarlos.academ_iq_api.utilities.ErrorHandler;
+import dev.luiiscarlos.academ_iq_api.configurations.filters.ExceptionFilter;
+import dev.luiiscarlos.academ_iq_api.exceptions.ErrorHandler;
+import dev.luiiscarlos.academ_iq_api.exceptions.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.utilities.RSAKeyProperties;
-
-import lombok.RequiredArgsConstructor;
 
 @EnableWebMvc
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    private final AccessTokenFilter accessTokenFilter;
-
-    private final ExceptionHandlingFilter exceptionHandlingFilter;
-
-    private final ErrorHandler errorHandler;
-
-    private final RSAKeyProperties RSAKeys;
-
+    /**
+     * Configures the security filter chain for the application
+     *
+     * @param http the HttpSecurity object to configure
+     * @param accessDeniedHandler the handler for access denied exceptions
+     * @param exceptionFilter the filter for handling exceptions
+     * @param accessTokenFilter the filter for handling access tokens
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, AccessDeniedHandler accessDeniedHandler)
+    SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            AccessDeniedHandler accessDeniedHandler,
+            ExceptionFilter exceptionFilter,
+            AccessTokenFilter accessTokenFilter)
             throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
@@ -78,19 +82,31 @@ public class SecurityConfiguration {
 
         http.exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler));
 
-        http.addFilterBefore(exceptionHandlingFilter, UsernamePasswordAuthenticationFilter.class)
+        http.addFilterBefore(exceptionFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(accessTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    /**
+     * Creates a JwtDecoder bean that decodes JWT tokens using the provided RSA keys
+     *
+     * @param RSAKeys the RSA key properties containing the public key
+     * @return a JwtDecoder instance
+     */
     @Bean
-    JwtDecoder jwtDecoder() {
+    JwtDecoder jwtDecoder(RSAKeyProperties RSAKeys) {
         return NimbusJwtDecoder.withPublicKey(RSAKeys.getPublicKey()).build();
     }
 
+    /**
+     * Creates a JwtEncoder bean that encodes JWT tokens using the provided RSA keys
+     *
+     * @param RSAKeys the RSA key properties containing the public and private keys
+     * @return a JwtEncoder instance
+     */
     @Bean
-    JwtEncoder jwtEncoder() {
+    JwtEncoder jwtEncoder(RSAKeyProperties RSAKeys) {
         JWK jwk = new RSAKey.Builder(RSAKeys.getPublicKey())
                 .privateKey(RSAKeys.getPrivateKey())
                 .build();
@@ -98,11 +114,22 @@ public class SecurityConfiguration {
         return new NimbusJwtEncoder(jwks);
     }
 
+    /**
+     * Creates a PasswordEncoder bean that uses BCrypt for password encoding
+     *
+     * @return a PasswordEncoder instance
+     */
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Creates a JwtAuthenticationConverter bean that converts JWT tokens
+     * to authentication objects with roles prefixed by "ROLE_"
+     *
+     * @return a JwtAuthenticationConverter instance
+     */
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
@@ -113,6 +140,12 @@ public class SecurityConfiguration {
         return jwtAuthenticationConverter;
     }
 
+    /**
+     * Creates a CorsConfigurationSource bean that configures CORS settings
+     * to allow all origins, methods, and headers, with credentials allowed
+     *
+     * @return a CorsConfigurationSource instance
+     */
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -128,11 +161,17 @@ public class SecurityConfiguration {
         return source;
     }
 
+    /**
+     * Creates an AccessDeniedHandler bean that handles access denied exceptions
+     * by setting a custom error response with a 403 Forbidden status
+     *
+     * @param errorHandler the error handler to use for setting the error response
+     * @return an AccessDeniedHandler instance
+     */
     @Bean
-    AccessDeniedHandler accessDeniedHandler() {
+    AccessDeniedHandler accessDeniedHandler(ErrorHandler errorHandler) {
         return (request, response, accessDeniedException) -> {
-            errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN,
-                    "Failed to access resource: Access denied");
+            errorHandler.setCustomErrorResponse(response, HttpStatus.FORBIDDEN, ErrorMessages.ACCESS_DENIED);
         };
     }
 

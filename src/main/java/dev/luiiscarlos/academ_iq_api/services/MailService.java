@@ -6,7 +6,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import dev.luiiscarlos.academ_iq_api.exceptions.EmailSendingException;
+import dev.luiiscarlos.academ_iq_api.exceptions.misc.EmailSendingException;
 import dev.luiiscarlos.academ_iq_api.models.User;
 
 import jakarta.mail.MessagingException;

@@ -42,29 +42,23 @@ import lombok.NoArgsConstructor;
 public class Course {
 
     @Id
-    @Nullable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     private String title;
 
-    @Nullable
     private String subtitle;
 
-    @NonNull
     @Column(length = 700)
     private String description;
 
-    @NonNull
-    private String author;
+    @ManyToOne
+    private User instructor;
 
-    @Nullable
     @JoinColumn(name = "file_id")
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private File thumbnail;
 
-    @Nullable
     @Builder.Default
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "requirement")
@@ -73,39 +67,32 @@ public class Course {
         joinColumns = @JoinColumn(name = "course_id"))
     private List<String> requirements = new ArrayList<>();
 
-    @NonNull
     @JoinColumn(name = "category_id")
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne
     private Category category;
 
-    @NonNull
     @Enumerated(EnumType.STRING)
     private Level level;
 
     @Transient
     private Double averageRating;
 
-    @Nullable
     @Builder.Default
     @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL , orphanRemoval = true)
-    private List<Rating> ratings = new ArrayList<>();
+    private List<Review> ratings = new ArrayList<>();
 
-    @Nullable
     @Builder.Default
     @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL , orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
-    @Nullable
     @Builder.Default
     @OneToMany(mappedBy = "course", fetch = FetchType.EAGER , orphanRemoval = true)
     private List<Enrollment> enrollments = new ArrayList<>();
 
-    @Nullable
     @Builder.Default
     @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime duration = LocalTime.of(0, 0, 0);
 
-    @Nullable
     @Builder.Default
     @Column(name = "created_at")
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
@@ -116,13 +103,12 @@ public class Course {
     }
 
 
-    @SuppressWarnings("null")
     private Double calculateAverageRating() {
         if (ratings == null || ratings.isEmpty())
             return 0.0;
 
         double sum = 0.0;
-        for (Rating rating : ratings)
+        for (Review rating : ratings)
             sum += rating.getRating();
 
         return sum / ratings.size();

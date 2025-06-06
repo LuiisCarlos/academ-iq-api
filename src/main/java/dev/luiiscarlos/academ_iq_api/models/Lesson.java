@@ -33,7 +33,6 @@ public class Lesson {
     @JoinColumn(name = "section_id")
     private Section section;
 
-    @Nullable
     @ManyToOne
     @JoinColumn(name = "file_id")
     private File file;

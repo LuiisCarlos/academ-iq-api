@@ -43,8 +43,6 @@ import lombok.NoArgsConstructor;
 public class User implements UserDetails {
 
     @Id
-    @Nullable
-    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -62,89 +60,69 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private Set<Role> authorities;
 
-    @Nullable
     @ManyToOne
-    @JoinColumn(name = "file_id")
+    @JoinColumn(name = "avatar")
     private File avatar;
 
-    @NonNull
     private String email;
 
-    @Nullable
+    private String fullname;
+
     private String firstname;
 
-    @NonNull
     private String lastname;
 
-    @NonNull
     private LocalDate birthdate;
 
-    @Nullable
     private String phone;
 
-    @Nullable
     private String dni;
 
-    @Nullable
     @Column(name = "github_url")
     private String githubUrl;
 
-    @Nullable
     @Column(name = "linkedin_url")
     private String linkedinUrl;
 
-    @Nullable
     @Column(name = "website_url")
     private String websiteUrl;
 
-    @Nullable
     private String biography;
 
-    @Nullable
     private String studies;
 
-    @Nullable
     @Column(name = "job_area")
     private String jobArea;
 
-    @Nullable
     @Column(name = "work_experience")
     private String workExperience;
 
-    @Nullable
     @Column(name = "company_name")
     private String companyName;
 
-    @Nullable
     @Builder.Default
     private Integer hours = 0;
 
-    @Nullable
     @Column(name = "is_team_manager")
     private Boolean isTeamManager;
 
-    @Nullable
     @Column(name = "want_to_upgrade")
     private Boolean wantToUpgrade;
 
-    @Nullable
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Enrollment> enrollments = new ArrayList<>();
 
-    @Nullable
     @Builder.Default
     @Column(name = "registered_at")
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime registeredAt = LocalDateTime.now();
 
-    @Nullable
     @Builder.Default
     @Column(name = "updated_at")
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @Nullable
     @Builder.Default
     @Column(name = "is_verified")
     private Boolean isVerified = false;

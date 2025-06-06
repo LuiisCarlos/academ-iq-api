@@ -21,6 +21,7 @@ import dev.luiiscarlos.academ_iq_api.models.Category;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
+import dev.luiiscarlos.academ_iq_api.services.CategoryService;
 import dev.luiiscarlos.academ_iq_api.services.CourseService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,8 @@ public class CourseController {
     private final CourseService courseService;
 
     private final CourseMapper courseMapper;
+
+    private final CategoryService categoryService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CourseResponseDto> save(
@@ -65,7 +68,7 @@ public class CourseController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(courseService.findAllCategories());
+                .body(categoryService.findAllCategories());
     }
 
     @GetMapping("categories/{category}")
@@ -73,7 +76,7 @@ public class CourseController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(courseService.findCategoryByName(categoryName));
+                .body(categoryService.findCategoryByName(categoryName));
     }
 
     @PutMapping("/{id}")

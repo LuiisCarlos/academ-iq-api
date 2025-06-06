@@ -15,10 +15,10 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
-import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
-import dev.luiiscarlos.academ_iq_api.exceptions.InvalidTokenException;
-import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenExpiredException;
-import dev.luiiscarlos.academ_iq_api.exceptions.RefreshTokenNotFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.auth.InvalidCredentialsException;
+import dev.luiiscarlos.academ_iq_api.exceptions.token.InvalidTokenException;
+import dev.luiiscarlos.academ_iq_api.exceptions.token.RefreshTokenExpiredException;
+import dev.luiiscarlos.academ_iq_api.exceptions.token.RefreshTokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.repositories.RefreshTokenRepository;

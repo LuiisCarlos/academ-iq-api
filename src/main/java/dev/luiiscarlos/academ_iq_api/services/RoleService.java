@@ -2,7 +2,7 @@ package dev.luiiscarlos.academ_iq_api.services;
 
 import org.springframework.stereotype.Service;
 
-import dev.luiiscarlos.academ_iq_api.exceptions.RoleNotFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.auth.RoleNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.Role;
 import dev.luiiscarlos.academ_iq_api.repositories.RoleRepository;
 

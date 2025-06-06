@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.CompletedLesson;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.EnrollmentResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.ProgressState;
-import dev.luiiscarlos.academ_iq_api.exceptions.EnrollmentNotFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.course.EnrollmentNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.Course;
 import dev.luiiscarlos.academ_iq_api.models.Enrollment;
 import dev.luiiscarlos.academ_iq_api.models.User;

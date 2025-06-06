@@ -12,11 +12,11 @@ import lombok.Data;
 @Builder
 public class EnrollmentCourseResponseDto {
 
-    private long id;
+    private Long id;
 
     private String title;
 
-    private String author;
+    private String instructor;
 
     private String thumbnailUrl;
 

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import dev.luiiscarlos.academ_iq_api.models.RefreshToken;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.repositories.RefreshTokenRepository;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;
@@ -29,13 +30,11 @@ public class AcademIqApiApplication {
 			TokenService tokenService) {
 		return args -> {
 			User admin = userRepository.findByUsername("admin").orElse(null);
-			User user = userRepository.findByUsername("user").orElse(null);
 
-			System.out.println("\nUser access token: " + tokenService.generateAccessToken(user) + "\n");
-			refreshTokenRepository.save(tokenService.generateRefreshToken(user));
+			System.out.println("\nAccess token: " + tokenService.generateAccessToken(admin));
 
-			System.out.println("Admin access token: " + tokenService.generateAccessToken(admin) + "\n");
-			refreshTokenRepository.save(tokenService.generateRefreshToken(admin));
+			RefreshToken refreshToken = refreshTokenRepository.save(tokenService.generateRefreshToken(admin));
+			System.out.println("\nRefresh token: " + refreshToken.getToken() + "\n");
 		};
 	}
 

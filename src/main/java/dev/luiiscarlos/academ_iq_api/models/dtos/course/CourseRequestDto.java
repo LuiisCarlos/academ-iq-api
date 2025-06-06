@@ -8,17 +8,17 @@ import lombok.Data;
 @Data
 public class CourseRequestDto {
 
+    private Long userId;
+
     private String title;
 
     private String subtitle;
 
     private String description;
 
-    private String author;
-
     private List<String> requirements;
 
-    private long categoryId;
+    private Long categoryId;
 
     private String level;
 

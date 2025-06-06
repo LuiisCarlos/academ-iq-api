@@ -31,24 +31,19 @@ import lombok.NoArgsConstructor;
 public class RefreshToken {
 
     @Id
-    @Nullable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     @Column(length = 600)
     private String token;
 
-    @NonNull
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NonNull
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
-    @Nullable
     @Builder.Default
     @Column(name = "created_at")
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.models.Category;
-import dev.luiiscarlos.academ_iq_api.models.dtos.rating.RatingResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.rating.ReviewResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionResponseDto;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +17,7 @@ import lombok.Data;
 @Builder
 public class CourseResponseDto {
 
-    private long id;
+    private Long id;
 
     private String title;
 
@@ -25,17 +25,17 @@ public class CourseResponseDto {
 
     private String description;
 
-    private String author;
+    private String instructor;
 
-    private String thumbnailUrl;
+    private String thumbnail;
 
     private Category category;
 
     private String level;
 
-    private double averageRating;
+    private Double averageRating;
 
-    private List<RatingResponseDto> ratings;
+    private List<ReviewResponseDto> ratings;
 
     @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime duration;

@@ -2,7 +2,7 @@ package dev.luiiscarlos.academ_iq_api.services;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +16,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
-import dev.luiiscarlos.academ_iq_api.exceptions.FileStorageException;
-import dev.luiiscarlos.academ_iq_api.exceptions.InvalidCredentialsException;
-import dev.luiiscarlos.academ_iq_api.exceptions.InvalidFileTypeException;
-import dev.luiiscarlos.academ_iq_api.exceptions.FileNotFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.file.FileNotFoundException;
+import dev.luiiscarlos.academ_iq_api.exceptions.file.FileStorageException;
+import dev.luiiscarlos.academ_iq_api.exceptions.file.InvalidFileTypeException;
+import dev.luiiscarlos.academ_iq_api.exceptions.ErrorMessages;
+import dev.luiiscarlos.academ_iq_api.exceptions.auth.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.repositories.FileRepository;
 
@@ -41,17 +42,63 @@ public class FileServiceImpl {
 	private final Cloudinary cloudinary;
 
 	/**
-	 * Retrieves all files
+	 * Saves a file to Cloudinary and the database
 	 *
-	 * @return the list of files
+	 * @param file  the file to be saved
+	 * @param image the resource type (image or raw)
+	 * @return {@link File} the file entity saved in the database
+	 * @throws FileStorageException     if the file can not be saved
+	 * @throws InvalidFileTypeException if the resource type is not valid
+	 */
+	public File save(MultipartFile file, boolean isImage) {
+		if (file.isEmpty() || file == null)
+			throw new FileStorageException(ErrorMessages.FILE_MISSING);
+
+		if (isImage && file.getSize() > 10_000_000)
+			throw new FileStorageException(String.format(ErrorMessages.FILE_TOO_LARGE, 10));
+
+		try {
+			Map<?, ?> uploadResult = cloudinary.uploader()
+					.upload(file.getBytes(), ObjectUtils.asMap(
+							"resource_type",
+							isImage ? "image" : "raw",
+							"folder",
+							isImage ? "uploads/images" : "uploads/videos"));
+
+			String publicId = (String) uploadResult.get("public_id");
+			String url = (String) uploadResult.get("secure_url");
+			String originalFilename = file.getOriginalFilename();
+			String filename = publicId.contains("/")
+					? publicId.substring(publicId.lastIndexOf("/") + 1)
+					: publicId;
+
+			File fileEntity = File.builder()
+					.filename(filename)
+					.contentType(file.getContentType())
+					.size(file.getSize())
+					.image(isImage)
+					.url(url)
+					.extension(StringUtils.getFilenameExtension(originalFilename))
+					.build();
+
+			return fileRepository.save(fileEntity);
+		} catch (IOException e) {
+			throw new FileStorageException(String.format(
+					ErrorMessages.FILE_DELETION_CLOUDINARY_BY_NAME, file.getOriginalFilename()), e);
+		}
+	}
+
+	/**
+	 * Retrieves all files from the database
 	 *
+	 * @return A list of {@link File} entities
 	 * @throws FileNotFoundException if the files can not be found
 	 */
 	public List<File> findAll() {
 		List<File> files = fileRepository.findAll();
 
 		if (fileRepository.findAll().isEmpty() || fileRepository.findAll() == null)
-			throw new FileNotFoundException("Failed to find files: No files found");
+			throw new FileNotFoundException(ErrorMessages.FILES_NOT_FOUND);
 
 		return files;
 	}
@@ -60,31 +107,26 @@ public class FileServiceImpl {
 	 * Retrieves a file by its id
 	 *
 	 * @param id the file id
-	 *
-	 * @return the file
-	 *
+	 * @return {@link File} the file entity
 	 * @throws FileNotFoundException if the file can not be found
 	 */
-	public File findById(Long id) {
-		return fileRepository.findById(id)
+	public File findById(Long fileId) {
+		return fileRepository.findById(fileId)
 				.orElseThrow(() -> new FileNotFoundException(
-						"Failed to find file: File not found with id " + id));
+						String.format(ErrorMessages.FILE_NOT_FOUND, fileId)));
 	}
 
 	/**
 	 * Retrieves a file by its filename
 	 *
 	 * @param filename the file name
-	 *
-	 * @return the file
-	 *
-	 * @throws FileNotFoundException    if the file can not be found
-	 * @throws InvalidFileTypeException if the file type is not valid
+	 * @return {@link File} the file
+	 * @throws FileNotFoundException if the file can not be found
 	 */
 	public File findByFilename(String filename) {
 		File file = fileRepository.findByFilename(filename)
 				.orElseThrow(() -> new FileNotFoundException(
-						"Failed to find file: File not found with name " + filename));
+						String.format(ErrorMessages.FILE_NOT_FOUND_BY_NAME, filename)));
 
 		return file;
 	}
@@ -94,98 +136,47 @@ public class FileServiceImpl {
 	 *
 	 * @param token    the authentication token
 	 * @param filename the file name
-	 *
-	 * @return the file
-	 *
+	 * @return {@link File} the file
 	 * @throws FileNotFoundException       if the file can not be found
 	 * @throws InvalidCredentialsException if the file can not be retrieved
 	 */
 	public File findByFilename(String token, String filename) {
 		File file = fileRepository.findByFilename(filename)
 				.orElseThrow(() -> new FileNotFoundException(
-						"Failed to find file: File not found with name " + filename));
+						String.format(ErrorMessages.FILE_NOT_FOUND_BY_NAME, filename)));
 
 		if ((token == null || token.isEmpty()) && !file.isImage())
-			throw new InvalidCredentialsException("Failed to find file: Access denied");
+			throw new InvalidCredentialsException(
+					ErrorMessages.ACCESS_DENIED);
 
 		return file;
 	}
 
 	/**
-	 * Retrieves a Cloudinary resource URL by its filename (public_id)
+	 * Retrieves a resource URL from Cludinary by its filename (public_id)
 	 *
 	 * @param filename the public_id of the file in Cloudinary
-	 *
 	 * @return the Resource (URL) pointing to Cloudinary's CDN
-	 *
 	 * @throws FileNotFoundException if the file doesn't exist in the database
 	 */
 	public Resource findResourceByFilename(String filename) {
 		File file = fileRepository.findByFilename(filename)
 				.orElseThrow(() -> new FileNotFoundException(
-						"Failed to find resource: File not found with name " + filename));
+						String.format(ErrorMessages.FILE_NOT_FOUND_BY_NAME, filename)));
+
+		String resourceType = file.isImage() ? "image" : "raw";
 
 		try {
-			String fileUrl;
+			String fileUrl = cloudinary.url()
+					.resourceType(resourceType)
+					.format(file.getExtension())
+					.generate(filename);
 
-			if (file.isImage()) {
-				fileUrl = cloudinary.url()
-						.resourceType("image")
-						.format(file.getExtension())
-						.generate(filename);
-			} else {
-				fileUrl = cloudinary.url()
-						.resourceType("raw")
-						.generate(filename);
-			}
-
-			return new UrlResource(new URL(fileUrl));
+			URI uri = URI.create(fileUrl);
+			return new UrlResource(uri.toURL());
 		} catch (MalformedURLException e) {
-			throw new FileNotFoundException("Failed to generate Cloudinary URL: " + e.getMessage());
-		}
-	}
-
-	/**
-	 * Saves a file
-	 *
-	 * @param file    the file
-	 * @param isImage the file type
-	 *
-	 * @return the file
-	 *
-	 * @throws FileStorageException     if the file can not be saved
-	 * @throws InvalidFileTypeException if the file type is not valid
-	 */
-	public File save(MultipartFile file, boolean isImage) {
-		if (file.isEmpty() || file == null)
-			throw new FileStorageException("Failed to save file: File is required");
-
-		try {
-			Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
-					"resource_type",
-					isImage ? "image" : "raw",
-					"folder",
-					"uploads"));
-
-			String publicId = (String) uploadResult.get("public_id");
-			String secureUrl = (String) uploadResult.get("secure_url");
-			String originalFilename = file.getOriginalFilename();
-			String fileNameOnly = publicId.contains("/")
-					? publicId.substring(publicId.lastIndexOf("/") + 1)
-					: publicId;
-
-			File fileEntity = File.builder()
-					.filename(fileNameOnly)
-					.contentType(file.getContentType())
-					.size(file.getSize())
-					.isImage(isImage)
-					.url(secureUrl)
-					.extension(StringUtils.getFilenameExtension(originalFilename))
-					.build();
-
-			return fileRepository.save(fileEntity);
-		} catch (IOException e) {
-			throw new FileStorageException("Failed to upload file to Cloudinary: " + e.getMessage());
+			throw new FileNotFoundException( // TODO handle this exception properly
+					String.format(ErrorMessages.RESOURCE_GENERATION_BY_NAME, filename), e);
 		}
 	}
 
@@ -194,30 +185,32 @@ public class FileServiceImpl {
 	 * Cloudinary)
 	 *
 	 * @param filename the public_id of the file in Cloudinary
-	 *
 	 * @throws FileNotFoundException if the file doesn't exist in the database
 	 * @throws FileStorageException  if the file can't be deleted from Cloudinary
 	 */
 	public void deleteByFilename(String filename) {
 		File file = fileRepository.findByFilename(filename)
 				.orElseThrow(() -> new FileNotFoundException(
-						"Failed to delete file: File not found with name " + filename));
+						String.format(ErrorMessages.FILE_NOT_FOUND_BY_NAME, filename)));
 
-		if (!file.isDefaultFile()) {
-			try {
-				Map<?, ?> result = cloudinary.uploader().destroy("uploads/" + filename, ObjectUtils.asMap(
-						"resource_type",
-						file.isImage() ? "image" : "raw",
-						"invalidate",
-						true));
+		if (file.isPrimary())
+			return;
 
-				if (!"ok".equals(result.get("result")))
-					throw new FileStorageException("Cloudinary deletion failed for file: " + filename);
+		try {
+			Map<?, ?> result = cloudinary.uploader().destroy("uploads/" + filename, ObjectUtils.asMap(
+					"resource_type",
+					file.isImage() ? "image" : "raw",
+					"invalidate",
+					true));
 
-				fileRepository.deleteByFilename(filename);
-			} catch (IOException e) {
-				throw new FileStorageException("Failed to delete file from Cloudinary: " + e.getMessage());
-			}
+			if (!"ok".equals(result.get("result")))
+				throw new FileStorageException(String.format(
+						ErrorMessages.FILE_DELETION_CLOUDINARY, filename));
+
+			fileRepository.deleteByFilename(filename);
+		} catch (IOException e) {
+			throw new FileStorageException(String.format(
+					ErrorMessages.FILE_DELETION_CLOUDINARY_BY_NAME, filename), e);
 		}
 	}
 
@@ -225,7 +218,6 @@ public class FileServiceImpl {
 	 * Validates if the file is an image
 	 *
 	 * @param multiPartfile the file to be validated
-	 *
 	 * @return true if the file is an image, false otherwise
 	 */
 	private boolean isImageContentTypeValid(MultipartFile multiPartfile) {
@@ -236,7 +228,6 @@ public class FileServiceImpl {
 	 * Validates if the file is a video
 	 *
 	 * @param multiPartfile the file to be validated
-	 *
 	 * @return true if the file is a video, false otherwise
 	 */
 	private boolean isVideoContentTypeValid(MultipartFile multiPartfile) {
@@ -247,7 +238,6 @@ public class FileServiceImpl {
 	 * Validates if the file is a valid image or video
 	 *
 	 * @param multiPartfile the file to be validated
-	 *
 	 * @return true if the file is a valid image or video, false otherwise
 	 */
 	public boolean isValidImage(MultipartFile multiPartfile) {
@@ -258,7 +248,6 @@ public class FileServiceImpl {
 	 * Validates if the file is a valid video or image
 	 *
 	 * @param multiPartfile the file to be validated
-	 *
 	 * @return true if the file is a valid video or image, false otherwise
 	 */
 	public boolean isValidVideo(MultipartFile multiPartfile) {

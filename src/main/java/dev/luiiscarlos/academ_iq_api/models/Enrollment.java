@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_course_junction")
+@Table(name = "user_course_enrollments")
 public class Enrollment {
 
     @Id

@@ -10,20 +10,28 @@ import com.cloudinary.Cloudinary;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-import lombok.RequiredArgsConstructor;
-
 @Configuration
-@RequiredArgsConstructor
 public class UtilityConfiguration {
 
+    /**
+     * Creates a Dotenv bean to obtain the environment variables
+     *
+     * @return a Dotenv instance
+     */
     @Bean
     Dotenv dotenv() {
-        Dotenv dotenv = Dotenv.configure().ignoreIfMissing() .load();
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
         dotenv.entries().forEach(e -> System.setProperty(e.getKey(), e.getValue()));
 
         return dotenv;
     }
 
+    /**
+     * Creates and configure a Cloudinary bean to upload files to the cloud
+     *
+     * @param dotenv the environment variables needed for configuration
+     * @return a cloudinary instance
+     */
     @Bean
     Cloudinary cloudinary(Dotenv dotenv) {
         Map<String, Object> config = new HashMap<>();
