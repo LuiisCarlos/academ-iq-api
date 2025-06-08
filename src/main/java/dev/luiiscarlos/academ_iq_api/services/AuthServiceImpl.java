@@ -15,7 +15,7 @@ import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.Role;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.Credentials;
-import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordResetDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.ResetPasswordDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.LoginResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.UserMapper;
 import dev.luiiscarlos.academ_iq_api.services.interfaces.AuthService;
@@ -68,27 +68,27 @@ public class AuthServiceImpl implements AuthService {
         return userMapper.toLoginResponseDto(accessToken, refreshToken, user);
     }
 
-    public User register(User register, @Nullable String origin) {
-        if (userService.existsByUsername(register.getUsername()))
+    public User register(User userToRegister, @Nullable String origin) {
+        if (userService.existsByUsername(userToRegister.getUsername()))
             throw new UserAlreadyExistsException(ErrorMessages.INVALID_CREDENTIALS);
 
-        String encodedPassword = ENCODED_PASSWORD_PREFIX + passwordEncoder.encode(register.getPassword());
+        String encodedPassword = ENCODED_PASSWORD_PREFIX + passwordEncoder.encode(userToRegister.getPassword());
 
         Set<Role> authorities = Set.of(roleService.findByAuthority("USER"));
         File defaultAvatar = fileService.findByFilename("default-user-avatar_nsfvaz");
 
-        register.setAvatar(defaultAvatar);
-        register.setPassword(encodedPassword);
-        register.setAuthorities(authorities);
+        userToRegister.setAvatar(defaultAvatar);
+        userToRegister.setPassword(encodedPassword);
+        userToRegister.setAuthorities(authorities);
 
         if (origin != null)
-            mailService.sendMailVerification(register, origin);
+            mailService.sendMailVerification(userToRegister, origin);
         else
-            register.setVerified(true);
+            userToRegister.setVerified(true);
 
-        log.info("User '%s' has successfully signed up at %s", register.getUsername(), LocalDateTime.now());
+        log.info("User '%s' has successfully signed up at %s", userToRegister.getUsername(), LocalDateTime.now());
 
-        return userService.save(register);
+        return userService.save(userToRegister);
     }
 
     public String refresh(String token) {
@@ -124,10 +124,10 @@ public class AuthServiceImpl implements AuthService {
         log.info("User '%s' has successfully verified the account at %s", user.getUsername(), LocalDateTime.now());
     }
 
-    public void recoverPassword(String email, @Nullable String origin) {
+    public void recoverPassword(String email, String origin) {
         User user = userService.findByEmail(email);
 
-        if (!user.isVerified() && origin != null) {
+        if (!user.isVerified()) {
             mailService.sendMailVerification(user, origin);
             throw new UserAccountNotVerifiedException(String.format(
                     ErrorMessages.USER_NOT_VERIFIED, email));
@@ -138,7 +138,7 @@ public class AuthServiceImpl implements AuthService {
         log.info("User '%s' has requested to recover the password at %s", user.getUsername(), LocalDateTime.now());
     }
 
-    public void resetPassword(String token, PasswordResetDto passwordDto) {
+    public void resetPassword(String token, ResetPasswordDto passwordDto) {
         tokenService.validate(token, "recover");
 
         User user = userService.findByToken(token);

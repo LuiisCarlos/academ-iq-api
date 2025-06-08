@@ -12,18 +12,18 @@ import dev.luiiscarlos.academ_iq_api.exceptions.user.UserWithDifferentPasswordsE
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.Credentials;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.LoginResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordResetDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.ResetPasswordDto;
 
 public interface AuthService {
 
     static final String ENCODED_PASSWORD_PREFIX = "{bcrypt}";
 
     /**
-     * Login a user
+     * Logs in a user using its username and password
      *
-     * @param origin  the origin of the request
-     * @param userDto the user to login
-     * @return the logged in user
+     * @param credentials the user to login
+     * @param origin      the origin of the request
+     * @return {@link LoginResponseDto} the logged in user
      * @throws UserAccountNotVerifiedException if the user account is not verified
      * @throws InvalidCredentialsException     if the username or password is
      *                                         invalid
@@ -31,20 +31,20 @@ public interface AuthService {
     LoginResponseDto login(Credentials credentials, @Nullable String origin);
 
     /**
-     * Register a new user
+     * Signs up a new user
      *
-     * @param origin  the origin of the request
-     * @param userDto the user to register
-     * @return the registered user
+     * @param userToRegister the user to register
+     * @param origin         the origin of the request
+     * @return {@link User} the registered user
      * @throws UserWithDifferentPasswordsException if the password and its
      *                                             confirmation do not match
      * @throws UserAlreadyExistsException          if the username already exists
      * @throws UserUnderageException               if the user is underage
      */
-    User register(User register, @Nullable String origin);
+    User register(User userToRegister, @Nullable String origin);
 
     /**
-     * Refresh the access token
+     * Refresh the access token for the current user
      *
      * @param token the refresh token
      * @return the new access token
@@ -54,7 +54,7 @@ public interface AuthService {
     String refresh(String token);
 
     /**
-     * Logout the user and invalidate the refresh token
+     * Logout the current user and invalidate the refresh token
      *
      * @param token the refresh token
      * @throws AuthCredentialsNotFoundException if the token is null or blank
@@ -63,7 +63,7 @@ public interface AuthService {
     void logout(String token);
 
     /**
-     * Verifies the user's email
+     * Verifies the user's account by a token
      *
      * @param token the token
      * @throws AuthCredentialsNotFoundException if the token is null or blank
@@ -74,11 +74,11 @@ public interface AuthService {
     /**
      * If the user account is verified, can recover his password by its email
      *
-     * @param origin the origin of the request
      * @param email  the user's email
+     * @param origin the origin of the request
      * @throws UserAccountNotVerifiedException if the user account is not verified
      */
-    void recoverPassword(String email, @Nullable String origin);
+    void recoverPassword(String email, String origin);
 
     /**
      * Change the password of the current user
@@ -91,6 +91,6 @@ public interface AuthService {
      * @throws UserWithDifferentPasswordsException if the password and its
      *                                             confirmation do not match
      */
-    void resetPassword(String token, PasswordResetDto passwordDto);
+    void resetPassword(String token, ResetPasswordDto passwordDto);
 
 }

@@ -12,6 +12,6 @@ public class LessonResponseDto {
 
     private String name;
 
-    private FileResponseDto file;
+    private FileResponseDto video;
 
 }

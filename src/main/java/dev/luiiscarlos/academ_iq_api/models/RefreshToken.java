@@ -31,12 +31,12 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 600)
-    private String token;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(length = 600)
+    private String token;
 
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;

@@ -52,31 +52,33 @@ public class AccessTokenFilter extends OncePerRequestFilter {
         String token = request.getHeader("Authorization");
         String endpoint = request.getRequestURI();
 
-        tokenService.validate(token, null);
+        if (token != null && token.startsWith("Bearer")) {
+            tokenService.validate(token, null);
 
-        Jwt jwt = tokenService.decode(token);
-        Instant expiresAt = jwt.getExpiresAt();
-        String tokenType = jwt.getClaimAsString("token_type");
+            Jwt jwt = tokenService.decode(token);
+            Instant expiresAt = jwt.getExpiresAt();
+            String tokenType = jwt.getClaimAsString("token_type");
 
-        if (expiresAt.isBefore(Instant.now())) {
-            errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
-                    ErrorMessages.EXPIRED_TOKEN);
-            return;
-        }
-
-        if (isRefreshPath(endpoint)) {
-            if (!"refresh".equals(tokenType))
-                throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
-        } else {
-            if (!"access".equals(tokenType)) {
+            if (expiresAt.isBefore(Instant.now())) {
                 errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
-                        ErrorMessages.INVALID_TOKEN_TYPE);
+                        ErrorMessages.EXPIRED_TOKEN);
                 return;
             }
-        }
 
-        Authentication authentication = new JwtAuthenticationToken(jwt);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (isRefreshPath(endpoint)) {
+                if (!"refresh".equals(tokenType))
+                    throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
+            } else {
+                if (!"access".equals(tokenType)) {
+                    errorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
+                            ErrorMessages.INVALID_TOKEN_TYPE);
+                    return;
+                }
+            }
+
+            Authentication authentication = new JwtAuthenticationToken(jwt);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
 
         filterChain.doFilter(request, response);
     }
@@ -84,7 +86,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
     /**
      * Checks if the path is a refresh path
      *
-     * @param path The path to check
+     * @param path the path to check
      * @return true if the path is a refresh path, false otherwise
      */
     private boolean isRefreshPath(String path) {

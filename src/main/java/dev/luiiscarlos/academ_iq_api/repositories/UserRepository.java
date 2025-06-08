@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
-    @Query("SELECT u FROM User u JOIN u.refreshTokens rt WHERE rt.token = :token")
+    @Query("SELECT rt.user FROM RefreshToken rt WHERE rt.token = :token")
     Optional<User> findByToken(@Param("token") String token);
 
     Boolean existsByUsername(String username);

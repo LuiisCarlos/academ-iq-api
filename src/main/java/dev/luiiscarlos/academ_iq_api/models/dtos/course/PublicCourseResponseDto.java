@@ -7,15 +7,12 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
-import dev.luiiscarlos.academ_iq_api.models.dtos.rating.ReviewResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionResponseDto;
-
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class CourseResponseDto {
+public class PublicCourseResponseDto {
 
     private Long id;
 
@@ -29,22 +26,22 @@ public class CourseResponseDto {
 
     private String thumbnail;
 
-    private CourseCategoryResponseDto category;
-
     private String level;
 
     private Double rating;
 
-    private List<ReviewResponseDto> reviews;
+    private Integer reviews;
+
+    private Integer sections;
 
     @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime duration;
 
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime createdAt;
+    private CourseCategoryResponseDto category;
 
     private List<String> requirements;
 
-    private List<SectionResponseDto> sections;
+    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime createdAt;
 
 }

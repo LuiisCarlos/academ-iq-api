@@ -8,7 +8,11 @@ public class ErrorMessages {
     public static final String UNEXPECTED_ERROR = "An unexpected error occurred";
 
 
-    public static final String USER_NOT_FOUND = "User '%s' not found";
+    public static final String USER_NOT_FOUND = "User with ID '%d' not found";
+
+    public static final String USER_NOT_FOUND_BY_NAME = "User with name '%s' not found";
+
+    public static final String USER_AVATAR_NOT_FOUND = "User avatar";
 
     public static final String USER_NOT_VERIFIED = "User account '%s' is not verified";
 
@@ -38,6 +42,8 @@ public class ErrorMessages {
     public static final String FILE_DELETION = "Failed to delete file with ID '%d'";
 
     public static final String FILE_DELETION_BY_NAME = "Failed to delete file with name '%s'";
+
+    public static final String INVALID_CONTENT_TYPE = "Failed to upload file with content type %s";
 
 
     public static final String FILE_NOT_FOUND_CLOUDINARY = "File not found in Cloudinary with public ID '%s'";

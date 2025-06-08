@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import dev.luiiscarlos.academ_iq_api.models.dtos.enrollment.CompletedLesson;
@@ -49,7 +50,7 @@ public class EnrollmentService {
      * @throws EnrollmentNotFoundException if the user is already enrolled in the
      *                                     course
      */
-    public Enrollment create(String token, Long courseId, Map<String, Boolean> flags) {
+    public Enrollment create(String token, Long courseId, @Nullable Map<String, Boolean> flags) {
         User user = userService.findByToken(token);
         Course course = courseService.findById(courseId);
 
@@ -63,7 +64,7 @@ public class EnrollmentService {
                 .build();
 
         if (flags != null)
-            enrollment.setIsFavorite(flags.getOrDefault("isFavorite", false));
+            enrollment.setFavorite(flags.getOrDefault("isFavorite", false));
 
         return enrollmentRepository.save(enrollment);
     }
@@ -141,17 +142,16 @@ public class EnrollmentService {
                         "Failed to update enrollment: Enrollment not found with course id " + courseId));
 
         if (updates.containsKey("isFavorite"))
-            enrollment.setIsFavorite(updates.get("isFavorite"));
+            enrollment.setFavorite(updates.get("isFavorite"));
 
         if (updates.containsKey("isArchived"))
-            enrollment.setIsArchived(updates.get("isArchived"));
+            enrollment.setArchived(updates.get("isArchived"));
 
         if (updates.containsKey("isCompleted")) {
-            enrollment.setIsCompleted(updates.get("isCompleted"));
+            enrollment.setCompleted(updates.get("isCompleted"));
             enrollment.setProgress(1.0);
             enrollment.setCompletedAt(LocalDateTime.now());
         }
-
 
         return enrollmentRepository.save(enrollment);
     }
@@ -180,6 +180,7 @@ public class EnrollmentService {
                 completedLesson.setLessonId(lessonId);
                 completedLesson.setCompletedAt(LocalDateTime.now());
                 progressState.getCompletedLessons().add(completedLesson);
+
             }
         }
 
@@ -215,7 +216,7 @@ public class EnrollmentService {
         List<Long> allLessonIds = courseService.findAllLessonIdsById(enrollment.getCourse().getId());
 
         if (allLessonIds.isEmpty()) {
-            enrollment.setIsCompleted(true);
+            enrollment.setCompleted(true);
             enrollment.setCompletedAt(LocalDateTime.now());
             enrollment.setProgress(1.0);
             return;

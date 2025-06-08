@@ -25,14 +25,14 @@ public class Lesson {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
     @ManyToOne
     @JoinColumn(name = "section_id")
     private Section section;
 
     @ManyToOne
-    @JoinColumn(name = "file_id")
-    private File file;
+    @JoinColumn(name = "video_id")
+    private File video;
+
+    private String name;
 
 }

@@ -10,7 +10,7 @@ import dev.luiiscarlos.academ_iq_api.models.dtos.user.*;
 @Component
 public class UserMapper {
 
-    public User toModel(UserRegisterRequestDto userDto) {
+    public User toModel(RegisterRequestDto userDto) {
         String fullname = String.format("%s %s", userDto.getUsername(), userDto.getLastname());
 
         return User.builder()
@@ -46,8 +46,8 @@ public class UserMapper {
                 .build();
     }
 
-    public UserRegisterResponseDto toRegisterResponseDto(User user) {
-        return UserRegisterResponseDto.builder()
+    public RegisterResponseDto toRegisterResponseDto(User user) {
+        return RegisterResponseDto.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .firstname(user.getFirstname())
@@ -73,7 +73,7 @@ public class UserMapper {
     public UserResponseDto toResponseDto(User user) {
         return UserResponseDto.builder()
                 .username(user.getUsername())
-                .avatarUrl(user.getAvatar().getUrl())
+                .avatar(user.getAvatar().getUrl())
                 .email(user.getEmail())
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())

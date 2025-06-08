@@ -20,9 +20,9 @@ public class EnrollmentMapper {
                 .course(courseMapper.toEnrollmentCourseResponseDto(enrollment.getCourse()))
                 .progress(enrollment.getProgress())
                 .progressState(enrollment.getProgressState())
-                .isFavorite(enrollment.isFavorite())
-                .isArchived(enrollment.isArchived())
-                .isCompleted(enrollment.isCompleted())
+                .favorite(enrollment.isFavorite())
+                .archived(enrollment.isArchived())
+                .completed(enrollment.isCompleted())
                 .enrolledAt(enrollment.getEnrolledAt())
                 .completedAt(enrollment.getCompletedAt())
                 .build();

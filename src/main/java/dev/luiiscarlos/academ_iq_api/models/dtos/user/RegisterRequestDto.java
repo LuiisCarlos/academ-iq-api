@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 @PasswordMatches
-public class UserRegisterRequestDto {
+public class RegisterRequestDto {
 
     private String username;
 

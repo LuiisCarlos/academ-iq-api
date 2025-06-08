@@ -46,20 +46,14 @@ public class User implements UserDetails {
 
     private String username;
 
+    private String email;
+
     private String password;
 
-    @JoinTable(
-        name = "user_role_junction",
-        joinColumns = { @JoinColumn(name = "user_id") },
-        inverseJoinColumns = { @JoinColumn(name = "role_id") })
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    private Set<Role> authorities;
-
     @ManyToOne
-    @JoinColumn(name = "file_id")
+    @JoinColumn(name = "avatar_id")
     private File avatar;
 
-    private String email;
 
     private String fullname;
 
@@ -98,9 +92,15 @@ public class User implements UserDetails {
     @Builder.Default
     private Integer hours = 0;
 
+    @Column(name = "is_manager")
+    private Boolean manager;
+
+    @Column(name = "want_to_upgrade")
+    private Boolean wantToUpgrade;
+
     @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Enrollment> enrollments = new ArrayList<>();
+    @Column(name = "is_verified")
+    private Boolean verified = false;
 
     @Builder.Default
     @Column(name = "registered_at")
@@ -112,15 +112,16 @@ public class User implements UserDetails {
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @Column(name = "is_manager")
-    private Boolean manager;
-
-    @Column(name = "want_to_upgrade")
-    private Boolean wantToUpgrade;
-
     @Builder.Default
-    @Column(name = "is_verified")
-    private Boolean verified = false;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Enrollment> enrollments = new ArrayList<>();
+
+    @JoinTable(
+        name = "user_role_junction",
+        joinColumns = { @JoinColumn(name = "user_id") },
+        inverseJoinColumns = { @JoinColumn(name = "role_id") })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    private Set<Role> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -59,17 +59,17 @@ public class Enrollment {
     @Nullable
     @Builder.Default
     @Column(name = "is_favorite")
-    private Boolean isFavorite = false;
+    private Boolean favorite = false;
 
     @Nullable
     @Builder.Default
     @Column(name = "is_archived")
-    private Boolean isArchived = false;
+    private Boolean archived = false;
 
     @Nullable
     @Builder.Default
     @Column(name = "is_completed")
-    private Boolean isCompleted = false;
+    private Boolean completed = false;
 
     @Nullable
     @Builder.Default
@@ -83,15 +83,15 @@ public class Enrollment {
     private LocalDateTime completedAt;
 
     public Boolean isFavorite() {
-        return this.isFavorite;
+        return this.favorite;
     }
 
     public Boolean isArchived() {
-        return this.isArchived;
+        return this.archived;
     }
 
     public Boolean isCompleted() {
-        return this.isCompleted;
+        return this.completed;
     }
 
 }

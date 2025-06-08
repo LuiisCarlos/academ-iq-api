@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>dev.luiiscarlos</groupId>
 	<artifactId>academ-iq-api</artifactId>
-	<version>1.0.0-beta</version>
+	<version>1.1.0-beta</version>
 	<name>Academ-IQ API</name>
 	<description>RESTful API for my senior grade year final project</description>
 	<url>https://github.com/LuiisCarlos/academ-iq-api</url>
@@ -84,6 +84,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>29.2.0</version>
 		</dependency>
 	</dependencies>
 	<build>

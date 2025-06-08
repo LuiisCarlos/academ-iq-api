@@ -1,6 +1,5 @@
 package dev.luiiscarlos.academ_iq_api.utilities;
 
-
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 

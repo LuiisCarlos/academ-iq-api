@@ -1,4 +1,4 @@
-# Academ-IQ API 1.0.0
+# Academ-IQ API 1.1.0
 
 Academ-IQ API is a backend application developed in Java using Spring Boot. It provides a RESTful API for managing courses, user enrollments, lesson progress, and features related to an educational platform.
 

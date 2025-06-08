@@ -19,6 +19,7 @@ public class RoleService {
 
     public Role findByAuthority(String authority) {
         return roleRepository.findByAuthority(authority)
-            .orElseThrow(() -> new RoleNotFoundException("Failed to find role: Role not found with authority " + authority));
+                .orElseThrow(() -> new RoleNotFoundException(
+                        "Failed to find role: Role not found with authority " + authority));
     }
 }

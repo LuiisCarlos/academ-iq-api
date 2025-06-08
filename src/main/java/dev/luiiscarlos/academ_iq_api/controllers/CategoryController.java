@@ -13,7 +13,6 @@ import dev.luiiscarlos.academ_iq_api.models.Category;
 import dev.luiiscarlos.academ_iq_api.services.CategoryService;
 import lombok.RequiredArgsConstructor;
 
-
 @RequiredArgsConstructor
 @RequestMapping("/v1/categories")
 public class CategoryController {

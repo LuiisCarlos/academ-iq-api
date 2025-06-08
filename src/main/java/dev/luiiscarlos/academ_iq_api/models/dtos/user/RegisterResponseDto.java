@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UserRegisterResponseDto {
+public class RegisterResponseDto {
 
     private String username;
 

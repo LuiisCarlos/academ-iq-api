@@ -22,6 +22,7 @@ import dev.luiiscarlos.academ_iq_api.models.Section;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.course.PublicCourseResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.lesson.LessonRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
@@ -51,8 +52,8 @@ public class CourseService {
      * @param files     the files to be saved
      * @return {@link CourseResponseDto} the saved course
      * @throws CourseAlreadyExistsException if the course already exists
-     * @throws CourseNotFoundException     if the category does not exist
-     * @throws InvalidFileTypeException    if the file is not a valid video
+     * @throws CourseNotFoundException      if the category does not exist
+     * @throws InvalidFileTypeException     if the file is not a valid video
      */
     public CourseResponseDto create(CourseRequestDto courseDto, Map<String, MultipartFile> files) {
         if (courseRepository.existsByTitle(courseDto.getTitle()))
@@ -62,7 +63,7 @@ public class CourseService {
         File thumbnail;
         MultipartFile thumbPart = files.get("thumbnail");
         if (thumbPart != null && !thumbPart.isEmpty())
-            thumbnail = fileService.save(thumbPart, false);
+            thumbnail = fileService.save(thumbPart, "thumbnail", false);
         else
             thumbnail = fileService.findByFilename("default-course-thumbnail.jpg");
 
@@ -96,12 +97,12 @@ public class CourseService {
                 }
 
                 File video = (multipartFile != null && !multipartFile.isEmpty())
-                        ? fileService.save(multipartFile, false)
+                        ? fileService.save(multipartFile, "course", false)
                         : null;
 
                 Lesson lesson = Lesson.builder()
                         .name(lessonDto.getName())
-                        .file(video)
+                        .video(video)
                         .section(section)
                         .build();
 
@@ -111,24 +112,30 @@ public class CourseService {
         }
 
         course = courseRepository.save(course);
-        return courseMapper.toCourseResponseDto(course);
+        return courseMapper.toResponseDto(course);
     }
 
     /**
      * Find all courses
+     *
      * @return the list of the courses
      * @throws CourseNotFoundException if no courses are found
      */
-    public List<CourseResponseDto> findAll() {
+    public List<PublicCourseResponseDto> findAll() {
         List<Course> courses = courseRepository.findAll();
 
         if (courses.isEmpty())
             throw new CourseNotFoundException(
                     "No courses found");
 
-        return courses.stream().map(courseMapper::toCourseResponseDto).toList();
+        return courses.stream().map(courseMapper::toPublicResponseDto).toList();
     }
 
+    /**
+     *
+     * @param courseId
+     * @return
+     */
     public List<Long> findAllLessonIdsById(Long courseId) {
         List<Long> lessonsIds = courseRepository.findAllLessonIdsById(courseId);
 
@@ -142,9 +149,7 @@ public class CourseService {
      * Finds the course by its id
      *
      * @param id the id of the course
-     *
      * @return the course
-     *
      * @throws CourseNotFoundException if the course is not found
      */
     public Course findById(Long courseId) {
@@ -159,9 +164,7 @@ public class CourseService {
      * @param courseId  the id of the course
      * @param courseDto the course details
      * @param files     the files to be saved
-     *
      * @return the course
-     *
      * @throws CourseNotFoundException  if the course is not found
      * @throws InvalidFileTypeException if the file is not a valid video
      */
@@ -187,16 +190,16 @@ public class CourseService {
         if (thumbPart != null && !thumbPart.isEmpty()) {
             filenamesToDelete.add(course.getThumbnail().getFilename());
 
-            File thumbnail = fileService.save(thumbPart, false);
+            File thumbnail = fileService.save(thumbPart, "thumbnail", false);
             thumbnail.setUpdatedAt(LocalDateTime.now());
             course.setThumbnail(thumbnail);
         }
 
         for (Section section : course.getSections()) {
             for (Lesson lesson : section.getLessons()) {
-                File oldFile = lesson.getFile();
+                File oldFile = lesson.getVideo();
                 if (oldFile != null && !oldFile.isPrimary()) {
-                    lesson.setFile(null);
+                    lesson.setVideo(null);
                     filenamesToDelete.add(oldFile.getFilename());
                 }
             }
@@ -215,17 +218,17 @@ public class CourseService {
 
                 if (multipartFile != null && !multipartFile.isEmpty()) {
                     if (!fileService.isValidVideo(multipartFile))
-                        throw new InvalidFileTypeException(
-                                "Invalid video content type: " + multipartFile.getContentType());
+                        throw new InvalidFileTypeException(String.format(
+                                ErrorMessages.INVALID_CONTENT_TYPE, multipartFile.getContentType()));
                 }
 
                 File video = (multipartFile != null && !multipartFile.isEmpty())
-                        ? fileService.save(multipartFile, false)
-                        : null;
+                        ? fileService.save(multipartFile, "course",  false)
+                        : new File();
 
                 Lesson lesson = Lesson.builder()
                         .name(lessonDto.getName())
-                        .file(video)
+                        .video(video)
                         .section(section)
                         .build();
 
@@ -240,14 +243,13 @@ public class CourseService {
         for (String filename : filenamesToDelete)
             fileService.deleteByFilename(filename);
 
-        return courseMapper.toCourseResponseDto(updated);
+        return courseMapper.toResponseDto(updated);
     }
 
     /**
      * Deletes the course by its id
      *
      * @param id the id of the course
-     *
      * @throws CourseNotFoundException if the course is not found
      */
     public void deleteById(Long courseId) {

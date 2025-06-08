@@ -12,13 +12,13 @@ import lombok.Data;
 @Builder
 public class ReviewResponseDto {
 
+    private String username;
+
+    private String avatar;
+
     private Integer rating;
 
     private String comment;
-
-    private String user;
-
-    private String userAvatarUrl;
 
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime ratedAt;

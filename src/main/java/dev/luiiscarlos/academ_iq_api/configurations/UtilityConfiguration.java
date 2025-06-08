@@ -35,7 +35,6 @@ public class UtilityConfiguration {
     @Bean
     Cloudinary cloudinary(Dotenv dotenv) {
         Map<String, Object> config = new HashMap<>();
-
         config.put("cloud_name", dotenv.get("CLOUDINARY_NAME"));
         config.put("api_key", dotenv.get("CLOUDINARY_KEY"));
         config.put("api_secret", dotenv.get("CLOUDINARY_SECRET"));

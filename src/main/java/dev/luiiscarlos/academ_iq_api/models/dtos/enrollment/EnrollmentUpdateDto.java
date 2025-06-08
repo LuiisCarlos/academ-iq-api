@@ -7,22 +7,22 @@ public class EnrollmentUpdateDto {
 
     private String progressState;
 
-    private Boolean isFavorite;
+    private Boolean favorite;
 
-    private Boolean isArchived;
+    private Boolean archived;
 
-    private Boolean isCompleted;
+    private Boolean completed;
 
     public Boolean isFavorite() {
-        return this.isFavorite;
+        return this.favorite;
     }
 
     public Boolean isArchived() {
-        return this.isArchived;
+        return this.archived;
     }
 
     public Boolean isCompleted() {
-        return this.isCompleted;
+        return this.completed;
     }
 
 }

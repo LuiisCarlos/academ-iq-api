@@ -6,7 +6,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import dev.luiiscarlos.academ_iq_api.exceptions.misc.EmailSendingException;
+import dev.luiiscarlos.academ_iq_api.exceptions.misc.MailSendingException;
 import dev.luiiscarlos.academ_iq_api.models.User;
 
 import jakarta.mail.MessagingException;
@@ -31,7 +31,7 @@ public class MailService {
      * @param origin the origin of the request (e.g. http://localhost:8888)
      * @param user the user to send the email to
      *
-     * @throws EmailSendingException if there is an error sending the email
+     * @throws MailSendingException if there is an error sending the email
      */
     public void sendMailVerification(User user, String origin) {
         try {
@@ -88,7 +88,7 @@ public class MailService {
             helper.setText(html, true);
             mailSender.send(message);
         } catch (MessagingException ex) {
-            throw new EmailSendingException("Failed to send the confirmation email: " + ex.getMessage());
+            throw new MailSendingException("Failed to send the confirmation email: " + ex.getMessage());
         }
 
         log.debug("A verification e-mail has been sent to " + user.getUsername() + " at " + LocalDateTime.now());
@@ -101,7 +101,7 @@ public class MailService {
      * @param origin the origin of the request (e.g. http://localhost:8888)
      * @param user the user to send the email to
      *
-     * @throws EmailSendingException if there is an error sending the email
+     * @throws MailSendingException if there is an error sending the email
      */
     public void sendMailPasswordRecover(User user, String origin) {
         try {
@@ -156,7 +156,7 @@ public class MailService {
             helper.setText(html, true);
             mailSender.send(message);
         } catch (MessagingException ex) {
-            throw new EmailSendingException("Failed to send the reset password email: " + ex.getMessage());
+            throw new MailSendingException("Failed to send the reset password email: " + ex.getMessage());
         }
 
         log.debug("A recover password e-mail has been sent to " + user.getUsername() + " at " + LocalDateTime.now());

@@ -3,20 +3,20 @@ package dev.luiiscarlos.academ_iq_api.exceptions.misc;
 import java.io.Serial;
 import java.util.UUID;
 
-public class EmailSendingException extends RuntimeException {
+public class MailSendingException extends RuntimeException {
 
     @Serial
     private static final long serialVersionUID = UUID.randomUUID().getMostSignificantBits();
 
-    public EmailSendingException(String message) {
+    public MailSendingException(String message) {
         super(message);
     }
 
-    public EmailSendingException(String message, Throwable cause) {
+    public MailSendingException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public EmailSendingException(Throwable cause) {
+    public MailSendingException(Throwable cause) {
         super(cause);
     }
 

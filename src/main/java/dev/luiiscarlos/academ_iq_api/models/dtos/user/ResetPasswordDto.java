@@ -1,9 +1,12 @@
 package dev.luiiscarlos.academ_iq_api.models.dtos.user;
 
+import dev.luiiscarlos.academ_iq_api.utilities.annotations.PasswordMatches;
+
 import lombok.Data;
 
 @Data
-public class PasswordResetDto {
+@PasswordMatches
+public class ResetPasswordDto {
 
     private String password;
 

@@ -15,8 +15,8 @@ public class ReviewMapper {
                 : "";
 
         return ReviewResponseDto.builder()
-                .user(rating.getUser().getUsername())
-                .userAvatarUrl(userAvatarUrl)
+                .username(rating.getUser().getUsername())
+                .avatar(userAvatarUrl)
                 .rating(rating.getRating())
                 .comment(rating.getComment())
                 .ratedAt(rating.getRatedAt())

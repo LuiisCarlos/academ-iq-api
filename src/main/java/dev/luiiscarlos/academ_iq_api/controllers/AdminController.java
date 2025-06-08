@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.file.FileResponseDto;
-import dev.luiiscarlos.academ_iq_api.services.UserServiceImpl;
+import dev.luiiscarlos.academ_iq_api.services.interfaces.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/v1/admin")
 public class AdminController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<List<User>> findAll() {

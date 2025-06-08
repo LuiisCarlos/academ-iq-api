@@ -43,14 +43,15 @@ public class Course {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "instructor_id")
     private User instructor;
 
     @ManyToOne
-    @JoinColumn(name = "file_id")
+    @JoinColumn(name = "thumbnail_id")
     private File thumbnail;
 
-    @JoinColumn(name = "category_id")
     @ManyToOne
+    @JoinColumn(name = "category_id")
     private Category category;
 
     private String title;
@@ -60,31 +61,11 @@ public class Course {
     @Column(length = 700)
     private String description;
 
-    @Builder.Default
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Column(name = "requirement")
-    @CollectionTable(
-        name = "requirements",
-        joinColumns = @JoinColumn(name = "course_id"))
-    private List<String> requirements = new ArrayList<>();
-
     @Enumerated(EnumType.STRING)
     private Level level;
 
     @Transient
-    private Double averageRating;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL , orphanRemoval = true)
-    private List<Review> ratings = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL , orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER , orphanRemoval = true)
-    private List<Enrollment> enrollments = new ArrayList<>();
+    private Double rating;
 
     @Builder.Default
     @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
@@ -95,20 +76,37 @@ public class Course {
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Double getAverageRating() {
+    @Builder.Default
+    @Column(name = "requirement")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "requirements", joinColumns = @JoinColumn(name = "course_id"))
+    private List<String> requirements = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<Enrollment> enrollments = new ArrayList<>();
+
+    public Double getRating() {
         return calculateAverageRating();
     }
 
-
     private Double calculateAverageRating() {
-        if (ratings == null || ratings.isEmpty())
+        if (this.reviews == null || this.reviews.isEmpty())
             return 0.0;
 
         double sum = 0.0;
-        for (Review rating : ratings)
+        for (Review rating : this.reviews)
             sum += rating.getRating();
 
-        return sum / ratings.size();
+        return sum / this.reviews.size();
     }
 
 }

@@ -18,11 +18,11 @@ public class EnrollmentResponseDto {
 
     private ProgressState progressState;
 
-    private Boolean isFavorite;
+    private Boolean favorite;
 
-    private Boolean isArchived;
+    private Boolean archived;
 
-    private Boolean isCompleted;
+    private Boolean completed;
 
     @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime enrolledAt;

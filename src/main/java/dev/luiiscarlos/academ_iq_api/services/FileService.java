@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +15,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 
 import dev.luiiscarlos.academ_iq_api.exceptions.file.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exceptions.file.FileStorageException;
@@ -44,47 +44,50 @@ public class FileService {
 	/**
 	 * Saves a file to Cloudinary and the database
 	 *
-	 * @param file  the file to be saved
-	 * @param image the resource type (image or raw)
+	 * @param multipartFile the file to be saved
+	 * @param type          the type (e.g. avatar, thumbnail, course)
+	 * @param image         the resource type (image or video)
 	 * @return {@link File} the file entity saved in the database
 	 * @throws FileStorageException     if the file can not be saved
 	 * @throws InvalidFileTypeException if the resource type is not valid
 	 */
-	public File save(MultipartFile file, boolean isImage) {
-		if (file.isEmpty() || file == null)
+	public File save(MultipartFile multipartFile, String type, boolean image) {
+		if (multipartFile.isEmpty() || multipartFile == null)
 			throw new FileStorageException(ErrorMessages.FILE_MISSING);
 
-		if (isImage && file.getSize() > 10_000_000)
+		if (image && multipartFile.getSize() > 10_000_000)
 			throw new FileStorageException(String.format(ErrorMessages.FILE_TOO_LARGE, 10));
 
-		try {
-			Map<?, ?> uploadResult = cloudinary.uploader()
-					.upload(file.getBytes(), ObjectUtils.asMap(
-							"resource_type",
-							isImage ? "image" : "raw",
-							"folder",
-							isImage ? "uploads/images" : "uploads/videos"));
+		String originalFilename = multipartFile.getOriginalFilename();
+		String extension = StringUtils.getFilenameExtension(originalFilename);
 
-			String publicId = (String) uploadResult.get("public_id");
-			String url = (String) uploadResult.get("secure_url");
-			String originalFilename = file.getOriginalFilename();
+		try {
+			Map<String, Object> params = new HashMap<>();
+			params.put("resource_type", image ? "image" : "video");
+			params.put("folder", image ? "uploads/images" : "uploads/videos");
+			//params.put("format", image ? "webp" : "mp4");
+			params.put("type", type);
+			Map<?, ?> response = cloudinary.uploader().upload(multipartFile.getBytes(), params);
+
+			String publicId = (String) response.get("public_id");
+			String secureUrl = (String) response.get("secure_url");
 			String filename = publicId.contains("/")
 					? publicId.substring(publicId.lastIndexOf("/") + 1)
 					: publicId;
 
-			File fileEntity = File.builder()
+			File file = File.builder()
 					.filename(filename)
-					.contentType(file.getContentType())
-					.size(file.getSize())
-					.image(isImage)
-					.url(url)
-					.extension(StringUtils.getFilenameExtension(originalFilename))
+					.contentType(multipartFile.getContentType())
+					.size(multipartFile.getSize())
+					.image(image)
+					.url(secureUrl)
+					.extension(extension)
 					.build();
 
-			return fileRepository.save(fileEntity);
+			return fileRepository.save(file);
 		} catch (IOException e) {
 			throw new FileStorageException(String.format(
-					ErrorMessages.FILE_DELETION_CLOUDINARY_BY_NAME, file.getOriginalFilename()), e);
+					ErrorMessages.FILE_UPLOAD_CLOUDINARY_BY_NAME, originalFilename), e);
 		}
 	}
 
@@ -196,14 +199,16 @@ public class FileService {
 		if (file.isPrimary())
 			return;
 
-		try {
-			Map<?, ?> result = cloudinary.uploader().destroy("uploads/" + filename, ObjectUtils.asMap(
-					"resource_type",
-					file.isImage() ? "image" : "raw",
-					"invalidate",
-					true));
+		String folder = file.isImage() ? "uploads/images/" : "uploads/videos/";
 
-			if (!"ok".equals(result.get("result")))
+		try {
+			Map<String, Object> params = new HashMap<>();
+			params.put("resource_type", file.isImage() ? "image" : "video");
+			params.put("invalidate", true);
+
+			Map<?, ?> response = cloudinary.uploader().destroy(folder + filename, params);
+
+			if (!"ok".equals(response.get("result")))
 				throw new FileStorageException(String.format(
 						ErrorMessages.FILE_DELETION_CLOUDINARY, filename));
 
@@ -253,5 +258,19 @@ public class FileService {
 	public boolean isValidVideo(MultipartFile multiPartfile) {
 		return isVideoContentTypeValid(multiPartfile) && !isImageContentTypeValid(multiPartfile);
 	}
+
+	/* public Duration findDuration(String filename) {
+		try {
+			Map<String, Object> params = new HashMap<>();
+			params.put("resource_type", "video");
+			Map<?, ?> response = cloudinary.api().resource(filename, params);
+
+			Double duration = (Double) response.get("duration");
+
+			return Duration.ofSeconds(duration.intValue());
+		} catch (Exception e) {
+			throw new RuntimeException("Bebesita bebe lean");
+		}
+	} */
 
 }

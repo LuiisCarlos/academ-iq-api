@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.course.PublicCourseResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.services.CourseService;
 
@@ -33,7 +34,6 @@ public class CourseController {
 
     private final CourseMapper courseMapper;
 
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CourseResponseDto> create(
             @RequestPart("course") CourseRequestDto courseDto,
@@ -45,7 +45,8 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CourseResponseDto>> findAll() {
+    public ResponseEntity<List<PublicCourseResponseDto>> findAll() {
+        System.out.println("Hola");
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -57,7 +58,7 @@ public class CourseController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(courseMapper.toCourseResponseDto(courseService.findById(courseId)));
+                .body(courseMapper.toResponseDto(courseService.findById(courseId)));
     }
 
     @PutMapping("/{id}")

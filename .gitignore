@@ -1,4 +1,4 @@
-# IDE files/directories
+# IDE files
 .mvn/
 .apt_generated
 .classpath
@@ -21,7 +21,7 @@ build/
 !**/src/test/**/build/
 .vscode/
 
-# Build directories
+# Build files
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

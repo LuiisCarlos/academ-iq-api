@@ -20,8 +20,8 @@ public interface TokenService {
     /**
      * Finds a refresh token by its value
      *
-     * @param token The value of the refresh token to be found
-     * @return The found RefreshToken object
+     * @param token the value of the refresh token to be found
+     * @return {@link RefreshToken} the found RefreshToken object
      * @throws RefreshTokenNotFoundException if the refresh token is not found in
      *                                       the database
      */
@@ -30,7 +30,7 @@ public interface TokenService {
     /**
      * Generates an access token for the given user
      *
-     * @param the user for whom the access token is generated
+     * @param {@link User} the user for whom the access token is generated
      * @return the generated access token as a String
      */
     String generateAccessToken(User user);
@@ -39,7 +39,7 @@ public interface TokenService {
      * Generates a refresh token for the given user
      * If a refresh token already exists for the user, it updates the existing one
      *
-     * @param the user for whom the refresh token is generated
+     * @param {@link User} the user for whom the refresh token is generated
      * @return {@link RefreshToken} the generated refresh token
      */
     RefreshToken generateRefreshToken(User user);
@@ -48,7 +48,7 @@ public interface TokenService {
      * Generates a verification token for the given user
      * This token is used for email verification
      *
-     * @param the user for whom the verification token is generated
+     * @param {@link User} the user for whom the verification token is generated
      * @return the generated verification token as a String
      */
     String generateVerificationToken(User user);
@@ -57,7 +57,8 @@ public interface TokenService {
      * Generates a password recovery token for the given user
      * This token is used for password recovery
      *
-     * @param the user for whom the password recovery token is generated
+     * @param {@link User} the user for whom the password recovery token is
+     *               generated
      * @return the generated password recovery token as a String
      */
     String generateRecoverPasswordToken(User user);

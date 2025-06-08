@@ -15,9 +15,10 @@ import dev.luiiscarlos.academ_iq_api.exceptions.user.UserWithDifferentPasswordsE
 import dev.luiiscarlos.academ_iq_api.models.File;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.file.FileResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordUpdateDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.UpdatePasswordDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.FileMapper;
 import dev.luiiscarlos.academ_iq_api.repositories.UserRepository;
+import dev.luiiscarlos.academ_iq_api.services.interfaces.UserService;
 
 import jakarta.transaction.Transactional;
 
@@ -26,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService {
 
     private final FileService fileService;
 
@@ -57,13 +58,13 @@ public class UserServiceImpl {
     public User findById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "Failed to find user: User not found with id " + userId));
+                        String.format(ErrorMessages.USER_NOT_FOUND , userId)));
     }
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "Failed to find user : User not found with username " + username));
+                        String.format(ErrorMessages.USER_NOT_FOUND_BY_NAME, username)));
     }
 
     public User findByEmail(String email) {
@@ -117,7 +118,7 @@ public class UserServiceImpl {
         User user = userRepository.findById(userId).map(u -> {
             fileService.deleteByFilename(u.getAvatar().getFilename());
 
-            File file = fileService.save(avatar, true);
+            File file = fileService.save(avatar, "avatar", true);
             file.setUpdatedAt(LocalDateTime.now());
             u.setAvatar(file);
 
@@ -182,7 +183,9 @@ public class UserServiceImpl {
         return patchAvatarById(user.getId(), avatar);
     }
 
-    public void updateCurrentUserPassword(User user, PasswordUpdateDto passwordDto) {
+    public void updatePasswordByToken(String token, UpdatePasswordDto passwordDto) {
+        User user = this.findByToken(token);
+
         if (!passwordEncoder.matches(passwordDto.getCurrentPassword(), user.getPassword().substring(8)))
             throw new UserWithDifferentPasswordsException("Failed to update password: Invalid old password");
 

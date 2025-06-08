@@ -10,7 +10,7 @@ import dev.luiiscarlos.academ_iq_api.exceptions.token.InvalidTokenException;
 import dev.luiiscarlos.academ_iq_api.exceptions.user.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.file.FileResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordUpdateDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.UpdatePasswordDto;
 
 public interface UserService {
 
@@ -103,7 +103,7 @@ public interface UserService {
      * @param token       the user's token
      * @param passwordDto the current and new password
      */
-    void UpdatePasswordByToken(User user, PasswordUpdateDto passwordDto);
+    void updatePasswordByToken(String token, UpdatePasswordDto passwordDto);
 
     /**
      * Updates the user's information by the token
@@ -169,6 +169,6 @@ public interface UserService {
      * @param username the username of the user
      * @return true if the user exists, false otherwise
      */
-    boolean existsByUsername(String username);
+    Boolean existsByUsername(String username);
 
 }

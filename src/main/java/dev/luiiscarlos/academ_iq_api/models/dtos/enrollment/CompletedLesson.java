@@ -13,7 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompletedLesson {
+
     private Long sectionId;
+
     private Long lessonId;
 
     @Builder.Default

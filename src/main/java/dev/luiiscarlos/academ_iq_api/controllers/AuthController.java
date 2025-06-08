@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dev.luiiscarlos.academ_iq_api.models.User;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.Credentials;
-import dev.luiiscarlos.academ_iq_api.models.dtos.user.PasswordResetDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.ResetPasswordDto;
 import dev.luiiscarlos.academ_iq_api.models.dtos.user.LoginResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserRegisterRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.user.UserRegisterResponseDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.RegisterRequestDto;
+import dev.luiiscarlos.academ_iq_api.models.dtos.user.RegisterResponseDto;
 import dev.luiiscarlos.academ_iq_api.models.mappers.UserMapper;
 import dev.luiiscarlos.academ_iq_api.services.AuthServiceImpl;
 
@@ -53,11 +53,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserRegisterResponseDto> register(
+    public ResponseEntity<RegisterResponseDto> register(
             @RequestHeader("Origin") String origin,
-            @Valid @RequestBody UserRegisterRequestDto userDto) {
+            @Valid @RequestBody RegisterRequestDto userDto) {
         User user = userMapper.toModel(userDto);
-        UserRegisterResponseDto responseDto = userMapper
+        RegisterResponseDto responseDto = userMapper
                 .toRegisterResponseDto(authService.register(user, origin));
 
         return ResponseEntity
@@ -98,7 +98,7 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(
             @RequestParam String token,
-            @RequestBody PasswordResetDto userDto) {
+            @Valid @RequestBody ResetPasswordDto userDto) {
         authService.resetPassword(token, userDto);
 
         return ResponseEntity
