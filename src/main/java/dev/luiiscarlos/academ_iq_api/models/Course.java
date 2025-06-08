@@ -78,20 +78,20 @@ public class Course {
 
     @Builder.Default
     @Column(name = "requirement")
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "requirements", joinColumns = @JoinColumn(name = "course_id"))
     private List<String> requirements = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Enrollment> enrollments = new ArrayList<>();
 
     public Double getRating() {

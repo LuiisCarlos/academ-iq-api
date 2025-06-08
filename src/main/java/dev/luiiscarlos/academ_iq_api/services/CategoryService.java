@@ -20,10 +20,9 @@ public class CategoryService {
      * Find all categories
      *
      * @return the list of the courses
-     *
      * @throws CourseNotFoundException if no categories are found
      */
-    public List<Category> findAllCategories() {
+    public List<Category> findAll() {
         List<Category> categories = categoryRepository.findAll();
 
         if (categories.isEmpty())
@@ -33,7 +32,12 @@ public class CategoryService {
         return categories;
     }
 
-    public Category findCategoryByName(String categoryName) {
+    /**
+     *
+     * @param categoryName
+     * @return
+     */
+    public Category findByName(String categoryName) {
         Category category = categoryRepository.findByName(categoryName)
                 .orElseThrow(() -> new CourseNotFoundException(
                         "Failed to find category: Category not found with name " + categoryName));

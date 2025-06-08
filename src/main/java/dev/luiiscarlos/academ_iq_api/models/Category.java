@@ -41,7 +41,7 @@ public class Category {
     private String longDescription;
 
     @Builder.Default
-    @OneToMany(mappedBy = "category", fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Benefit> benefits = new ArrayList<>();
 
 }

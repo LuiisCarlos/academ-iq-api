@@ -46,7 +46,7 @@ public class Section {
     private LocalTime duration = LocalTime.of(0, 0, 0);
 
     @Builder.Default
-    @OneToMany(mappedBy = "section", fetch = FetchType.EAGER , cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "section", fetch = FetchType.LAZY , cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lesson> lessons = new ArrayList<>();
 
 }
