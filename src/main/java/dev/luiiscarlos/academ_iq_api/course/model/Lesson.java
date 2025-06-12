@@ -1,6 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.course.model;
 
-import dev.luiiscarlos.academ_iq_api.file.File;
+import dev.luiiscarlos.academ_iq_api.file.model.File;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -10,9 +10,10 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.category.Category;
 import dev.luiiscarlos.academ_iq_api.enrollment.model.Enrollment;
-import dev.luiiscarlos.academ_iq_api.file.File;
+import dev.luiiscarlos.academ_iq_api.file.model.File;
 import dev.luiiscarlos.academ_iq_api.review.model.Review;
 import dev.luiiscarlos.academ_iq_api.user.model.User;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;

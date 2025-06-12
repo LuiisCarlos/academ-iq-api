@@ -8,18 +8,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.auth.security.TokenServiceImpl;
-import dev.luiiscarlos.academ_iq_api.file.File;
-import dev.luiiscarlos.academ_iq_api.file.FileService;
 import dev.luiiscarlos.academ_iq_api.file.exception.FileStorageException;
 import dev.luiiscarlos.academ_iq_api.file.exception.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.file.file.FileResponseDto;
-import dev.luiiscarlos.academ_iq_api.file.mappers.FileMapper;
-import dev.luiiscarlos.academ_iq_api.shared.exceptions.ErrorMessages;
+import dev.luiiscarlos.academ_iq_api.file.mapper.FileMapper;
+import dev.luiiscarlos.academ_iq_api.file.model.File;
+import dev.luiiscarlos.academ_iq_api.file.service.FileService;
+import dev.luiiscarlos.academ_iq_api.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.user.dto.UpdatePassword;
 import dev.luiiscarlos.academ_iq_api.user.exception.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.user.exception.UserWithDifferentPasswordsException;
 import dev.luiiscarlos.academ_iq_api.user.model.User;
 import dev.luiiscarlos.academ_iq_api.user.repository.UserRepository;
+
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final Fidev.luiiscarlos.academ_iq_api.file.fileService;
+    private final FileService fileService;
 
     private final TokenServiceImpl tokenService;
 

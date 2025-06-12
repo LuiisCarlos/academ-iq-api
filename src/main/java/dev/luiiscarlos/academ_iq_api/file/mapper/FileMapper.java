@@ -1,7 +1,7 @@
-package dev.luiiscarlos.academ_iq_api.file.mappers;
+package dev.luiiscarlos.academ_iq_api.file.mapper;
 
-import dev.luiiscarlos.academ_iq_api.file.File;
 import dev.luiiscarlos.academ_iq_api.file.file.FileResponseDto;
+import dev.luiiscarlos.academ_iq_api.file.model.File;
 
 import org.springframework.stereotype.Component;
 

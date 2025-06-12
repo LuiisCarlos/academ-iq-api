@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.models.dtos.course;
+package dev.luiiscarlos.academ_iq_api.course.dto.course;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -7,8 +7,9 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
-import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionResponseDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.section.SectionResponseDto;
 import dev.luiiscarlos.academ_iq_api.review.dto.ReviewResponseDto;
+
 import lombok.Builder;
 import lombok.Data;
 

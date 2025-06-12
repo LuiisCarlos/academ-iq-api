@@ -1,18 +1,18 @@
 package dev.luiiscarlos.academ_iq_api.course.mapper;
 
 import dev.luiiscarlos.academ_iq_api.category.Category;
+import dev.luiiscarlos.academ_iq_api.enrollment.dto.EnrollmentCourseResponseDto;
 import dev.luiiscarlos.academ_iq_api.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.course.model.Lesson;
 import dev.luiiscarlos.academ_iq_api.course.model.Section;
-import dev.luiiscarlos.academ_iq_api.enrollment.dto.EnrollmentCourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.file.mappers.FileMapper;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseCategoryResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseLessonResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseSectionResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.PublicCourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.lesson.LessonResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionResponseDto;
+import dev.luiiscarlos.academ_iq_api.file.mapper.FileMapper;
+import dev.luiiscarlos.academ_iq_api.course.dto.course.CourseCategoryResponseDto;
+// import dev.luiiscarlos.academ_iq_api.course.dto.course.CourseLessonResponseDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.course.CourseResponseDto;
+// import dev.luiiscarlos.academ_iq_api.course.dto.course.CourseSectionResponseDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.course.PublicCourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.lesson.LessonResponseDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.section.SectionResponseDto;
 import dev.luiiscarlos.academ_iq_api.review.dto.ReviewResponseDto;
 import dev.luiiscarlos.academ_iq_api.review.model.Review;
 
@@ -81,21 +81,21 @@ public class CourseMapper {
                 .build();
     }
 
-    private CourseSectionResponseDto toCourseSectionResponseDto(Section section) {
+    /* private CourseSectionResponseDto toCourseSectionResponseDto(Section section) {
         return CourseSectionResponseDto.builder()
                 .id(section.getId())
                 .name(section.getName())
                 .duration(section.getDuration())
                 .lessons(section.getLessons().stream().map(this::toCourseLessonResponseDto).toList())
                 .build();
-    }
+    } */
 
-    private CourseLessonResponseDto toCourseLessonResponseDto(Lesson lesson) {
+    /* private CourseLessonResponseDto toCourseLessonResponseDto(Lesson lesson) {
         return CourseLessonResponseDto.builder()
                 .id(lesson.getId())
                 .name(lesson.getName())
                 .build();
-    }
+    } */
 
     private ReviewResponseDto toReviewResponseDto(Review review) {
         return ReviewResponseDto.builder()

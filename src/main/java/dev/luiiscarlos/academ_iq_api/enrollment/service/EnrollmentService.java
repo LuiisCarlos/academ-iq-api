@@ -9,15 +9,15 @@ import java.util.stream.Collectors;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
-import dev.luiiscarlos.academ_iq_api.course.exception.EnrollmentNotFoundException;
-import dev.luiiscarlos.academ_iq_api.course.model.Course;
-import dev.luiiscarlos.academ_iq_api.course.service.CourseService;
 import dev.luiiscarlos.academ_iq_api.enrollment.dto.CompletedLesson;
 import dev.luiiscarlos.academ_iq_api.enrollment.dto.EnrollmentMapper;
 import dev.luiiscarlos.academ_iq_api.enrollment.dto.EnrollmentResponseDto;
 import dev.luiiscarlos.academ_iq_api.enrollment.dto.ProgressState;
 import dev.luiiscarlos.academ_iq_api.enrollment.model.Enrollment;
 import dev.luiiscarlos.academ_iq_api.enrollment.repository.EnrollmentRepository;
+import dev.luiiscarlos.academ_iq_api.course.exception.EnrollmentNotFoundException;
+import dev.luiiscarlos.academ_iq_api.course.model.Course;
+import dev.luiiscarlos.academ_iq_api.course.service.CourseService;
 import dev.luiiscarlos.academ_iq_api.user.model.User;
 import dev.luiiscarlos.academ_iq_api.user.service.UserServiceImpl;
 import jakarta.transaction.Transactional;

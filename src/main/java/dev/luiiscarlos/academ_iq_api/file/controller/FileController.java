@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.file;
+package dev.luiiscarlos.academ_iq_api.file.controller;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.luiiscarlos.academ_iq_api.file.model.File;
+import dev.luiiscarlos.academ_iq_api.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 
 @RestController

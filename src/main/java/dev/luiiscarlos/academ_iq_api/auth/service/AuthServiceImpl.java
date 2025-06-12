@@ -15,8 +15,8 @@ import dev.luiiscarlos.academ_iq_api.auth.dto.ResetPassword;
 import dev.luiiscarlos.academ_iq_api.auth.exception.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.auth.security.TokenService;
 import dev.luiiscarlos.academ_iq_api.exception.ErrorMessages;
-import dev.luiiscarlos.academ_iq_api.file.File;
-import dev.luiiscarlos.academ_iq_api.file.FileService;
+import dev.luiiscarlos.academ_iq_api.file.model.File;
+import dev.luiiscarlos.academ_iq_api.file.service.FileService;
 import dev.luiiscarlos.academ_iq_api.shared.mail.MailService;
 import dev.luiiscarlos.academ_iq_api.user.exception.UserAccountNotVerifiedException;
 import dev.luiiscarlos.academ_iq_api.user.exception.UserAlreadyExistsException;
@@ -25,6 +25,7 @@ import dev.luiiscarlos.academ_iq_api.user.model.User;
 import dev.luiiscarlos.academ_iq_api.user.security.Role;
 import dev.luiiscarlos.academ_iq_api.user.security.RoleService;
 import dev.luiiscarlos.academ_iq_api.user.service.UserService;
+
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;

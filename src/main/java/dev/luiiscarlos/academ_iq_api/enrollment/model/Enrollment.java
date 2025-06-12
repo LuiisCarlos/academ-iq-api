@@ -10,9 +10,10 @@ import org.springframework.lang.Nullable;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
-import dev.luiiscarlos.academ_iq_api.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.enrollment.dto.ProgressState;
+import dev.luiiscarlos.academ_iq_api.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.user.model.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +30,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-dev.luiiscarlos.academ_iq_api.enrollment.dto.Builder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user_course_enrollments")

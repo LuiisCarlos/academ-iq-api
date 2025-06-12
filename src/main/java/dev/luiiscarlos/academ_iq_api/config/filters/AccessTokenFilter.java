@@ -16,6 +16,7 @@ import dev.luiiscarlos.academ_iq_api.auth.security.InvalidTokenTypeException;
 import dev.luiiscarlos.academ_iq_api.auth.security.TokenService;
 import dev.luiiscarlos.academ_iq_api.exception.ErrorHandler;
 import dev.luiiscarlos.academ_iq_api.exception.ErrorMessages;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.file;
+package dev.luiiscarlos.academ_iq_api.file.service;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -18,7 +18,8 @@ import com.cloudinary.Cloudinary;
 
 import dev.luiiscarlos.academ_iq_api.auth.exception.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.exception.ErrorMessages;
-import dev.luiiscarlos.academ_iq_api.file.File;
+import dev.luiiscarlos.academ_iq_api.file.model.File;
+import dev.luiiscarlos.academ_iq_api.file.repository.FileRepository;
 import dev.luiiscarlos.academ_iq_api.file.exception.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.file.exception.FileStorageException;
 import dev.luiiscarlos.academ_iq_api.file.exception.InvalidFileTypeException;

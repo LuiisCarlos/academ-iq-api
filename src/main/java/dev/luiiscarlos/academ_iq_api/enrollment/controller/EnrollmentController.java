@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.enrollment;
+package dev.luiiscarlos.academ_iq_api.enrollment.controller;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +21,7 @@ import dev.luiiscarlos.academ_iq_api.enrollment.dto.EnrollmentMapper;
 import dev.luiiscarlos.academ_iq_api.enrollment.dto.EnrollmentResponseDto;
 import dev.luiiscarlos.academ_iq_api.enrollment.model.Enrollment;
 import dev.luiiscarlos.academ_iq_api.enrollment.service.EnrollmentService;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController

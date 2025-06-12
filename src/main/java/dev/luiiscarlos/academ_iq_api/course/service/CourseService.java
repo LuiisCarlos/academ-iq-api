@@ -18,16 +18,17 @@ import dev.luiiscarlos.academ_iq_api.course.model.Lesson;
 import dev.luiiscarlos.academ_iq_api.course.model.Section;
 import dev.luiiscarlos.academ_iq_api.course.model.Course.Level;
 import dev.luiiscarlos.academ_iq_api.course.repository.CourseRepository;
-import dev.luiiscarlos.academ_iq_api.file.File;
-import dev.luiiscarlos.academ_iq_api.file.FileService;
 import dev.luiiscarlos.academ_iq_api.file.exception.InvalidFileTypeException;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.PublicCourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.lesson.LessonRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.section.SectionRequestDto;
-import dev.luiiscarlos.academ_iq_api.shared.exceptions.ErrorMessages;
+import dev.luiiscarlos.academ_iq_api.file.model.File;
+import dev.luiiscarlos.academ_iq_api.file.service.FileService;
+import dev.luiiscarlos.academ_iq_api.course.dto.course.CourseRequestDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.course.CourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.course.PublicCourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.lesson.LessonRequestDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.section.SectionRequestDto;
+import dev.luiiscarlos.academ_iq_api.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.user.model.User;
+
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
-    private final Fidev.luiiscarlos.academ_iq_api.file.fileService;
+    private final FileService fileService;
 
     private final CourseMapper courseMapper;
 

@@ -16,9 +16,10 @@ import dev.luiiscarlos.academ_iq_api.auth.dto.AuthResponse;
 import dev.luiiscarlos.academ_iq_api.auth.dto.Credentials;
 import dev.luiiscarlos.academ_iq_api.auth.dto.RegisterResponseDto;
 import dev.luiiscarlos.academ_iq_api.auth.dto.ResetPassword;
-import dev.luiiscarlos.academ_iq_api.auth.service.AuthServiceImpl;
+import dev.luiiscarlos.academ_iq_api.auth.service.AuthService;
 import dev.luiiscarlos.academ_iq_api.user.mapper.UserMapper;
 import dev.luiiscarlos.academ_iq_api.user.model.User;
+
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/v1/auth")
 public class AuthController {
 
-    private final AuthServiceImpl authService;
+    private final AuthService authService;
 
     private final UserMapper userMapper;
 

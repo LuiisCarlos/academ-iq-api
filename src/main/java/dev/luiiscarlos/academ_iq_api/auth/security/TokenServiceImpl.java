@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import dev.luiiscarlos.academ_iq_api.auth.exception.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.user.model.User;
+
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;

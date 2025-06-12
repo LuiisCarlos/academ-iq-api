@@ -3,6 +3,7 @@ package dev.luiiscarlos.academ_iq_api.user.security;
 import org.springframework.stereotype.Service;
 
 import dev.luiiscarlos.academ_iq_api.auth.exception.RoleNotFoundException;
+
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;

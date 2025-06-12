@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.models;
+package dev.luiiscarlos.academ_iq_api.file.model;
 
 import java.time.LocalDateTime;
 

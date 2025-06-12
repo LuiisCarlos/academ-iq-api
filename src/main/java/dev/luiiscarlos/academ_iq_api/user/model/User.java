@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.enrollment.model.Enrollment;
-import dev.luiiscarlos.academ_iq_api.file.File;
+import dev.luiiscarlos.academ_iq_api.file.model.File;
 import dev.luiiscarlos.academ_iq_api.user.security.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

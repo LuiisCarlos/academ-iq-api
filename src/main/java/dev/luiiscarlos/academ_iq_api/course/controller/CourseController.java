@@ -19,9 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.course.mapper.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.course.service.CourseService;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseRequestDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.CourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.models.dtos.course.PublicCourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.course.CourseRequestDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.course.CourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.course.dto.course.PublicCourseResponseDto;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
