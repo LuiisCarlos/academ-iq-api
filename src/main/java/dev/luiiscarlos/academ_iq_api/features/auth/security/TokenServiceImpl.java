@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.features.auth.exception.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
+
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,7 @@ public class TokenServiceImpl implements TokenService {
         RefreshToken refreshToken = refreshTokenRepository.findByUser(user).map(rt -> {
             rt.setToken(token);
             rt.setExpiresAt(LocalDateTime.ofInstant(expiresAt, zoneId));
+
             return rt;
         }).orElse(RefreshToken.builder()
                 .token(token)

@@ -1,56 +1,54 @@
 package dev.luiiscarlos.academ_iq_api.features.user.mapper;
 
-import java.time.LocalDate;
-
 import org.springframework.stereotype.Component;
 
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.AuthRequest;
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.AuthResponse;
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterResponseDto;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterRequest;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.LoginResponse;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterResponse;
 import dev.luiiscarlos.academ_iq_api.features.user.dto.*;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 
 @Component
 public class UserMapper {
 
-    public User toModel(AuthRequest userDto) {
-        String fullname = String.format("%s %s", userDto.getUsername(), userDto.getLastname());
+    public User toModel(RegisterRequest dto) {
+        String fullname = String.format("%s %s", dto.getFirstname(), dto.getLastname());
 
         return User.builder()
-                .username(userDto.getUsername())
-                .email(userDto.getEmail())
+                .username(dto.getUsername())
+                .email(dto.getEmail())
                 .fullname(fullname)
-                .firstname(userDto.getFirstname())
-                .lastname(userDto.getLastname())
-                .phone(userDto.getPhone())
-                .birthdate(userDto.getBirthdate())
+                .firstname(dto.getFirstname())
+                .lastname(dto.getLastname())
+                .phone(dto.getPhone())
+                .birthdate(dto.getBirthdate())
                 .build();
     }
 
-    public User toModel(UpdateRequest userDto) {
+    public User toModel(UpdateRequest dto) {
         return User.builder()
-                .username(userDto.getUsername())
-                .email(userDto.getEmail())
-                .firstname(userDto.getFirstname())
-                .lastname(userDto.getLastname())
-                .birthdate(LocalDate.parse(userDto.getBirthdate()))
-                .phone(userDto.getPhone())
-                .dni(userDto.getDni())
-                .githubUrl(userDto.getGithubUrl())
-                .linkedinUrl(userDto.getLinkedinUrl())
-                .websiteUrl(userDto.getWebsiteUrl())
-                .biography(userDto.getBiography())
-                .studies(userDto.getStudies())
-                .jobArea(userDto.getJobArea())
-                .workExperience(userDto.getWorkExperience())
-                .companyName(userDto.getCompanyName())
-                .manager(userDto.isManager())
-                .wantToUpgrade(userDto.wantToUpgrade())
+                .username(dto.getUsername())
+                .email(dto.getEmail())
+                .firstname(dto.getFirstname())
+                .lastname(dto.getLastname())
+                .birthdate(dto.getBirthdate())
+                .phone(dto.getPhone())
+                .dni(dto.getDni())
+                .githubUrl(dto.getGithubUrl())
+                .linkedinUrl(dto.getLinkedinUrl())
+                .websiteUrl(dto.getWebsiteUrl())
+                .biography(dto.getBiography())
+                .studies(dto.getStudies())
+                .jobArea(dto.getJobArea())
+                .workExperience(dto.getWorkExperience())
+                .companyName(dto.getCompanyName())
+                .manager(dto.isManager())
+                .wantToUpgrade(dto.wantToUpgrade())
                 .build();
     }
 
-    public RegisterResponseDto toRegisterResponseDto(User user) {
-        return RegisterResponseDto.builder()
+    public RegisterResponse toRegisterResponse(User user) {
+        return RegisterResponse.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .firstname(user.getFirstname())
@@ -60,24 +58,24 @@ public class UserMapper {
                 .build();
     }
 
-    public AuthResponse toLoginResponseDto(
-            String accessToken,
-            String refreshToken,
-            User user) {
-        UserResponse userResponse = this.toResponseDto(user);
+    public LoginResponse toLoginResponse(User user, String accessToken, String refreshToken) {
+        UserResponse userResponse = this.toUserResponse(user);
 
-        return AuthResponse.builder()
+        return LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .user(userResponse)
                 .build();
     }
 
-    public UserResponse toResponseDto(User user) {
+    public UserResponse toUserResponse(User user) {
+        String fullname = String.format("%s %s", user.getFirstname(), user.getLastname());
+
         return UserResponse.builder()
                 .username(user.getUsername())
                 .avatar(user.getAvatar().getUrl())
                 .email(user.getEmail())
+                .fullname(fullname)
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
                 .phone(user.getPhone())

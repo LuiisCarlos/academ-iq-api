@@ -7,8 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 import dev.luiiscarlos.academ_iq_api.features.auth.exception.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.auth.exception.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenException;
-import dev.luiiscarlos.academ_iq_api.features.file.file.FileResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.user.dto.UpdatePassword;
+import dev.luiiscarlos.academ_iq_api.features.file.dto.FileResponse;
+import dev.luiiscarlos.academ_iq_api.features.user.dto.UpdatePasswordRequest;
 import dev.luiiscarlos.academ_iq_api.features.user.exception.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 
@@ -62,10 +62,10 @@ public interface UserService {
      * Finds the user's avatar by its id
      *
      * @param id the user's id
-     * @return {@link FileResponseDto} the user's avatar
+     * @return {@link FileResponse} the user's avatar
      * @throws UserNotFoundException if the user does not exist
      */
-    FileResponseDto findAvatarById(Long id);
+    FileResponse findAvatarById(Long id);
 
     /**
      * Finds the user by the token
@@ -85,7 +85,7 @@ public interface UserService {
      * @param token the user's token
      * @return the user's avatar
      */
-    FileResponseDto findAvatarByToken(String token);
+    FileResponse findAvatarByToken(String token);
 
     /**
      * Updates the user's information by its id
@@ -103,7 +103,7 @@ public interface UserService {
      * @param token       the user's token
      * @param passwordDto the current and new password
      */
-    void updatePasswordByToken(String token, UpdatePassword passwordDto);
+    void updatePasswordByToken(String token, UpdatePasswordRequest passwordDto);
 
     /**
      * Updates the user's information by the token
@@ -122,7 +122,7 @@ public interface UserService {
      * @return the updated avatar
      * @throws UserNotFoundException if the user does not exist
      */
-    FileResponseDto patchAvatarById(Long id, MultipartFile avatar);
+    FileResponse patchAvatarById(Long id, MultipartFile avatar);
 
     /**
      * Updates the user's avatar by the token
@@ -131,7 +131,7 @@ public interface UserService {
      * @param avatar the new avatar
      * @return the updated avatar
      */
-    FileResponseDto patchAvatarByToken(String token, MultipartFile avatar);
+    FileResponse patchAvatarByToken(String token, MultipartFile avatar);
 
     /**
      * Deletes the user by its id

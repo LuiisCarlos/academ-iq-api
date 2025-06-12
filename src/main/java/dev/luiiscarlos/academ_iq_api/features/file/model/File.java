@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,11 +34,11 @@ public class File {
     @Column(name = "content_type")
     private String contentType;
 
-    private Long size;
-
     private String url;
 
     private String extension;
+
+    private Long size;
 
     @Builder.Default
     @Column(name = "is_image")
@@ -49,7 +50,7 @@ public class File {
 
     @Builder.Default
     @Column(name = "updated_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    @JsonFormat(shape = Shape.STRING)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     public Boolean isImage() {

@@ -11,14 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.AuthRequest;
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.AuthResponse;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterRequest;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.LoginResponse;
 import dev.luiiscarlos.academ_iq_api.features.auth.dto.Credentials;
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.ResetPassword;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterResponse;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.ResetPasswordRequest;
 import dev.luiiscarlos.academ_iq_api.features.auth.service.AuthService;
-import dev.luiiscarlos.academ_iq_api.features.user.mapper.UserMapper;
-import dev.luiiscarlos.academ_iq_api.features.user.model.User;
+
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -30,8 +29,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    private final UserMapper userMapper;
-
     @GetMapping("/refresh")
     public ResponseEntity<String> refresh(@RequestParam String token) {
         return ResponseEntity
@@ -41,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(
+    public ResponseEntity<LoginResponse> login(
             @RequestHeader("Origin") String origin,
             @RequestBody Credentials credentials) {
 
@@ -52,17 +49,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponseDto> register(
+    public ResponseEntity<RegisterResponse> register(
             @RequestHeader("Origin") String origin,
-            @Valid @RequestBody AuthRequest userDto) {
-        User user = userMapper.toModel(userDto);
-        RegisterResponseDto responseDto = userMapper
-                .toRegisterResponseDto(authService.register(user, origin));
+            @Valid @RequestBody RegisterRequest userDto) {
+
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(responseDto);
+                .body(authService.register(userDto, origin));
     }
 
     @PostMapping("/logout")
@@ -97,7 +92,7 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(
             @RequestParam String token,
-            @Valid @RequestBody ResetPassword userDto) {
+            @Valid @RequestBody ResetPasswordRequest userDto) {
         authService.resetPassword(token, userDto);
 
         return ResponseEntity

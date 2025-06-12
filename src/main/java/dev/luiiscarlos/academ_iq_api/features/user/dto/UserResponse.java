@@ -13,11 +13,13 @@ import lombok.Data;
 @Builder
 public class UserResponse {
 
-    private String username;
-
     private String avatar;
 
+    private String username;
+
     private String email;
+
+    private String fullname;
 
     private String firstname;
 
@@ -49,10 +51,10 @@ public class UserResponse {
 
     private Boolean wantToUpgrade;
 
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
+    @JsonFormat(shape = Shape.STRING)
     private LocalDate birthdate;
 
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    @JsonFormat(shape = Shape.STRING)
     private LocalDateTime registeredAt;
 
 }

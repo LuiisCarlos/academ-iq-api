@@ -2,10 +2,8 @@ package dev.luiiscarlos.academ_iq_api.features.auth.security;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -44,7 +42,6 @@ public class RefreshToken {
 
     @Builder.Default
     @Column(name = "created_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createdAt = LocalDateTime.now();
 
 }

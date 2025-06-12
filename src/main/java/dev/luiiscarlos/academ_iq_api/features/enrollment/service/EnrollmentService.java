@@ -12,14 +12,15 @@ import org.springframework.stereotype.Service;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.EnrollmentNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.features.course.service.CourseService;
-import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.CompletedLesson;
-import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentMapper;
-import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.ProgressState;
+import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentResponse;
+import dev.luiiscarlos.academ_iq_api.features.enrollment.mapper.EnrollmentMapper;
+import dev.luiiscarlos.academ_iq_api.features.enrollment.model.CompletedLesson;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.model.Enrollment;
+import dev.luiiscarlos.academ_iq_api.features.enrollment.model.ProgressState;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.repository.EnrollmentRepository;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
-import dev.luiiscarlos.academ_iq_api.features.user.service.UserServiceImpl;
+import dev.luiiscarlos.academ_iq_api.features.user.service.impl.UserServiceImpl;
+
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -87,12 +88,12 @@ public class EnrollmentService {
      *
      * @param token the authentication token of the user
      *
-     * @return an {@link EnrollmentResponseDto} containing enrollment data
+     * @return an {@link EnrollmentResponse} containing enrollment data
      *
      * @throws EnrollmentNotFoundException if no enrollments found for the given
      *                                     user
      */
-    public List<EnrollmentResponseDto> findAllByUserId(String token) {
+    public List<EnrollmentResponse> findAllByUserId(String token) {
         User user = userService.findByToken(token);
         List<Enrollment> enrollments = enrollmentRepository.findAllByUserId(user.getId());
 
@@ -110,12 +111,12 @@ public class EnrollmentService {
      * @param token    the authentication token of the user
      * @param courseId the ID of the course
      *
-     * @return an {@link EnrollmentResponseDto} containing enrollment data
+     * @return an {@link EnrollmentResponse} containing enrollment data
      *
      * @throws EnrollmentNotFoundException if no enrollment is found for the given
      *                                     user and course
      */
-    public EnrollmentResponseDto findByUserIdAndCourseId(String token, Long courseId) {
+    public EnrollmentResponse findByUserIdAndCourseId(String token, Long courseId) {
         User user = userService.findByToken(token);
 
         Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId)

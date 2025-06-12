@@ -16,6 +16,7 @@ import dev.luiiscarlos.academ_iq_api.core.exception.ErrorHandler;
 import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenTypeException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,12 +41,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @throws IOException      If an I/O error occurs
      */
     @Override
-    @SuppressWarnings("null")
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
         String endpoint = request.getRequestURI();
 
@@ -56,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Instant expiresAt = jwt.getExpiresAt();
             String tokenType = jwt.getClaimAsString("token_type");
 
-            if (expiresAt.isBefore(Instant.now())) {
+            if (expiresAt != null && expiresAt.isBefore(Instant.now())) {
                 ErrorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
                         ErrorMessages.EXPIRED_TOKEN);
                 return;

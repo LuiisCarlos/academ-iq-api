@@ -2,19 +2,19 @@ package dev.luiiscarlos.academ_iq_api.features.review.mapper;
 
 import org.springframework.stereotype.Component;
 
-import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewRequestDto;
-import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewResponseDto;
+import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewRequest;
+import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewResponse;
 import dev.luiiscarlos.academ_iq_api.features.review.model.Review;
 
 @Component
 public class ReviewMapper {
 
-    public ReviewResponseDto toResponseDto(Review rating) {
+    public ReviewResponse toResponseDto(Review rating) {
         String userAvatarUrl = rating.getUser().getAvatar() != null
                 ? rating.getUser().getAvatar().getUrl()
                 : "";
 
-        return ReviewResponseDto.builder()
+        return ReviewResponse.builder()
                 .username(rating.getUser().getUsername())
                 .avatar(userAvatarUrl)
                 .rating(rating.getRating())
@@ -23,7 +23,7 @@ public class ReviewMapper {
                 .build();
     }
 
-    public Review toModel(ReviewRequestDto requestDto) {
+    public Review toModel(ReviewRequest requestDto) {
         return Review.builder()
                 .rating(requestDto.getRating())
                 .comment(requestDto.getComment())

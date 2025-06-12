@@ -1,18 +1,19 @@
 package dev.luiiscarlos.academ_iq_api.features.course.model;
 
 import java.util.ArrayList;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
-import dev.luiiscarlos.academ_iq_api.features.category.Category;
+import dev.luiiscarlos.academ_iq_api.features.category.model.Category;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.model.Enrollment;
 import dev.luiiscarlos.academ_iq_api.features.file.model.File;
 import dev.luiiscarlos.academ_iq_api.features.review.model.Review;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -75,13 +76,8 @@ public class Course {
     private Double rating;
 
     @Builder.Default
-    @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-    private LocalTime duration = LocalTime.of(0, 0, 0);
-
-    @Builder.Default
-    @Column(name = "created_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @JsonFormat(shape = Shape.STRING)
+    private Duration duration = Duration.ZERO;
 
     @Builder.Default
     @Column(name = "requirement")
@@ -100,6 +96,15 @@ public class Course {
     @Builder.Default
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Enrollment> enrollments = new ArrayList<>();
+
+    @Column(name = "updated_at")
+    @JsonFormat(shape = Shape.STRING)
+    private LocalDateTime updatedAt;
+
+    @Builder.Default
+    @Column(name = "created_at")
+    @JsonFormat(shape = Shape.STRING)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public Double getRating() {
         return calculateAverageRating();

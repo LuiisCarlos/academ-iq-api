@@ -2,9 +2,11 @@ package dev.luiiscarlos.academ_iq_api.features.auth.service;
 
 import org.springframework.lang.Nullable;
 
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.AuthResponse;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.LoginResponse;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterRequest;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterResponse;
 import dev.luiiscarlos.academ_iq_api.features.auth.dto.Credentials;
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.ResetPassword;
+import dev.luiiscarlos.academ_iq_api.features.auth.dto.ResetPasswordRequest;
 import dev.luiiscarlos.academ_iq_api.features.auth.exception.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.auth.exception.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenException;
@@ -23,12 +25,12 @@ public interface AuthService {
      *
      * @param credentials the user to login
      * @param origin      the origin of the request
-     * @return {@link AuthResponse} the logged in user
+     * @return {@link LoginResponse} the logged in user
      * @throws UserAccountNotVerifiedException if the user account is not verified
      * @throws InvalidCredentialsException     if the username or password is
      *                                         invalid
      */
-    AuthResponse login(Credentials credentials, @Nullable String origin);
+    LoginResponse login(Credentials credentials, @Nullable String origin);
 
     /**
      * Signs up a new user
@@ -41,7 +43,7 @@ public interface AuthService {
      * @throws UserAlreadyExistsException          if the username already exists
      * @throws UserUnderageException               if the user is underage
      */
-    User register(User userToRegister, @Nullable String origin);
+    RegisterResponse register(RegisterRequest request, @Nullable String origin);
 
     /**
      * Refresh the access token for the current user
@@ -91,6 +93,6 @@ public interface AuthService {
      * @throws UserWithDifferentPasswordsException if the password and its
      *                                             confirmation do not match
      */
-    void resetPassword(String token, ResetPassword passwordDto);
+    void resetPassword(String token, ResetPasswordRequest passwordDto);
 
 }

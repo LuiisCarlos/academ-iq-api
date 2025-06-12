@@ -17,11 +17,12 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseRequestDto;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.PublicCourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseRequest;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseResponse;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.course.PublicCourseResponse;
 import dev.luiiscarlos.academ_iq_api.features.course.mapper.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.features.course.service.CourseService;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -34,8 +35,8 @@ public class CourseController {
     private final CourseMapper courseMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CourseResponseDto> create(
-            @RequestPart("course") CourseRequestDto courseDto,
+    public ResponseEntity<CourseResponse> create(
+            @RequestPart("course") CourseRequest courseDto,
             @RequestParam Map<String, MultipartFile> files) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -44,8 +45,7 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PublicCourseResponseDto>> findAll() {
-        System.out.println("Hola");
+    public ResponseEntity<List<PublicCourseResponse>> findAll() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -53,7 +53,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CourseResponseDto> findById(@PathVariable("id") Long courseId) {
+    public ResponseEntity<CourseResponse> findById(@PathVariable("id") Long courseId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -61,9 +61,9 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CourseResponseDto> updateById(
+    public ResponseEntity<CourseResponse> updateById(
             @PathVariable("id") Long courseId,
-            @RequestPart("course") CourseRequestDto courseDto,
+            @RequestPart("course") CourseRequest courseDto,
             @RequestParam Map<String, MultipartFile> files) {
         return ResponseEntity
                 .status(HttpStatus.OK)

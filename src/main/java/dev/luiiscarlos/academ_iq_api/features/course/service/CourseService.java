@@ -1,7 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.features.course.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
-import dev.luiiscarlos.academ_iq_api.features.category.Category;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseRequestDto;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.PublicCourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.lesson.LessonRequestDto;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.section.SectionRequestDto;
+import dev.luiiscarlos.academ_iq_api.features.category.model.Category;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseRequest;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseResponse;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.course.PublicCourseResponse;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.lesson.LessonRequest;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.section.SectionRequest;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.CourseAlreadyExistsException;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.CourseNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.course.mapper.CourseMapper;
@@ -28,6 +28,7 @@ import dev.luiiscarlos.academ_iq_api.features.file.exception.InvalidFileTypeExce
 import dev.luiiscarlos.academ_iq_api.features.file.model.File;
 import dev.luiiscarlos.academ_iq_api.features.file.service.FileService;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
+
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -50,12 +51,12 @@ public class CourseService {
      *
      * @param courseDto the course details
      * @param files     the files to be saved
-     * @return {@link CourseResponseDto} the saved course
+     * @return {@link CourseResponse} the saved course
      * @throws CourseAlreadyExistsException if the course already exists
      * @throws CourseNotFoundException      if the category does not exist
      * @throws InvalidFileTypeException     if the file is not a valid video
      */
-    public CourseResponseDto create(CourseRequestDto courseDto, Map<String, MultipartFile> files) {
+    public CourseResponse create(CourseRequest courseDto, Map<String, MultipartFile> files) {
         if (courseRepository.existsByTitle(courseDto.getTitle()))
             throw new CourseAlreadyExistsException(
                     String.format(ErrorMessages.COURSE_ALREADY_EXISTS, courseDto.getTitle()));
@@ -79,15 +80,15 @@ public class CourseService {
                 .sections(new ArrayList<>())
                 .build();
 
-        for (SectionRequestDto sectionDto : courseDto.getSections()) {
+        for (SectionRequest sectionDto : courseDto.getSections()) {
             Section section = Section.builder()
                     .name(sectionDto.getName())
                     .course(course)
-                    .duration(LocalTime.parse(sectionDto.getDuration()))
+                    .duration(Duration.ofSeconds(sectionDto.getDuration()))
                     .lessons(new ArrayList<>())
                     .build();
 
-            for (LessonRequestDto lessonDto : sectionDto.getLessons()) {
+            for (LessonRequest lessonDto : sectionDto.getLessons()) {
                 MultipartFile multipartFile = files.get("file_" + lessonDto.getName());
 
                 if (multipartFile != null && !multipartFile.isEmpty()) {
@@ -121,7 +122,7 @@ public class CourseService {
      * @return the list of the courses
      * @throws CourseNotFoundException if no courses are found
      */
-    public List<PublicCourseResponseDto> findAll() {
+    public List<PublicCourseResponse> findAll() {
         List<Course> courses = courseRepository.findAll();
 
         if (courses.isEmpty())
@@ -168,9 +169,9 @@ public class CourseService {
      * @throws CourseNotFoundException  if the course is not found
      * @throws InvalidFileTypeException if the file is not a valid video
      */
-    public CourseResponseDto updateById(
+    public CourseResponse updateById(
             Long courseId,
-            CourseRequestDto courseDto,
+            CourseRequest courseDto,
             Map<String, MultipartFile> files) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException("Course not found with id: " + courseId));
@@ -206,14 +207,14 @@ public class CourseService {
         }
 
         course.getSections().clear();
-        for (SectionRequestDto sectionDto : courseDto.getSections()) {
+        for (SectionRequest sectionDto : courseDto.getSections()) {
             Section section = Section.builder()
                     .name(sectionDto.getName())
                     .course(course)
                     .lessons(new ArrayList<>())
                     .build();
 
-            for (LessonRequestDto lessonDto : sectionDto.getLessons()) {
+            for (LessonRequest lessonDto : sectionDto.getLessons()) {
                 MultipartFile multipartFile = files.get("file_" + lessonDto.getName());
 
                 if (multipartFile != null && !multipartFile.isEmpty()) {

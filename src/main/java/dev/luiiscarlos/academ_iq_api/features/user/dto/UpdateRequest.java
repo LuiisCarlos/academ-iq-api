@@ -1,5 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.features.user.dto;
 
+import java.time.LocalDate;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,7 +17,7 @@ public class UpdateRequest {
 
     private String lastname;
 
-    private String birthdate;
+    private LocalDate birthdate;
 
     private String phone;
 

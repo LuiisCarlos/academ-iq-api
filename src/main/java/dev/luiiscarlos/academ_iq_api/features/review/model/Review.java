@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.features.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -41,13 +42,13 @@ public class Review {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    private Integer rating;
-
     private String comment;
+
+    private Integer rating;
 
     @Builder.Default
     @Column(name = "rated_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    @JsonFormat(shape = Shape.STRING)
     private LocalDateTime ratedAt = LocalDateTime.now();
 
 }

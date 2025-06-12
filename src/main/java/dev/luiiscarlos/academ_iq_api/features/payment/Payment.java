@@ -2,6 +2,9 @@ package dev.luiiscarlos.academ_iq_api.features.payment;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+
 import dev.luiiscarlos.academ_iq_api.features.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 import jakarta.persistence.Column;
@@ -55,6 +58,7 @@ public class Payment {
 
     @Builder.Default
     @Column(name = "create_at")
+    @JsonFormat(shape = Shape.STRING)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public enum Status {

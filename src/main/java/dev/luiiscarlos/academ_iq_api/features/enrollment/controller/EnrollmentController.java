@@ -17,10 +17,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentMapper;
-import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentResponseDto;
+import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentResponse;
+import dev.luiiscarlos.academ_iq_api.features.enrollment.mapper.EnrollmentMapper;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.model.Enrollment;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.service.EnrollmentService;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,7 +34,7 @@ public class EnrollmentController {
     private final EnrollmentMapper enrollmentMapper;
 
     @PostMapping("/@me/{id}")
-    public ResponseEntity<EnrollmentResponseDto> create(
+    public ResponseEntity<EnrollmentResponse> create(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId,
             @RequestBody(required = false) Map<String, Boolean> flags) {
@@ -46,7 +47,7 @@ public class EnrollmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EnrollmentResponseDto>> findAllByUserId(
+    public ResponseEntity<List<EnrollmentResponse>> findAllByUserId(
             @RequestHeader("Authorization") String token) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -55,7 +56,7 @@ public class EnrollmentController {
     }
 
     @GetMapping("/@me/{id}")
-    public ResponseEntity<EnrollmentResponseDto> findByUserIdAndCourseId(
+    public ResponseEntity<EnrollmentResponse> findByUserIdAndCourseId(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId) {
         return ResponseEntity
@@ -65,7 +66,7 @@ public class EnrollmentController {
     }
 
     @PutMapping("/@me/{id}")
-    public ResponseEntity<EnrollmentResponseDto> updateByUserIdAndCourseId(
+    public ResponseEntity<EnrollmentResponse> updateByUserIdAndCourseId(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId,
             @RequestBody Map<String, Boolean> updates) {
@@ -78,7 +79,7 @@ public class EnrollmentController {
     }
 
     @PatchMapping("/@me/{id}/progress")
-    public ResponseEntity<EnrollmentResponseDto> patchProgressState(
+    public ResponseEntity<EnrollmentResponse> patchProgressState(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId,
             @RequestBody Map<String, Object> updates) {
@@ -91,7 +92,7 @@ public class EnrollmentController {
     }
 
     @DeleteMapping("/@me/{id}")
-    public ResponseEntity<List<EnrollmentResponseDto>> deleteByUserIdAndCourseId(
+    public ResponseEntity<List<EnrollmentResponse>> deleteByUserIdAndCourseId(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId) {
         enrollmentService.deleteByUserIdAndCourseId(token, courseId);

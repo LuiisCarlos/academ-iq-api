@@ -1,7 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.features.course.repository;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +36,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     List<Course> findByTitle(String title);
 
-    List<Course> findByDuration(LocalTime duration);
+    List<Course> findByDuration(Duration duration);
 
     List<Course> findByCreatedAt(LocalDateTime createdAt);
 

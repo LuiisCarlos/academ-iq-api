@@ -16,7 +16,6 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.model.Enrollment;
 import dev.luiiscarlos.academ_iq_api.features.file.model.File;
 import dev.luiiscarlos.academ_iq_api.features.user.security.Role;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,15 +47,15 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "avatar_id")
+    private File avatar;
+
     private String username;
 
     private String email;
 
     private String password;
-
-    @ManyToOne
-    @JoinColumn(name = "avatar_id")
-    private File avatar;
 
     private String fullname;
 
@@ -64,6 +63,7 @@ public class User implements UserDetails {
 
     private String lastname;
 
+    @JsonFormat(shape = Shape.STRING)
     private LocalDate birthdate;
 
     private String phone;
@@ -106,25 +106,24 @@ public class User implements UserDetails {
     private Boolean verified = false;
 
     @Builder.Default
-    @Column(name = "registered_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime registeredAt = LocalDateTime.now();
-
-    @Builder.Default
-    @Column(name = "updated_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Enrollment> enrollments = new ArrayList<>();
 
-    @JoinTable(
-        name = "user_role_junction",
-        joinColumns = { @JoinColumn(name = "user_id") },
-        inverseJoinColumns = { @JoinColumn(name = "role_id") })
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinTable(name = "user_role_junction",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = { @JoinColumn(name = "role_id") })
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private Set<Role> authorities;
+
+    @Builder.Default
+    @Column(name = "updated_at")
+    @JsonFormat(shape = Shape.STRING)
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @Builder.Default
+    @Column(name = "registered_at")
+    @JsonFormat(shape = Shape.STRING)
+    private LocalDateTime registeredAt = LocalDateTime.now();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

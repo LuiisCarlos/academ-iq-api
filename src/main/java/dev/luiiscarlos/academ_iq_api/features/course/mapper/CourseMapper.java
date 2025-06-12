@@ -1,17 +1,17 @@
 package dev.luiiscarlos.academ_iq_api.features.course.mapper;
 
-import dev.luiiscarlos.academ_iq_api.features.category.Category;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseCategoryResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.PublicCourseResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.lesson.LessonResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.section.SectionResponseDto;
+import dev.luiiscarlos.academ_iq_api.features.category.dto.CategoryResponse;
+import dev.luiiscarlos.academ_iq_api.features.category.model.Category;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseResponse;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.course.PublicCourseResponse;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.lesson.LessonResponse;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.section.SectionResponse;
 import dev.luiiscarlos.academ_iq_api.features.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.features.course.model.Lesson;
 import dev.luiiscarlos.academ_iq_api.features.course.model.Section;
-import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentCourseResponseDto;
+import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentCourseResponse;
 import dev.luiiscarlos.academ_iq_api.features.file.mapper.FileMapper;
-import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewResponseDto;
+import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewResponse;
 import dev.luiiscarlos.academ_iq_api.features.review.model.Review;
 
 import org.springframework.stereotype.Component;
@@ -24,8 +24,8 @@ public class CourseMapper {
 
     private final FileMapper fileMapper;
 
-    public PublicCourseResponseDto toPublicResponseDto(Course course) {
-        return PublicCourseResponseDto.builder()
+    public PublicCourseResponse toPublicResponseDto(Course course) {
+        return PublicCourseResponse.builder()
                 .id(course.getId())
                 .title(course.getTitle())
                 .subtitle(course.getSubtitle())
@@ -37,14 +37,15 @@ public class CourseMapper {
                 .sections(course.getSections().size())
                 .rating(course.getRating())
                 .reviews(course.getReviews().size())
-                .level(course.getLevel().toString())
+                .level(course.getLevel())
                 .duration(course.getDuration())
+                .updatedAt(course.getUpdatedAt())
                 .createdAt(course.getCreatedAt())
                 .build();
     }
 
-    public CourseResponseDto toResponseDto(Course course) {
-        return CourseResponseDto.builder()
+    public CourseResponse toResponseDto(Course course) {
+        return CourseResponse.builder()
                 .id(course.getId())
                 .title(course.getTitle())
                 .subtitle(course.getSubtitle())
@@ -56,14 +57,15 @@ public class CourseMapper {
                 .sections(course.getSections().stream().map(this::toSectionResponseDto).toList())
                 .rating(course.getRating())
                 .reviews(course.getReviews().stream().map(this::toReviewResponseDto).toList())
-                .level(course.getLevel().toString())
+                .level(course.getLevel())
                 .duration(course.getDuration())
+                .updatedAt(course.getUpdatedAt())
                 .createdAt(course.getCreatedAt())
                 .build();
     }
 
-    private SectionResponseDto toSectionResponseDto(Section section) {
-        return SectionResponseDto.builder()
+    private SectionResponse toSectionResponseDto(Section section) {
+        return SectionResponse.builder()
                 .id(section.getId())
                 .name(section.getName())
                 .duration(section.getDuration())
@@ -71,8 +73,8 @@ public class CourseMapper {
                 .build();
     }
 
-    private LessonResponseDto toLessonResponseDto(Lesson lesson) {
-        return LessonResponseDto.builder()
+    private LessonResponse toLessonResponseDto(Lesson lesson) {
+        return LessonResponse.builder()
                 .id(lesson.getId())
                 .name(lesson.getName())
                 .video(fileMapper.toFileResponseDto(lesson.getVideo()))
@@ -95,8 +97,8 @@ public class CourseMapper {
                 .build();
     } */
 
-    private ReviewResponseDto toReviewResponseDto(Review review) {
-        return ReviewResponseDto.builder()
+    private ReviewResponse toReviewResponseDto(Review review) {
+        return ReviewResponse.builder()
                 .rating(review.getRating())
                 .comment(review.getComment())
                 .username(review.getUser().getUsername())
@@ -105,16 +107,16 @@ public class CourseMapper {
                 .build();
     }
 
-    public CourseCategoryResponseDto toCourseCategoryResponseDto(Category category) {
-        return CourseCategoryResponseDto.builder()
+    public CategoryResponse toCourseCategoryResponseDto(Category category) {
+        return CategoryResponse.builder()
                 .id(category.getId())
                 .name(category.getName())
                 .shortDescription(category.getShortDescription())
                 .build();
     }
 
-    public EnrollmentCourseResponseDto toEnrollmentCourseResponseDto(Course course) {
-        return EnrollmentCourseResponseDto.builder()
+    public EnrollmentCourseResponse toEnrollmentCourseResponseDto(Course course) {
+        return EnrollmentCourseResponse.builder()
                 .id(course.getId())
                 .title(course.getTitle())
                 .instructor(course.getInstructor().getFullname())

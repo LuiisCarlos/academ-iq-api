@@ -3,6 +3,7 @@ package dev.luiiscarlos.academ_iq_api.features.review.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,11 +11,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewRequestDto;
-import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewResponseDto;
+import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewRequest;
+import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewResponse;
 import dev.luiiscarlos.academ_iq_api.features.review.service.ReviewService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -24,11 +26,11 @@ public class ReviewControlller {
     private final ReviewService reviewService;
 
     @PostMapping("/{id}")
-    public ResponseEntity<ReviewResponseDto> create(
+    public ResponseEntity<ReviewResponse> create(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId,
-            @RequestBody ReviewRequestDto requestDto) {
-        ReviewResponseDto responseDto = reviewService.save(token, courseId, requestDto);
+            @RequestBody ReviewRequest requestDto) {
+        ReviewResponse responseDto = reviewService.save(token, courseId, requestDto);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -37,10 +39,10 @@ public class ReviewControlller {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReviewResponseDto> retrieve(
+    public ResponseEntity<ReviewResponse> retrieve(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long courseId) {
-        ReviewResponseDto responseDto = reviewService.findByUserIdAndCourseId(token, courseId);
+        ReviewResponse responseDto = reviewService.findByUserIdAndCourseId(token, courseId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

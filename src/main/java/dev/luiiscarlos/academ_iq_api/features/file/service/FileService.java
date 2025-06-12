@@ -258,18 +258,4 @@ public class FileService {
 		return isVideoContentTypeValid(multiPartfile) && !isImageContentTypeValid(multiPartfile);
 	}
 
-	/* public Duration findDuration(String filename) {
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("resource_type", "video");
-			Map<?, ?> response = cloudinary.api().resource(filename, params);
-
-			Double duration = (Double) response.get("duration");
-
-			return Duration.ofSeconds(duration.intValue());
-		} catch (Exception e) {
-			throw new RuntimeException("Bebesita bebe lean");
-		}
-	} */
-
 }

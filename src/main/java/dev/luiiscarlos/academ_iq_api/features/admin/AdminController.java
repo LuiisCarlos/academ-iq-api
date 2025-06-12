@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.file.file.FileResponseDto;
+import dev.luiiscarlos.academ_iq_api.features.file.dto.FileResponse;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 import dev.luiiscarlos.academ_iq_api.features.user.service.UserService;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -45,7 +46,7 @@ public class AdminController {
     }
 
     @GetMapping("/{id}/avatar")
-    public ResponseEntity<FileResponseDto> findAvatarById(
+    public ResponseEntity<FileResponse> findAvatarById(
             @PathVariable("id") Long userId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -64,7 +65,7 @@ public class AdminController {
     }
 
     @PutMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<FileResponseDto> updateAvatarById(
+    public ResponseEntity<FileResponse> updateAvatarById(
             @PathVariable("id") Long userId,
             @RequestPart("avatar") MultipartFile file) {
         return ResponseEntity

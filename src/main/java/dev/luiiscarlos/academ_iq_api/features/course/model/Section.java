@@ -1,6 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.features.course.model;
 
-import java.time.LocalTime;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +42,8 @@ public class Section {
     private String name;
 
     @Builder.Default
-    @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-    private LocalTime duration = LocalTime.of(0, 0, 0);
+    @JsonFormat(shape = Shape.STRING)
+    private Duration duration = Duration.ZERO;
 
     @Builder.Default
     @OneToMany(mappedBy = "section", fetch = FetchType.LAZY , cascade = CascadeType.ALL, orphanRemoval = true)

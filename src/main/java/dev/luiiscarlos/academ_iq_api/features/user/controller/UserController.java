@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.file.file.FileResponseDto;
-import dev.luiiscarlos.academ_iq_api.features.user.dto.UpdatePassword;
+import dev.luiiscarlos.academ_iq_api.features.file.dto.FileResponse;
+import dev.luiiscarlos.academ_iq_api.features.user.dto.UpdatePasswordRequest;
 import dev.luiiscarlos.academ_iq_api.features.user.dto.UpdateRequest;
 import dev.luiiscarlos.academ_iq_api.features.user.dto.UserResponse;
 import dev.luiiscarlos.academ_iq_api.features.user.mapper.UserMapper;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
-import dev.luiiscarlos.academ_iq_api.features.user.service.UserServiceImpl;
+import dev.luiiscarlos.academ_iq_api.features.user.service.impl.UserServiceImpl;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -39,7 +40,7 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(userMapper.toResponseDto(userService.findByToken(token)));
+                .body(userMapper.toUserResponse(userService.findByToken(token)));
     }
 
     @PutMapping("/@me")
@@ -50,20 +51,20 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(userMapper.toResponseDto(userService.updateByToken(token, user)));
+                .body(userMapper.toUserResponse(userService.updateByToken(token, user)));
     }
 
     @PutMapping("/@me/change-password")
     public ResponseEntity<Void> updateCurrentUserPassword(
             @RequestHeader("Authorization") String token,
-            @RequestBody UpdatePassword passwordDto) {
+            @RequestBody UpdatePasswordRequest passwordDto) {
         userService.updatePasswordByToken(token, passwordDto);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PatchMapping(value = "/@me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<FileResponseDto> updateUserAvatar(
+    public ResponseEntity<FileResponse> updateUserAvatar(
             @RequestHeader("Authorization") String token,
             @RequestPart("avatar") MultipartFile file) {
         return ResponseEntity

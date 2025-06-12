@@ -4,15 +4,14 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.features.course.model.Course;
-import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.ProgressState;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,12 +39,10 @@ public class Enrollment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NonNull
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
@@ -58,31 +55,26 @@ public class Enrollment {
     @Column(columnDefinition = "jsonb")
     private ProgressState progressState = new ProgressState();
 
-    @Nullable
     @Builder.Default
     @Column(name = "is_favorite")
     private Boolean favorite = false;
 
-    @Nullable
     @Builder.Default
     @Column(name = "is_archived")
     private Boolean archived = false;
 
-    @Nullable
     @Builder.Default
     @Column(name = "is_completed")
     private Boolean completed = false;
 
-    @Nullable
+    @Column(name = "completed_at")
+    @JsonFormat(shape = Shape.STRING)
+    private LocalDateTime completedAt;
+
     @Builder.Default
     @Column(name = "enrolled_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    @JsonFormat(shape = Shape.STRING)
     private LocalDateTime enrolledAt = LocalDateTime.now();
-
-    @Nullable
-    @Column(name = "completed_at")
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime completedAt;
 
     public Boolean isFavorite() {
         return this.favorite;
