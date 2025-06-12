@@ -1,0 +1,35 @@
+package dev.luiiscarlos.academ_iq_api.core.config;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.cloudinary.Cloudinary;
+
+import io.github.cdimascio.dotenv.Dotenv;
+
+@Configuration
+public class CloudinaryConfig {
+
+    /**
+     * Creates and configure a Cloudinary bean to upload files
+     *
+     * @param dotenv the environment variables needed for configuration
+     * @return a cloudinary instance
+     */
+    @Bean
+    Cloudinary cloudinary(Dotenv dotenv) {
+        Map<String, Object> config = new HashMap<>();
+
+        config.put("cloud_name", dotenv.get("CLOUDINARY_NAME"));
+        config.put("api_key", dotenv.get("CLOUDINARY_KEY"));
+        config.put("api_secret", dotenv.get("CLOUDINARY_SECRET"));
+        config.put("secure", true);
+        config.put("connect_timeout", 30000);
+
+        return new Cloudinary(config);
+    }
+
+}
