@@ -87,16 +87,14 @@ public class AuthServiceImpl implements AuthService {
         user.setAuthorities(authorities);
         user.setAvatar(avatar);
 
-        user = userService.save(user);
-
-        log.info(String.format("User '%s' has successfully signed up at %s", user.getUsername(), LocalDateTime.now()));
+        User saved = userService.save(user);
 
         if (origin != null)
-            mailService.sendVerificationMail(user, origin);
-        else
-            user.setVerified(true);
+            mailService.sendVerificationMail(saved, origin);
 
-        return userMapper.toRegisterResponse(user);
+        log.info(String.format("User '%s' has successfully signed up at %s", saved.getUsername(), LocalDateTime.now()));
+
+        return userMapper.toRegisterResponse(saved);
     }
 
     public String refresh(String token) {
@@ -148,10 +146,10 @@ public class AuthServiceImpl implements AuthService {
                 "User '%s' has requested to recover the password at %s", user.getUsername(), LocalDateTime.now()));
     }
 
-    public void resetPassword(String token, ResetPasswordRequest passwordDto) {
+    public void resetPassword(String token, ResetPasswordRequest request) {
         tokenService.validate(token, "recover");
 
-        String encodedPassword = passwordEncoder.encode(passwordDto.getPassword());
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         User user = userService.findByToken(token);
         user.setPassword(ENCODED_PASSWORD_PREFIX + encodedPassword);

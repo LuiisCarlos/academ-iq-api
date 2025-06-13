@@ -7,6 +7,8 @@ import dev.luiiscarlos.academ_iq_api.core.validation.adult.Adult;
 import dev.luiiscarlos.academ_iq_api.core.validation.password.PasswordConfirmable;
 import dev.luiiscarlos.academ_iq_api.core.validation.password.PasswordMatches;
 
+import io.micrometer.common.lang.Nullable;
+
 import lombok.Data;
 
 @Data
@@ -25,6 +27,7 @@ public class RegisterRequest implements PasswordConfirmable {
 
     private String lastname;
 
+    @Nullable
     private String phone;
 
     @Adult

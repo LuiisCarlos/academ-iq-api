@@ -14,7 +14,7 @@ public class ErrorMessages {
 
     public static final String USER_AVATAR_NOT_FOUND = "User avatar";
 
-    public static final String USER_NOT_VERIFIED = "User account '%s' is not verified";
+    public static final String USER_NOT_VERIFIED = "User account '%s' not verified";
 
 
     public static final String COURSE_NOT_FOUND = "Course with ID '%d' not found";
@@ -85,6 +85,9 @@ public class ErrorMessages {
     public static final String MALFORMED_TOKEN = "Authentication failed: Malformed token";
 
     public static final String INVALID_TOKEN_TYPE = "Authentication failed: invalid token type";
+
+
+    public static final String TOKEN_GENERATION = "Failed to genere JSON Web Token";
 
 
     public static final String COURSE_ALREADY_EXISTS = "Course '%s' already exists";

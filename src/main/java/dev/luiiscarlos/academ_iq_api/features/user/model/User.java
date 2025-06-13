@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.model.Enrollment;
 import dev.luiiscarlos.academ_iq_api.features.file.model.File;
 import dev.luiiscarlos.academ_iq_api.features.user.security.Role;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -110,9 +111,9 @@ public class User implements UserDetails {
     private List<Enrollment> enrollments = new ArrayList<>();
 
     @JoinTable(name = "user_role_junction",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "role_id") })
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Set<Role> authorities;
 
     @Builder.Default

@@ -29,6 +29,9 @@ target/
 
 # Custom files
 .env
+*.env
+*.pem
 *.log
+**/keys/
 data/
 logs/

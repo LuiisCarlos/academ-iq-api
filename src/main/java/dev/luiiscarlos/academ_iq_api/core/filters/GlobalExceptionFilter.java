@@ -38,7 +38,7 @@ public class GlobalExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (Exception ex) {
-            ErrorHandler.setCustomErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorMessages.UNEXPECTED_ERROR);
+            ErrorHandler.createErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorMessages.UNEXPECTED_ERROR);
         }
     }
 

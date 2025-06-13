@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class ErrorHandler {
 
-    public static void setCustomErrorResponse(HttpServletResponse response, HttpStatus status, String message)
+    public static void createErrorResponse(HttpServletResponse response, HttpStatus status, String message)
             throws IOException {
         response.setStatus(status.value());
 

@@ -5,10 +5,9 @@ import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -16,6 +15,8 @@ import dev.luiiscarlos.academ_iq_api.core.exception.ErrorHandler;
 import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenTypeException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenService;
+import dev.luiiscarlos.academ_iq_api.features.user.model.User;
+import dev.luiiscarlos.academ_iq_api.features.user.service.impl.CustomUserDetailsService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
+
+    private final CustomUserDetailsService userDetailsService;
 
     /**
      * Filters the request and checks if the access token is valid and if it is,
@@ -46,34 +49,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
-        String endpoint = request.getRequestURI();
 
         if (token != null && token.startsWith("Bearer")) {
+            String endpoint = request.getRequestURI();
             tokenService.validate(token, null);
 
             Jwt jwt = tokenService.decode(token);
             Instant expiresAt = jwt.getExpiresAt();
             String tokenType = jwt.getClaimAsString("token_type");
+            String subject = jwt.getSubject();
 
             if (expiresAt != null && expiresAt.isBefore(Instant.now())) {
-                ErrorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
-                        ErrorMessages.EXPIRED_TOKEN);
+                ErrorHandler.createErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorMessages.EXPIRED_TOKEN);
                 return;
             }
 
-            if (isRefreshPath(endpoint)) {
-                if (!"refresh".equals(tokenType))
-                    throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
-            } else {
-                if (!"access".equals(tokenType)) {
-                    ErrorHandler.setCustomErrorResponse(response, HttpStatus.UNAUTHORIZED,
-                            ErrorMessages.INVALID_TOKEN_TYPE);
-                    return;
-                }
+            if (!isRefreshPath(endpoint) && !"access".equals(tokenType)) {
+                ErrorHandler.createErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorMessages.INVALID_TOKEN_TYPE);
+                return;
             }
 
-            Authentication authentication = new JwtAuthenticationToken(jwt);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (isRefreshPath(endpoint) && !"refresh".equals(tokenType)) {
+                throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
+            }
+
+            User currentUser = (User) userDetailsService.loadUserByUsername(subject);
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                    currentUser, null, currentUser.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
         filterChain.doFilter(request, response);
@@ -86,9 +89,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @return true if the path is a refresh path, false otherwise
      */
     private boolean isRefreshPath(String path) {
-        return path.contains("/auth/refresh") ||
-                path.contains("/auth/logout") ||
-                path.contains("/auth/verify");
+        return path.contains("/auth/refresh") || path.contains("/auth/logout") || path.contains("/auth/verify");
     }
 
 }

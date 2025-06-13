@@ -2,6 +2,7 @@ package dev.luiiscarlos.academ_iq_api.features.course.mapper;
 
 import dev.luiiscarlos.academ_iq_api.features.category.dto.CategoryResponse;
 import dev.luiiscarlos.academ_iq_api.features.category.model.Category;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.InstructorResponse;
 import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseResponse;
 import dev.luiiscarlos.academ_iq_api.features.course.dto.course.PublicCourseResponse;
 import dev.luiiscarlos.academ_iq_api.features.course.dto.lesson.LessonResponse;
@@ -13,6 +14,7 @@ import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentCourseRes
 import dev.luiiscarlos.academ_iq_api.features.file.mapper.FileMapper;
 import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewResponse;
 import dev.luiiscarlos.academ_iq_api.features.review.model.Review;
+import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 
 import org.springframework.stereotype.Component;
 
@@ -50,7 +52,7 @@ public class CourseMapper {
                 .title(course.getTitle())
                 .subtitle(course.getSubtitle())
                 .description(course.getDescription())
-                .instructor(course.getInstructor().getFullname())
+                .instructor(toInstructorResponse(course.getInstructor()))
                 .thumbnail(course.getThumbnail().getUrl())
                 .requirements(course.getRequirements())
                 .category(this.toCourseCategoryResponseDto(course.getCategory()))
@@ -78,6 +80,13 @@ public class CourseMapper {
                 .id(lesson.getId())
                 .name(lesson.getName())
                 .video(fileMapper.toFileResponseDto(lesson.getVideo()))
+                .build();
+    }
+
+    private InstructorResponse toInstructorResponse(User instructor) {
+        return InstructorResponse.builder()
+                .fullname(instructor.getFullname())
+                .avatar(instructor.getAvatar().getUrl())
                 .build();
     }
 

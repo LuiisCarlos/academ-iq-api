@@ -26,12 +26,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     @NonNull
     @EntityGraph(attributePaths = {
-            "category",
-            "category.benefits",
+            "category","category.benefits",
             "reviews",
             "requirements",
-            "sections",
-            "sections.lessons" })
+            "sections","sections.lessons",
+            "instructor", "instructor.avatar",
+            "thumbnail"})
     Optional<Course> findById(@NonNull Long id);
 
     List<Course> findByTitle(String title);

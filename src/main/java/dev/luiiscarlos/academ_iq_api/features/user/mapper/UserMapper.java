@@ -48,9 +48,12 @@ public class UserMapper {
     }
 
     public RegisterResponse toRegisterResponse(User user) {
+        String fullname = String.format("%s %s", user.getFirstname(), user.getLastname());
+
         return RegisterResponse.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
+                .fullname(fullname)
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
                 .phone(user.getPhone())

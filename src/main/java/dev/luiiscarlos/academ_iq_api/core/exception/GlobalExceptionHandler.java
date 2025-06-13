@@ -22,6 +22,7 @@ import dev.luiiscarlos.academ_iq_api.features.auth.exception.InvalidCredentialsE
 import dev.luiiscarlos.academ_iq_api.features.auth.exception.InvalidPasswordException;
 import dev.luiiscarlos.academ_iq_api.features.auth.exception.RoleNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenException;
+import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenTypeException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.RefreshTokenExpiredException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.RefreshTokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.CourseAlreadyExistsException;
@@ -91,7 +92,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler({
 			AuthenticationException.class,
 			InvalidTokenException.class,
-			InvalidCredentialsException.class })
+			InvalidCredentialsException.class,
+			InvalidTokenTypeException.class })
 	public ResponseEntity<ErrorResponse> handleUnauthorizedExceptions(Exception ex) {
 		String message = ex.getCause() != null
 				? ex.getCause().getLocalizedMessage()

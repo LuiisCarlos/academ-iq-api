@@ -27,77 +27,76 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/v1/auth")
 public class AuthController {
 
-    private final AuthService authService;
+	private final AuthService authService;
 
-    @GetMapping("/refresh")
-    public ResponseEntity<String> refresh(@RequestParam String token) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(authService.refresh(token));
-    }
+	@GetMapping("/refresh")
+	public ResponseEntity<String> refresh(@RequestParam String token) {
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(authService.refresh(token));
+	}
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
-            @RequestHeader("Origin") String origin,
-            @RequestBody Credentials credentials) {
+	@GetMapping("/verify")
+	public ResponseEntity<Void> verify(@RequestParam String token) {
+		authService.verify(token);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(authService.login(credentials, origin));
-    }
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.build();
+	}
 
-    @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(
-            @RequestHeader("Origin") String origin,
-            @Valid @RequestBody RegisterRequest userDto) {
+	@PostMapping("/login")
+	public ResponseEntity<LoginResponse> login(
+			@RequestBody Credentials credentials,
+			@RequestHeader("Origin") String origin) {
 
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(authService.login(credentials, origin));
+	}
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(authService.register(userDto, origin));
-    }
+	@PostMapping("/register")
+	public ResponseEntity<RegisterResponse> register(
+			@Valid @RequestBody RegisterRequest request,
+			@RequestHeader("Origin") String origin) {
 
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
-        authService.logout(token);
+		return ResponseEntity
+				.status(HttpStatus.CREATED)
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(authService.register(request, origin));
+	}
 
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .build();
-    }
+	@PostMapping("/logout")
+	public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
+		authService.logout(token);
 
-    @GetMapping("/verify")
-    public ResponseEntity<Void> verify(@RequestParam String token) {
-        authService.verify(token);
+		return ResponseEntity
+				.status(HttpStatus.NO_CONTENT)
+				.build();
+	}
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .build();
-    }
+	@PostMapping("/recover-password")
+	public ResponseEntity<Void> recoverPassword(
+			@RequestBody String email,
+			@RequestHeader("Origin") String origin) {
+		authService.recoverPassword(origin, email);
 
-    @PostMapping("/recover-password")
-    public ResponseEntity<Void> recoverPassword(
-            @RequestHeader("Origin") String origin,
-            @RequestBody String email) {
-        authService.recoverPassword(origin, email);
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.build();
+	}
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .build();
-    }
+	@PostMapping("/reset-password")
+	public ResponseEntity<Void> resetPassword(
+			@Valid @RequestBody ResetPasswordRequest request,
+			@RequestParam String token) {
+		authService.resetPassword(token, request);
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(
-            @RequestParam String token,
-            @Valid @RequestBody ResetPasswordRequest userDto) {
-        authService.resetPassword(token, userDto);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .build();
-    }
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.build();
+	}
 
 }

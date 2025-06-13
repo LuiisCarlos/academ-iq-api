@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenServiceImpl;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 import dev.luiiscarlos.academ_iq_api.shared.mail.exception.MailSendingException;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 

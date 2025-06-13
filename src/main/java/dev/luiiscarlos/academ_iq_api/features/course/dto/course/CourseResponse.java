@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.features.category.dto.CategoryResponse;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.InstructorResponse;
 import dev.luiiscarlos.academ_iq_api.features.course.dto.section.SectionResponse;
 import dev.luiiscarlos.academ_iq_api.features.course.model.Course.Level;
 import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewResponse;
@@ -27,7 +28,7 @@ public class CourseResponse {
 
     private String description;
 
-    private String instructor;
+    private InstructorResponse instructor;
 
     private String thumbnail;
 

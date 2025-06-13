@@ -2,22 +2,22 @@ package dev.luiiscarlos.academ_iq_api.shared.mail;
 
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class MailTemplateProcessor {
 
     private final TemplateEngine templateEngine;
 
-    public String buildTemplate(String templateName, Map<String, Object> variables) {
+    public String buildTemplate(String templateName, Map<String, Object> vars) {
         Context context = new Context();
 
-        variables.forEach(context::setVariable);
+        vars.forEach(context::setVariable);
 
         return templateEngine.process(templateName, context);
     }
