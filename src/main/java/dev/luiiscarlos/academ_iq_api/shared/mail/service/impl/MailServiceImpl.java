@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.shared.mail;
+package dev.luiiscarlos.academ_iq_api.shared.mail.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -6,12 +6,14 @@ import java.util.Map;
 
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenServiceImpl;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 import dev.luiiscarlos.academ_iq_api.shared.mail.exception.MailSendingException;
-
+import dev.luiiscarlos.academ_iq_api.shared.mail.service.MailService;
+import dev.luiiscarlos.academ_iq_api.shared.utils.TemplateProcessor;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
@@ -27,10 +29,11 @@ public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
 
-    private final MailTemplateProcessor mailTemplateProcessor;
+    private final TemplateProcessor mailTemplateProcessor;
 
+    @Async("mailExecutor")
     public void sendVerificationMail(User user, String origin) {
-        String verificationUrl = generateUrl(origin, "auth/verify", tokenService.generateVerificationToken(user));
+        String verificationUrl = this.buildUrl(origin, "auth/verify", tokenService.generateVerificationToken(user));
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -55,8 +58,9 @@ public class MailServiceImpl implements MailService {
                 "A verification e-mail has been sent to '%s' at %s", user.getUsername(), LocalDateTime.now()));
     }
 
-    public void sendPasswordResetMail(User user, String origin) {
-        String passwordResetUrl = generateUrl(origin, "auth/reset-password",
+    @Async("mailExecutor")
+    public void sendResetPasswordMail(User user, String origin) {
+        String resetPasswordUrl = this.buildUrl(origin, "auth/reset-password",
                 tokenService.generateRecoverPasswordToken(user));
 
         try {
@@ -64,7 +68,7 @@ public class MailServiceImpl implements MailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
             Map<String, Object> vars = new HashMap<>();
-            vars.put("passwordResetUrl", passwordResetUrl);
+            vars.put("passwordResetUrl", resetPasswordUrl);
 
             String htmlContent = mailTemplateProcessor.buildTemplate("password-reset.html", vars);
 
@@ -91,7 +95,7 @@ public class MailServiceImpl implements MailService {
      * @param token    the token to append to the URL
      * @return the generated URL
      */
-    private String generateUrl(String origin, String endpoint, String token) {
+    private String buildUrl(String origin, String endpoint, String token) {
         return origin + "/" + endpoint + "?token=" + token;
     }
 

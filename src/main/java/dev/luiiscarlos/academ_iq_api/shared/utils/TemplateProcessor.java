@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.shared.mail;
+package dev.luiiscarlos.academ_iq_api.shared.utils;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class MailTemplateProcessor {
+public class TemplateProcessor {
 
     private final TemplateEngine templateEngine;
 

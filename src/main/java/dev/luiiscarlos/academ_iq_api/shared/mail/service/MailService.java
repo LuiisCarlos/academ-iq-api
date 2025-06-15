@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.shared.mail;
+package dev.luiiscarlos.academ_iq_api.shared.mail.service;
 
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 import dev.luiiscarlos.academ_iq_api.shared.mail.exception.MailSendingException;
@@ -25,6 +25,6 @@ public interface MailService {
      * @param origin the origin of the request (e.g. http://localhost:8080)
      * @throws MailSendingException if there is an error sending the email
      */
-    void sendPasswordResetMail(User user, String origin);
+    void sendResetPasswordMail(User user, String origin);
 
 }
