@@ -24,6 +24,14 @@ public interface TokenService {
     RefreshToken findByToken(String token);
 
     /**
+     *
+     * @param token
+     * @param id
+     * @return
+     */
+    boolean existsByTokenAndUserId(String token, Long id); // TODO Documentate this
+
+    /**
      * Generates an access token for the given user
      *
      * @param {@link User} the user for whom the access token is generated
@@ -105,7 +113,7 @@ public interface TokenService {
      * @throws RefreshTokenNotFoundException if the refresh token is not found in
      *                                       the database
      */
-    String getTokenType(String token);
+    Object getClaim(String token, String claim);
 
     /**
      * Validates the provided token

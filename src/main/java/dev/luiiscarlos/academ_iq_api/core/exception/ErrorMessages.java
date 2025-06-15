@@ -26,6 +26,8 @@ public class ErrorMessages {
 
     public static final String REFRESH_TOKEN_NOT_FOUND = "Refresh token not found";
 
+    public static final String REFRESH_TOKEN_NOT_ASSOCIATED_WITH_USER = "No refresh token associated with user '%s'";
+
 
     public static final String FILE_MISSING = "File upload failed: no file provided";
 
@@ -84,10 +86,13 @@ public class ErrorMessages {
 
     public static final String MALFORMED_TOKEN = "Authentication failed: Malformed token";
 
-    public static final String INVALID_TOKEN_TYPE = "Authentication failed: invalid token type";
+    public static final String INVALID_TOKEN_TYPE = "Authentication failed: Invalid token type";
 
+    public static final String TOKEN_MISMATCH = "Authentication failed: Refresh token does not match stored token";
 
-    public static final String TOKEN_GENERATION = "Failed to genere JSON Web Token";
+    public static final String TOKEN_GENERATION = "Failed to generate JSON Web Token";
+
+    public static final String TOKEN_SUBJECT_NOT_FOUND = "Token subject '%s'  does not match any user record";
 
 
     public static final String COURSE_ALREADY_EXISTS = "Course '%s' already exists";

@@ -2,28 +2,11 @@ package dev.luiiscarlos.academ_iq_api.features.user.mapper;
 
 import org.springframework.stereotype.Component;
 
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterRequest;
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.LoginResponse;
-import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterResponse;
 import dev.luiiscarlos.academ_iq_api.features.user.dto.*;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 
 @Component
 public class UserMapper {
-
-    public User toModel(RegisterRequest dto) {
-        String fullname = String.format("%s %s", dto.getFirstname(), dto.getLastname());
-
-        return User.builder()
-                .username(dto.getUsername())
-                .email(dto.getEmail())
-                .fullname(fullname)
-                .firstname(dto.getFirstname())
-                .lastname(dto.getLastname())
-                .phone(dto.getPhone())
-                .birthdate(dto.getBirthdate())
-                .build();
-    }
 
     public User toModel(UpdateRequest dto) {
         return User.builder()
@@ -44,30 +27,6 @@ public class UserMapper {
                 .companyName(dto.getCompanyName())
                 .manager(dto.isManager())
                 .wantToUpgrade(dto.wantToUpgrade())
-                .build();
-    }
-
-    public RegisterResponse toRegisterResponse(User user) {
-        String fullname = String.format("%s %s", user.getFirstname(), user.getLastname());
-
-        return RegisterResponse.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .fullname(fullname)
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
-                .phone(user.getPhone())
-                .birthdate(user.getBirthdate())
-                .build();
-    }
-
-    public LoginResponse toLoginResponse(User user, String accessToken, String refreshToken) {
-        UserResponse userResponse = this.toUserResponse(user);
-
-        return LoginResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .user(userResponse)
                 .build();
     }
 

@@ -30,47 +30,45 @@ public class AuthController {
 	private final AuthService authService;
 
 	@GetMapping("/refresh")
-	public ResponseEntity<String> refresh(@RequestParam String token) {
+	public ResponseEntity<String> refresh(@RequestBody String refreshToken) {
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(authService.refresh(token));
+				.body(authService.refresh(refreshToken));
 	}
 
 	@GetMapping("/verify")
-	public ResponseEntity<Void> verify(@RequestParam String token) {
-		authService.verify(token);
+	public ResponseEntity<Void> verify(@RequestParam String verifyToken) {
+		authService.verify(verifyToken);
 
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.build();
 	}
 
-	@PostMapping("/login")
-	public ResponseEntity<LoginResponse> login(
-			@RequestBody Credentials credentials,
-			@RequestHeader("Origin") String origin) {
-
-		return ResponseEntity
-				.status(HttpStatus.OK)
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(authService.login(credentials, origin));
-	}
-
 	@PostMapping("/register")
 	public ResponseEntity<RegisterResponse> register(
 			@Valid @RequestBody RegisterRequest request,
 			@RequestHeader("Origin") String origin) {
-
 		return ResponseEntity
 				.status(HttpStatus.CREATED)
 				.contentType(MediaType.APPLICATION_JSON)
 				.body(authService.register(request, origin));
 	}
 
+	@PostMapping("/login")
+	public ResponseEntity<LoginResponse> login(
+			@RequestBody Credentials credentials,
+			@RequestHeader("Origin") String origin) {
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(authService.login(credentials, origin));
+	}
+
 	@PostMapping("/logout")
-	public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
-		authService.logout(token);
+	public ResponseEntity<Void> logout(@RequestBody String refreshToken) {
+		authService.logout(refreshToken);
 
 		return ResponseEntity
 				.status(HttpStatus.NO_CONTENT)
@@ -91,8 +89,8 @@ public class AuthController {
 	@PostMapping("/reset-password")
 	public ResponseEntity<Void> resetPassword(
 			@Valid @RequestBody ResetPasswordRequest request,
-			@RequestParam String token) {
-		authService.resetPassword(token, request);
+			@RequestParam String recoverToken) {
+		authService.resetPassword(recoverToken, request);
 
 		return ResponseEntity
 				.status(HttpStatus.OK)

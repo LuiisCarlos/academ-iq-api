@@ -17,7 +17,6 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
 import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
-import dev.luiiscarlos.academ_iq_api.features.auth.exception.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 
 import jakarta.transaction.Transactional;
@@ -38,6 +37,10 @@ public class TokenServiceImpl implements TokenService {
     public RefreshToken findByToken(String token) {
         return refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RefreshTokenNotFoundException(ErrorMessages.REFRESH_TOKEN_NOT_FOUND));
+    }
+
+    public boolean existsByTokenAndUserId(String token, Long  userId) {
+        return refreshTokenRepository.existsByTokenAndUserId(token, userId);
     }
 
     public String generateAccessToken(User user) {
@@ -121,11 +124,11 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
-    public String getTokenType(String token) {
+    public Object getClaim(String token, String claim) {
         token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
 
         try {
-            return jwtDecoder.decode(token).getClaimAsString("token_type");
+            return jwtDecoder.decode(token).getClaimAsString(claim);
         } catch (JwtException ex) {
             throw new InvalidTokenException(ErrorMessages.MALFORMED_TOKEN);
         }
@@ -133,12 +136,12 @@ public class TokenServiceImpl implements TokenService {
 
     public void validate(String token, @Nullable String tokenType) {
         if (token.isBlank() || token == null)
-            throw new AuthCredentialsNotFoundException(ErrorMessages.REQUIRED_TOKEN);
+            throw new TokenNotFoundException(ErrorMessages.REQUIRED_TOKEN);
 
         token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
 
         Instant expiresAt = this.getExpiresAt(token);
-        String type = this.getTokenType(token);
+        String type = (String) this.getClaim(token, "token_type");
 
         if (expiresAt == null || expiresAt.isBefore(Instant.now()))
             throw new RefreshTokenExpiredException(ErrorMessages.EXPIRED_TOKEN);
@@ -148,6 +151,8 @@ public class TokenServiceImpl implements TokenService {
     }
 
     public void invalidate(String token) {
+        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+
         if (refreshTokenRepository.existsByToken(token))
             refreshTokenRepository.deleteByToken(token);
     }

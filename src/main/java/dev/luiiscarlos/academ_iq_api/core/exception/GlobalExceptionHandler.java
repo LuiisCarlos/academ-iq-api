@@ -25,6 +25,7 @@ import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenExceptio
 import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenTypeException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.RefreshTokenExpiredException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.RefreshTokenNotFoundException;
+import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.CourseAlreadyExistsException;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.CourseNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.EnrollmentNotFoundException;
@@ -52,7 +53,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			RefreshTokenNotFoundException.class,
 			CourseNotFoundException.class,
 			EnrollmentNotFoundException.class,
-			SectionNotFoundException.class })
+			SectionNotFoundException.class,
+			TokenNotFoundException.class })
 	public ResponseEntity<ErrorResponse> handleNotFoundExceptions(Exception ex) {
 		String message = ex.getCause() != null
 				? ex.getCause().getLocalizedMessage()

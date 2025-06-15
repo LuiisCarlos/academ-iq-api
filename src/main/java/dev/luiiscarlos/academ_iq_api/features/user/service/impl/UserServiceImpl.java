@@ -161,7 +161,6 @@ public class UserServiceImpl implements UserService {
     public User findByToken(String token) {
         tokenService.validate(token, "access");
 
-        token = token.substring(7);
         String username = tokenService.getSubject(token);
 
         return userRepository.findByToken(token)

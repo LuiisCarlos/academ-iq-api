@@ -1,19 +1,15 @@
 package dev.luiiscarlos.academ_iq_api.features.auth.service;
 
-import org.springframework.lang.Nullable;
-
 import dev.luiiscarlos.academ_iq_api.features.auth.dto.LoginResponse;
 import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterRequest;
 import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterResponse;
 import dev.luiiscarlos.academ_iq_api.features.auth.dto.Credentials;
 import dev.luiiscarlos.academ_iq_api.features.auth.dto.ResetPasswordRequest;
-import dev.luiiscarlos.academ_iq_api.features.auth.exception.AuthCredentialsNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.auth.exception.InvalidCredentialsException;
-import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenException;
+import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.user.exception.UserAccountNotVerifiedException;
 import dev.luiiscarlos.academ_iq_api.features.user.exception.UserAlreadyExistsException;
-import dev.luiiscarlos.academ_iq_api.features.user.exception.UserUnderageException;
-import dev.luiiscarlos.academ_iq_api.features.user.exception.UserWithDifferentPasswordsException;
+import dev.luiiscarlos.academ_iq_api.features.user.exception.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 
 public interface AuthService {
@@ -21,78 +17,69 @@ public interface AuthService {
     static final String ENCODED_PASSWORD_PREFIX = "{bcrypt}";
 
     /**
+     * Refresh the access token for the refresh token given
+     *
+     * @param refreshToken the refresh token
+     * @return the new access token
+     */
+    String refresh(String refreshToken);
+
+    /**
+     * Verifies the user with a verify token
+     *
+     * @param verifyToken the token
+     * @throws UserNotFoundException if the user its not found with the token
+     *                               subject
+     */
+    void verify(String verifyToken);
+
+    /**
+     * Signs up a new user
+     *
+     * @param request {@link RegisterRequest} the user to register
+     * @param origin  the origin of the request
+     * @return {@link User} the registered user
+     * @throws UserAlreadyExistsException if the username already exists
+     */
+    RegisterResponse register(RegisterRequest request, String origin);
+
+    /**
      * Logs in a user using its username and password
      *
-     * @param credentials the user to login
+     * @param credentials {@link Credentials} the credentials of the user
      * @param origin      the origin of the request
      * @return {@link LoginResponse} the logged in user
      * @throws UserAccountNotVerifiedException if the user account is not verified
      * @throws InvalidCredentialsException     if the username or password is
      *                                         invalid
      */
-    LoginResponse login(Credentials credentials, @Nullable String origin);
+    LoginResponse login(Credentials credentials, String origin);
 
     /**
-     * Signs up a new user
+     * Logs out the current user and invalidates its refresh token
      *
-     * @param userToRegister the user to register
-     * @param origin         the origin of the request
-     * @return {@link User} the registered user
-     * @throws UserWithDifferentPasswordsException if the password and its
-     *                                             confirmation do not match
-     * @throws UserAlreadyExistsException          if the username already exists
-     * @throws UserUnderageException               if the user is underage
+     * @param refreshToken the refresh token
+     * @throws TokenNotFoundException if there is no associated token with the
+     *                                user in the database
      */
-    RegisterResponse register(RegisterRequest request, @Nullable String origin);
+    void logout(String refreshToken);
 
     /**
-     * Refresh the access token for the current user
+     * If the user account is verified, sends an email to recover its password
      *
-     * @param token the refresh token
-     * @return the new access token
-     * @throws AuthCredentialsNotFoundException if the token is null or blank
-     * @throws InvalidTokenException            if the token is invalid or expired
-     */
-    String refresh(String token);
-
-    /**
-     * Logout the current user and invalidate the refresh token
-     *
-     * @param token the refresh token
-     * @throws AuthCredentialsNotFoundException if the token is null or blank
-     * @throws InvalidTokenException            if the token is invalid or expired
-     */
-    void logout(String token);
-
-    /**
-     * Verifies the user's account by a token
-     *
-     * @param token the token
-     * @throws AuthCredentialsNotFoundException if the token is null or blank
-     * @throws InvalidTokenException            if the token is invalid or expired
-     */
-    void verify(String token);
-
-    /**
-     * If the user account is verified, can recover his password by its email
-     *
-     * @param email  the user's email
+     * @param email  the email of the user
      * @param origin the origin of the request
      * @throws UserAccountNotVerifiedException if the user account is not verified
      */
     void recoverPassword(String email, String origin);
 
     /**
-     * Change the password of the current user
+     * Changes the password of the current user
      *
-     * @param token       the recover token
-     * @param passwordDto the new password and its confirmation
-     * @throws AuthCredentialsNotFoundException    if the token is null or blank
-     * @throws InvalidTokenException               if the token is invalid or
-     *                                             expired
-     * @throws UserWithDifferentPasswordsException if the password and its
-     *                                             confirmation do not match
+     * @param recoverToken the recover token
+     * @param request      {@link ResetPasswordRequest} the new password and its
+     *                     confirmation
      */
-    void resetPassword(String token, ResetPasswordRequest passwordDto);
+    void resetPassword(String recoverToken, ResetPasswordRequest request);
 
 }
