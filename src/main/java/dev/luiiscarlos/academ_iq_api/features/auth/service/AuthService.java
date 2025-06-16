@@ -14,7 +14,7 @@ import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 
 public interface AuthService {
 
-    static final String ENCODED_PASSWORD_PREFIX = "{bcrypt}";
+    static final String BCRYPT_PREFIX = "{bcrypt}";
 
     /**
      * Refresh the access token for the refresh token given
@@ -58,11 +58,12 @@ public interface AuthService {
     /**
      * Logs out the current user and invalidates its refresh token
      *
+     * @param userId       the ID of the current authenticated user
      * @param refreshToken the refresh token
      * @throws TokenNotFoundException if there is no associated token with the
      *                                user in the database
      */
-    void logout(String refreshToken);
+    void logout(long userId, String refreshToken);
 
     /**
      * If the user account is verified, sends an email to recover its password

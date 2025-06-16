@@ -26,7 +26,6 @@ public class UserMapper {
                 .workExperience(dto.getWorkExperience())
                 .companyName(dto.getCompanyName())
                 .manager(dto.isManager())
-                .wantToUpgrade(dto.wantToUpgrade())
                 .build();
     }
 
@@ -52,7 +51,6 @@ public class UserMapper {
                 .companyName(user.getCompanyName())
                 .biography(user.getBiography())
                 .hours(user.getHours())
-                .wantToUpgrade(user.wantToUpgrade())
                 .manager(user.isManager())
                 .registeredAt(user.getRegisteredAt())
                 .build();

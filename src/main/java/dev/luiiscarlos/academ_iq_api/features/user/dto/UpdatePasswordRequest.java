@@ -1,5 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.features.user.dto;
 
+import dev.luiiscarlos.academ_iq_api.core.validation.password.Password;
 import dev.luiiscarlos.academ_iq_api.core.validation.password.PasswordConfirmable;
 import dev.luiiscarlos.academ_iq_api.core.validation.password.PasswordMatches;
 
@@ -11,6 +12,7 @@ public class UpdatePasswordRequest implements PasswordConfirmable {
 
     private String currentPassword;
 
+    @Password
     private String password;
 
     private String confirmPassword;

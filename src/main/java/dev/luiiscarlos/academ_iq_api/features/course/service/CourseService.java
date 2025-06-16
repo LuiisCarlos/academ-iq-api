@@ -7,29 +7,29 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.features.category.model.Category;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseRequest;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseResponse;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.PublicCourseResponse;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.lesson.LessonRequest;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.section.SectionRequest;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.CourseRequest;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.CourseResponse;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.PublicCourseResponse;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.CourseAlreadyExistsException;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.CourseNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.course.mapper.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.features.course.model.Course;
-import dev.luiiscarlos.academ_iq_api.features.course.model.Lesson;
-import dev.luiiscarlos.academ_iq_api.features.course.model.Section;
 import dev.luiiscarlos.academ_iq_api.features.course.model.Course.Level;
 import dev.luiiscarlos.academ_iq_api.features.course.repository.CourseRepository;
+import dev.luiiscarlos.academ_iq_api.features.course.structure.lesson.Lesson;
+import dev.luiiscarlos.academ_iq_api.features.course.structure.lesson.dto.LessonRequest;
+import dev.luiiscarlos.academ_iq_api.features.course.structure.section.Section;
+import dev.luiiscarlos.academ_iq_api.features.course.structure.section.section.SectionRequest;
 import dev.luiiscarlos.academ_iq_api.features.file.exception.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.features.file.model.File;
 import dev.luiiscarlos.academ_iq_api.features.file.service.FileService;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
-
-import jakarta.transaction.Transactional;
+import dev.luiiscarlos.academ_iq_api.shared.enums.FileType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,49 +38,48 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CourseService {
+public class CourseService { // TODO Fix documentation
 
     private final CourseRepository courseRepository;
 
-    private final FileService fileService;
-
     private final CourseMapper courseMapper;
+
+    private final FileService fileService;
 
     /**
      * Saves the course details and the files associated with it
      *
-     * @param courseDto the course details
-     * @param files     the files to be saved
+     * @param request the course details
+     * @param files   the files to be saved
      * @return {@link CourseResponse} the saved course
      * @throws CourseAlreadyExistsException if the course already exists
-     * @throws CourseNotFoundException      if the category does not exist
      * @throws InvalidFileTypeException     if the file is not a valid video
      */
-    public CourseResponse create(CourseRequest courseDto, Map<String, MultipartFile> files) {
-        if (courseRepository.existsByTitle(courseDto.getTitle()))
+    public CourseResponse create(CourseRequest request, Map<String, MultipartFile> files) {
+        if (courseRepository.existsByTitle(request.getTitle()))
             throw new CourseAlreadyExistsException(
-                    String.format(ErrorMessages.COURSE_ALREADY_EXISTS, courseDto.getTitle()));
+                    String.format(ErrorMessages.COURSE_ALREADY_EXISTS, request.getTitle()));
 
         File thumbnail;
         MultipartFile thumbPart = files.get("thumbnail");
         if (thumbPart != null && !thumbPart.isEmpty())
-            thumbnail = fileService.save(thumbPart, "thumbnail", false);
+            thumbnail = fileService.create(thumbPart, FileType.THUMBNAIL);
         else
-            thumbnail = fileService.findByFilename("default-course-thumbnail.jpg");
+            thumbnail = fileService.get("default-course-thumbnail.jpg");
 
         Course course = Course.builder()
-                .instructor(User.builder().id(courseDto.getUserId()).build())
-                .category(Category.builder().id(courseDto.getCategoryId()).build())
-                .title(courseDto.getTitle())
-                .subtitle(courseDto.getSubtitle())
-                .description(courseDto.getDescription())
-                .requirements(courseDto.getRequirements())
-                .level(Level.valueOf(courseDto.getLevel()))
+                .instructor(User.builder().id(request.getUserId()).build())
+                .category(Category.builder().id(request.getCategoryId()).build())
+                .title(request.getTitle())
+                .subtitle(request.getSubtitle())
+                .description(request.getDescription())
+                .requirements(request.getRequirements())
+                .level(Level.valueOf(request.getLevel()))
                 .thumbnail(thumbnail)
                 .sections(new ArrayList<>())
                 .build();
 
-        for (SectionRequest sectionDto : courseDto.getSections()) {
+        for (SectionRequest sectionDto : request.getSections()) {
             Section section = Section.builder()
                     .name(sectionDto.getName())
                     .course(course)
@@ -98,7 +97,7 @@ public class CourseService {
                 }
 
                 File video = (multipartFile != null && !multipartFile.isEmpty())
-                        ? fileService.save(multipartFile, "course", false)
+                        ? fileService.create(multipartFile, FileType.THUMBNAIL)
                         : null;
 
                 Lesson lesson = Lesson.builder()
@@ -137,7 +136,7 @@ public class CourseService {
      * @param courseId
      * @return
      */
-    public List<Long> findAllLessonIdsById(Long courseId) {
+    public List<Long> findAllLessonIdsById(long courseId) {
         List<Long> lessonsIds = courseRepository.findAllLessonIdsById(courseId);
 
         if (lessonsIds.isEmpty())
@@ -153,7 +152,7 @@ public class CourseService {
      * @return the course
      * @throws CourseNotFoundException if the course is not found
      */
-    public Course findById(Long courseId) {
+    public Course findById(long courseId) {
         return courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException(
                         "Failed to find course: Course not found with id " + courseId));
@@ -169,20 +168,17 @@ public class CourseService {
      * @throws CourseNotFoundException  if the course is not found
      * @throws InvalidFileTypeException if the file is not a valid video
      */
-    public CourseResponse updateById(
-            Long courseId,
-            CourseRequest courseDto,
-            Map<String, MultipartFile> files) {
+    public CourseResponse updateById(long courseId, CourseRequest request, Map<String, MultipartFile> files) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException("Course not found with id: " + courseId));
 
-        course.setInstructor(User.builder().id(courseDto.getUserId()).build());
-        course.setCategory(Category.builder().id(courseDto.getCategoryId()).build());
-        course.setTitle(courseDto.getTitle());
-        course.setSubtitle(courseDto.getSubtitle());
-        course.setDescription(courseDto.getDescription());
-        course.setRequirements(courseDto.getRequirements());
-        course.setLevel(Level.valueOf(courseDto.getLevel()));
+        course.setInstructor(User.builder().id(request.getUserId()).build());
+        course.setCategory(Category.builder().id(request.getCategoryId()).build());
+        course.setTitle(request.getTitle());
+        course.setSubtitle(request.getSubtitle());
+        course.setDescription(request.getDescription());
+        course.setRequirements(request.getRequirements());
+        course.setLevel(Level.valueOf(request.getLevel()));
 
         MultipartFile thumbPart = files.get("thumbnail");
 
@@ -191,7 +187,7 @@ public class CourseService {
         if (thumbPart != null && !thumbPart.isEmpty()) {
             filenamesToDelete.add(course.getThumbnail().getFilename());
 
-            File thumbnail = fileService.save(thumbPart, "thumbnail", false);
+            File thumbnail = fileService.create(thumbPart, FileType.THUMBNAIL);
             thumbnail.setUpdatedAt(LocalDateTime.now());
             course.setThumbnail(thumbnail);
         }
@@ -207,7 +203,7 @@ public class CourseService {
         }
 
         course.getSections().clear();
-        for (SectionRequest sectionDto : courseDto.getSections()) {
+        for (SectionRequest sectionDto : request.getSections()) {
             Section section = Section.builder()
                     .name(sectionDto.getName())
                     .course(course)
@@ -224,7 +220,7 @@ public class CourseService {
                 }
 
                 File video = (multipartFile != null && !multipartFile.isEmpty())
-                        ? fileService.save(multipartFile, "course",  false)
+                        ? fileService.create(multipartFile, FileType.COURSE_VIDEO)
                         : new File();
 
                 Lesson lesson = Lesson.builder()
@@ -242,7 +238,7 @@ public class CourseService {
         Course updated = courseRepository.save(course);
 
         for (String filename : filenamesToDelete)
-            fileService.deleteByFilename(filename);
+            fileService.get(filename);
 
         return courseMapper.toResponseDto(updated);
     }

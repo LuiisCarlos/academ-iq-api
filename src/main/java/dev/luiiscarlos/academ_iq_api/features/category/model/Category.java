@@ -3,6 +3,7 @@ package dev.luiiscarlos.academ_iq_api.features.category.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.luiiscarlos.academ_iq_api.features.category.structure.Benefit;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

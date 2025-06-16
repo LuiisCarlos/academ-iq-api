@@ -1,9 +1,8 @@
-package dev.luiiscarlos.academ_iq_api.features.course.dto.course;
+package dev.luiiscarlos.academ_iq_api.features.course.dto;
 
 import java.util.List;
 
-import dev.luiiscarlos.academ_iq_api.features.course.dto.section.SectionRequest;
-
+import dev.luiiscarlos.academ_iq_api.features.course.structure.section.section.SectionRequest;
 import lombok.Data;
 
 @Data

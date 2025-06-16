@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.features.category.model.Category;
+import dev.luiiscarlos.academ_iq_api.features.course.structure.section.Section;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.model.Enrollment;
 import dev.luiiscarlos.academ_iq_api.features.file.model.File;
 import dev.luiiscarlos.academ_iq_api.features.review.model.Review;

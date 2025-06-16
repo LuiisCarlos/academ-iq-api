@@ -1,5 +1,6 @@
 package dev.luiiscarlos.academ_iq_api.features.auth.dto;
 
+import dev.luiiscarlos.academ_iq_api.core.validation.password.Password;
 import dev.luiiscarlos.academ_iq_api.core.validation.password.PasswordConfirmable;
 import dev.luiiscarlos.academ_iq_api.core.validation.password.PasswordMatches;
 
@@ -9,6 +10,7 @@ import lombok.Data;
 @PasswordMatches
 public class ResetPasswordRequest implements PasswordConfirmable {
 
+    @Password
     private String password;
 
     private String confirmPassword;

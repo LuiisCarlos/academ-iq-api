@@ -32,8 +32,8 @@ public class FileController {
 	public ResponseEntity<Resource> findResourceByFilename(
 			@PathVariable String filename,
 			@RequestHeader(value = "Authorization", required = false) String token) {
-		Resource resource = fileService.findResourceByFilename(filename);
-		File file = fileService.findByFilename(filename);
+		Resource resource = fileService.getResource(filename);
+		File file = fileService.get(filename);
 
 		String contentType = file.getContentType();
 

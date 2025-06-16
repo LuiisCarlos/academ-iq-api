@@ -28,8 +28,8 @@ import dev.luiiscarlos.academ_iq_api.features.auth.security.RefreshTokenNotFound
 import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.CourseAlreadyExistsException;
 import dev.luiiscarlos.academ_iq_api.features.course.exception.CourseNotFoundException;
-import dev.luiiscarlos.academ_iq_api.features.course.exception.EnrollmentNotFoundException;
-import dev.luiiscarlos.academ_iq_api.features.course.exception.SectionNotFoundException;
+import dev.luiiscarlos.academ_iq_api.features.course.structure.section.SectionNotFoundException;
+import dev.luiiscarlos.academ_iq_api.features.enrollment.exception.EnrollmentNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.file.exception.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.file.exception.FileStorageException;
 import dev.luiiscarlos.academ_iq_api.features.file.exception.InvalidFileTypeException;

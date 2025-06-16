@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import dev.luiiscarlos.academ_iq_api.core.exception.ErrorHandler;
-import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -38,7 +37,7 @@ public class GlobalExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (Exception ex) {
-            ErrorHandler.createErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorMessages.UNEXPECTED_ERROR);
+            ErrorHandler.createErrorResponse(response, HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
 

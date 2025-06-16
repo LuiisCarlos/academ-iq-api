@@ -99,12 +99,13 @@ public class User implements UserDetails {
     @Column(name = "is_manager")
     private Boolean manager;
 
-    @Column(name = "want_to_upgrade")
-    private Boolean wantToUpgrade;
-
     @Builder.Default
     @Column(name = "is_verified")
     private Boolean verified = false;
+
+    @Builder.Default
+    @Column(name ="is_enabled")
+    private Boolean enabled = Boolean.TRUE;
 
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -128,7 +129,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return this.authorities;
     }
 
     public Boolean isVerified() {
@@ -139,8 +140,9 @@ public class User implements UserDetails {
         return this.manager;
     }
 
-    public Boolean wantToUpgrade() {
-        return this.wantToUpgrade;
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
     }
 
 }

@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.features.course.dto.course;
+package dev.luiiscarlos.academ_iq_api.features.course.dto;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

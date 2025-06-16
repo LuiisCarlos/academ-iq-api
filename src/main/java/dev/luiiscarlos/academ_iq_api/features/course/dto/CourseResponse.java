@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.features.course.dto.course;
+package dev.luiiscarlos.academ_iq_api.features.course.dto;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -8,11 +8,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.features.category.dto.CategoryResponse;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.InstructorResponse;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.section.SectionResponse;
 import dev.luiiscarlos.academ_iq_api.features.course.model.Course.Level;
+import dev.luiiscarlos.academ_iq_api.features.course.structure.section.section.SectionResponse;
 import dev.luiiscarlos.academ_iq_api.features.review.dto.ReviewResponse;
-
 import lombok.Builder;
 import lombok.Data;
 

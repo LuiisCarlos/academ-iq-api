@@ -8,20 +8,19 @@ import java.util.stream.Collectors;
 
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import dev.luiiscarlos.academ_iq_api.features.course.exception.EnrollmentNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.features.course.service.CourseService;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentResponse;
+import dev.luiiscarlos.academ_iq_api.features.enrollment.exception.EnrollmentNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.mapper.EnrollmentMapper;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.model.CompletedLesson;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.model.Enrollment;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.model.ProgressState;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.repository.EnrollmentRepository;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
-import dev.luiiscarlos.academ_iq_api.features.user.service.impl.UserServiceImpl;
-
-import jakarta.transaction.Transactional;
+import dev.luiiscarlos.academ_iq_api.features.user.service.impl.UserQueryService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,30 +29,28 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class EnrollmentService {
+public class EnrollmentService { // TODO Fix documentation
 
     private final EnrollmentRepository enrollmentRepository;
 
     private final EnrollmentMapper enrollmentMapper;
 
-    private final UserServiceImpl userService;
+    private final UserQueryService userQueryService;
 
     private final CourseService courseService;
 
     /**
      * Creates a new enrollment for a user in a specific course
      *
-     * @param token    the authentication token of the user
+     * @param user     the current authenticated user
      * @param courseId the ID of the course
      * @param flags    a map containing optional enrollment flags
-     *
      * @return an {@link Enrollment} the newly created enrollment
-     *
      * @throws EnrollmentNotFoundException if the user is already enrolled in the
      *                                     course
      */
-    public Enrollment create(String token, Long courseId, @Nullable Map<String, Boolean> flags) {
-        User user = userService.findByToken(token);
+    public Enrollment create(long userId, long courseId, @Nullable Map<String, Boolean> args) {
+        User user = userQueryService.findById(userId);
         Course course = courseService.findById(courseId);
 
         if (enrollmentRepository.existsByUserIdAndCourseId(user.getId(), courseId))
@@ -65,36 +62,22 @@ public class EnrollmentService {
                 .course(course)
                 .build();
 
-        if (flags != null)
-            enrollment.setFavorite(flags.getOrDefault("isFavorite", false));
+        if (args != null)
+            enrollment.setFavorite(args.getOrDefault("isFavorite", false));
 
         return enrollmentRepository.save(enrollment);
     }
 
     /**
-     *
-     * @param token
-     * @param courseId
-     * @return
-     */
-    public Enrollment findOrCreate(String token, Long courseId) {
-        User user = userService.findByToken(token);
-        return enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId)
-                .orElseGet(() -> create(token, courseId, null));
-    }
-
-    /**
      * Retrieves the list of enrollments for a specific user
      *
-     * @param token the authentication token of the user
-     *
+     * @param userId the ID of the authenticated user
      * @return an {@link EnrollmentResponse} containing enrollment data
-     *
      * @throws EnrollmentNotFoundException if no enrollments found for the given
      *                                     user
      */
-    public List<EnrollmentResponse> findAllByUserId(String token) {
-        User user = userService.findByToken(token);
+    public List<EnrollmentResponse> getAll(long userId) {
+        User user = userQueryService.findById(userId);
         List<Enrollment> enrollments = enrollmentRepository.findAllByUserId(user.getId());
 
         if (enrollments.isEmpty() || enrollments == null)
@@ -110,20 +93,30 @@ public class EnrollmentService {
      *
      * @param token    the authentication token of the user
      * @param courseId the ID of the course
-     *
      * @return an {@link EnrollmentResponse} containing enrollment data
-     *
      * @throws EnrollmentNotFoundException if no enrollment is found for the given
      *                                     user and course
      */
-    public EnrollmentResponse findByUserIdAndCourseId(String token, Long courseId) {
-        User user = userService.findByToken(token);
-
+    public EnrollmentResponse get(long userId, long courseId) {
+        User user = userQueryService.findById(userId);
         Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId)
                 .orElseThrow(() -> new EnrollmentNotFoundException(
                         "Failed to find enrollment: Enrollment not found with course id: " + courseId));
 
         return enrollmentMapper.toEnrollmentResponse(enrollment);
+    }
+
+    /**
+     *
+     * @param token
+     * @param courseId
+     * @return
+     */
+    public Enrollment getOrCreate(long userId, long courseId) {
+        User user = userQueryService.findById(userId);
+        return enrollmentRepository
+                .findByUserIdAndCourseId(user.getId(), courseId)
+                .orElseGet(() -> this.create(userId, courseId, null));
     }
 
     /**
@@ -133,24 +126,23 @@ public class EnrollmentService {
      * @param token    the authentication token of the user
      * @param courseId the ID of the course
      * @param updates  a map containing the fields to update and their new values
-     *
      * @throws EnrollmentNotFoundException if no enrollment is found for the given
      *                                     user and course
      */
-    public Enrollment updateByUserIdAndCourseId(String token, Long courseId, Map<String, Boolean> updates) {
-        User user = userService.findByToken(token);
+    public Enrollment update(long userId, long courseId, Map<String, Boolean> args) {
+        User user = userQueryService.findById(userId);
         Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId)
                 .orElseThrow(() -> new EnrollmentNotFoundException(
                         "Failed to update enrollment: Enrollment not found with course id " + courseId));
 
-        if (updates.containsKey("isFavorite"))
-            enrollment.setFavorite(updates.get("isFavorite"));
+        if (args.containsKey("isFavorite"))
+            enrollment.setFavorite(args.get("isFavorite"));
 
-        if (updates.containsKey("isArchived"))
-            enrollment.setArchived(updates.get("isArchived"));
+        if (args.containsKey("isArchived"))
+            enrollment.setArchived(args.get("isArchived"));
 
-        if (updates.containsKey("isCompleted")) {
-            enrollment.setCompleted(updates.get("isCompleted"));
+        if (args.containsKey("isCompleted")) {
+            enrollment.setCompleted(args.get("isCompleted"));
             enrollment.setProgress(1.0);
             enrollment.setCompletedAt(LocalDateTime.now());
         }
@@ -161,19 +153,20 @@ public class EnrollmentService {
     /**
      *
      */
-    public Enrollment patchProgressState(String token, Long courseId, Map<String, Object> updates) {
-        Enrollment enrollment = findOrCreate(token, courseId);
+    public Enrollment patchProgress(long userId, long courseId, Map<String, Object> args) {
+        Enrollment enrollment = this.getOrCreate(userId, courseId);
         ProgressState progressState = enrollment.getProgressState();
 
-        Long sectionId = Long.valueOf((int) updates.get("sectionId"));
-        Long lessonId = Long.valueOf((int) updates.get("lessonId"));
-        Boolean isCompleted = (Boolean) updates.get("isCompleted");
+        long sectionId = (long) args.get("sectionId");
+        long lessonId = (long) args.get("lessonId");
+        Boolean isCompleted = (Boolean) args.get("isCompleted");
 
         progressState.setCurrentSectionId(sectionId);
         progressState.setCurrentLessonId(lessonId);
 
         if (isCompleted) {
-            boolean alreadyCompleted = progressState.getCompletedLessons().stream()
+            boolean alreadyCompleted = progressState.getCompletedLessons()
+                    .stream()
                     .anyMatch(cl -> cl.getSectionId().equals(sectionId) && cl.getLessonId().equals(lessonId));
 
             if (!alreadyCompleted) {
@@ -182,7 +175,6 @@ public class EnrollmentService {
                 completedLesson.setLessonId(lessonId);
                 completedLesson.setCompletedAt(LocalDateTime.now());
                 progressState.getCompletedLessons().add(completedLesson);
-
             }
         }
 
@@ -196,12 +188,11 @@ public class EnrollmentService {
      *
      * @param token    the authentication token of the user
      * @param courseId the ID of the course
-     *
      * @throws EnrollmentNotFoundException if no enrollment is found for the given
      *                                     user and course
      */
-    public void deleteByUserIdAndCourseId(String token, Long courseId) {
-        User user = userService.findByToken(token);
+    public void delete(long userId, long courseId) {
+        User user = userQueryService.findById(userId);
 
         if (!enrollmentRepository.existsByUserIdAndCourseId(user.getId(), courseId))
             throw new EnrollmentNotFoundException(
@@ -214,7 +205,7 @@ public class EnrollmentService {
      *
      * @param enrollment
      */
-    private void checkCourseCompletion(Enrollment enrollment) {
+    private void checkCourseCompletion(Enrollment enrollment) { // TODO Documentate this
         List<Long> allLessonIds = courseService.findAllLessonIdsById(enrollment.getCourse().getId());
 
         if (allLessonIds.isEmpty()) {

@@ -24,7 +24,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     })
     List<Course> findAll();
 
-    @NonNull
     @EntityGraph(attributePaths = {
             "category","category.benefits",
             "reviews",
@@ -32,7 +31,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "sections","sections.lessons",
             "instructor", "instructor.avatar",
             "thumbnail"})
-    Optional<Course> findById(@NonNull Long id);
+    Optional<Course> findById(long id);
 
     List<Course> findByTitle(String title);
 
@@ -42,7 +41,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Boolean existsByTitle(String title);
 
-    @Query("SELECT l.id FROM Course c JOIN c.sections s JOIN s.lessons l WHERE c.id = :courseId")
-    List<Long> findAllLessonIdsById(@Param("courseId") Long courseId);
+    @Query("SELECT l.id FROM Course c JOIN c.sections s JOIN s.lessons l WHERE c.id = :id")
+    List<Long> findAllLessonIdsById(@Param("id") long courseId);
 
 }

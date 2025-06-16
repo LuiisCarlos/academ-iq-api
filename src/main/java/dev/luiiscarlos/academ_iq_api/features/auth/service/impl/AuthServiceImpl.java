@@ -3,9 +3,9 @@ package dev.luiiscarlos.academ_iq_api.features.auth.service.impl;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.features.auth.dto.LoginResponse;
@@ -14,20 +14,21 @@ import dev.luiiscarlos.academ_iq_api.features.auth.dto.RegisterResponse;
 import dev.luiiscarlos.academ_iq_api.features.auth.dto.Credentials;
 import dev.luiiscarlos.academ_iq_api.features.auth.dto.ResetPasswordRequest;
 import dev.luiiscarlos.academ_iq_api.features.auth.exception.InvalidCredentialsException;
+import dev.luiiscarlos.academ_iq_api.features.auth.mapper.AuthMapper;
+import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenService;
 import dev.luiiscarlos.academ_iq_api.features.auth.service.AuthService;
 import dev.luiiscarlos.academ_iq_api.features.file.model.File;
 import dev.luiiscarlos.academ_iq_api.features.file.service.FileService;
 import dev.luiiscarlos.academ_iq_api.features.user.exception.UserAccountNotVerifiedException;
 import dev.luiiscarlos.academ_iq_api.features.user.exception.UserAlreadyExistsException;
-import dev.luiiscarlos.academ_iq_api.features.user.mapper.UserMapper;
+import dev.luiiscarlos.academ_iq_api.features.user.exception.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 import dev.luiiscarlos.academ_iq_api.features.user.security.Role;
 import dev.luiiscarlos.academ_iq_api.features.user.security.RoleService;
-import dev.luiiscarlos.academ_iq_api.features.user.service.UserService;
-import dev.luiiscarlos.academ_iq_api.shared.mail.MailService;
-
-import jakarta.transaction.Transactional;
+import dev.luiiscarlos.academ_iq_api.features.user.service.impl.UserQueryService;
+import dev.luiiscarlos.academ_iq_api.shared.enums.RoleType;
+import dev.luiiscarlos.academ_iq_api.shared.mail.service.MailService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,9 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final UserService userService;
+    private final UserQueryService userQueryService;
+
+    private final AuthMapper authMapper;
 
     private final TokenService tokenService;
 
@@ -50,114 +53,115 @@ public class AuthServiceImpl implements AuthService {
 
     private final FileService fileService;
 
-    private final UserMapper userMapper;
+    public String refresh(String refreshToken) {
+        tokenService.validate(refreshToken, "refresh");
 
-    public LoginResponse login(Credentials credentials, @Nullable String origin) {
-        User user = userService.findByUsername(credentials.getUsername());
+        String refreshedAccessToken = tokenService.refreshAccessToken(refreshToken);
+        String username = tokenService.getSubject(refreshToken);
+
+        log.info("User '{}' has successfully refreshed the access token at {}", username, LocalDateTime.now());
+
+        return refreshedAccessToken;
+    }
+
+    public void verify(String verifyToken) {
+        tokenService.validate(verifyToken, "verify");
+
+        String username = tokenService.getSubject(verifyToken);
+        if (!userQueryService.existsByUsername(username))
+            throw new UserNotFoundException(String.format(ErrorMessages.TOKEN_SUBJECT_NOT_FOUND, username));
+
+        User user = userQueryService.findByUsername(username);
+        user.setVerified(true);
+
+        userQueryService.save(user);
+
+        log.info("User '{}' has successfully verified the account at {}", user.getUsername(), LocalDateTime.now());
+    }
+
+    public RegisterResponse register(RegisterRequest request, String origin) {
+        if (userQueryService.existsByUsername(request.getUsername()))
+            throw new UserAlreadyExistsException(ErrorMessages.INVALID_CREDENTIALS);
+
+        String encodedPassword = BCRYPT_PREFIX + passwordEncoder.encode(request.getPassword());
+        Set<Role> authorities = Set.of(roleService.findByAuthority(RoleType.USER));
+        File avatar = fileService.get("default-user-avatar_nsfvaz");
+
+        User user = authMapper.toModel(request);
+        user.setPassword(encodedPassword);
+        user.setAuthorities(authorities);
+        user.setAvatar(avatar);
+
+        userQueryService.save(user);
+
+        log.info("User '{}' has successfully signed up at {}", user.getUsername(), LocalDateTime.now());
+
+        mailService.sendVerificationMail(user, origin);
+
+        return authMapper.toRegisterResponse(user);
+    }
+
+    public LoginResponse login(Credentials credentials, String origin) {
+        User user = userQueryService.findByUsername(credentials.getUsername());
 
         if (!passwordEncoder.matches(credentials.getPassword(),
-                user.getPassword().substring(ENCODED_PASSWORD_PREFIX.length())))
+                user.getPassword().substring(BCRYPT_PREFIX.length())))
             throw new InvalidCredentialsException(ErrorMessages.INVALID_CREDENTIALS);
 
-        if (!user.isVerified() && origin != null) {
+        if (!user.isVerified()) {
             mailService.sendVerificationMail(user, origin);
-            throw new UserAccountNotVerifiedException(String.format(
-                    ErrorMessages.USER_NOT_VERIFIED, credentials.getUsername()));
+            throw new UserAccountNotVerifiedException(
+                    String.format(ErrorMessages.USER_NOT_VERIFIED, credentials.getUsername()));
         }
 
         String accessToken = tokenService.generateAccessToken(user);
         String refreshToken = tokenService.generateRefreshToken(user).getToken();
 
-        log.info(String.format(
-                "User '%s' has successfully logged in at %s", credentials.getUsername(), LocalDateTime.now()));
+        log.info("User '{}' has successfully logged in at {}", credentials.getUsername(), LocalDateTime.now());
 
-        return userMapper.toLoginResponse(user, accessToken, refreshToken);
+        return authMapper.toLoginResponse(user, accessToken, refreshToken);
     }
 
-    public RegisterResponse register(RegisterRequest request, @Nullable String origin) {
-        if (userService.existsByUsername(request.getUsername()))
-            throw new UserAlreadyExistsException(ErrorMessages.INVALID_CREDENTIALS);
+    public void logout(long userId, String refreshToken) {
+        User user = userQueryService.findById(userId);
 
-        String encodedPassword = ENCODED_PASSWORD_PREFIX + passwordEncoder.encode(request.getPassword());
-        Set<Role> authorities = Set.of(roleService.findByAuthority("USER"));
-        File avatar = fileService.findByFilename("default-user-avatar_nsfvaz");
+        if (!tokenService.existsByTokenAndUserId(refreshToken, user.getId()))
+            throw new TokenNotFoundException(
+                    String.format(ErrorMessages.REFRESH_TOKEN_NOT_ASSOCIATED_WITH_USER, user.getUsername()));
 
-        User user = userMapper.toModel(request);
-        user.setPassword(encodedPassword);
-        user.setAuthorities(authorities);
-        user.setAvatar(avatar);
-
-        User saved = userService.save(user);
-
-        if (origin != null)
-            mailService.sendVerificationMail(saved, origin);
-
-        log.info(String.format("User '%s' has successfully signed up at %s", saved.getUsername(), LocalDateTime.now()));
-
-        return userMapper.toRegisterResponse(saved);
-    }
-
-    public String refresh(String token) {
-        tokenService.validate(token, "refresh");
-
-        log.info(String.format("User '%s' has successfully refreshed the access token at %s",
-                tokenService.getSubject(token), LocalDateTime.now()));
-
-        return tokenService.refreshAccessToken(token);
-    }
-
-    public void logout(String token) {
-        tokenService.validate(token, "refresh");
-
-        token = token.startsWith("Bearer ") ? token.substring(7) : token;
-
-        String refreshToken = tokenService.findByToken(token).getToken();
-        User user = userService.findByToken(token);
-
+        tokenService.validate(refreshToken, "refresh");
         tokenService.invalidate(refreshToken);
 
-        log.info(String.format("User '%s' has successfully logged out at %s", user.getUsername(), LocalDateTime.now()));
-    }
+        log.info("User '{}' has successfully logged out at {}", user.getUsername(), LocalDateTime.now());
 
-    public void verify(String token) {
-        tokenService.validate(token, "verify");
-
-        User user = userService.findByToken(token);
-        user.setVerified(true);
-
-        userService.save(user);
-
-        log.info(String.format(
-                "User '%s' has successfully verified the account at %s", user.getUsername(), LocalDateTime.now()));
     }
 
     public void recoverPassword(String email, String origin) {
-        User user = userService.findByEmail(email);
+        User user = userQueryService.findByEmail(email);
 
         if (!user.isVerified()) {
             mailService.sendVerificationMail(user, origin);
-            throw new UserAccountNotVerifiedException(String.format(
-                    ErrorMessages.USER_NOT_VERIFIED, email));
+            throw new UserAccountNotVerifiedException(
+                    String.format(ErrorMessages.USER_NOT_VERIFIED, email));
         }
 
-        mailService.sendPasswordResetMail(user, origin);
+        mailService.sendResetPasswordMail(user, origin);
 
-        log.info(String.format(
-                "User '%s' has requested to recover the password at %s", user.getUsername(), LocalDateTime.now()));
+        log.info("User '{}' has requested to recover the password at {}", user.getUsername(), LocalDateTime.now());
     }
 
-    public void resetPassword(String token, ResetPasswordRequest request) {
-        tokenService.validate(token, "recover");
+    public void resetPassword(String recoverToken, ResetPasswordRequest request) {
+        tokenService.validate(recoverToken, "recover");
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
+        String username = tokenService.getSubject(recoverToken);
 
-        User user = userService.findByToken(token);
-        user.setPassword(ENCODED_PASSWORD_PREFIX + encodedPassword);
+        User user = userQueryService.findByUsername(username);
+        user.setPassword(BCRYPT_PREFIX + encodedPassword);
 
-        userService.save(user);
+        userQueryService.save(user);
 
-        log.info(String.format(
-                "User '%s' has successfully reseted the password at %s", user.getUsername(), LocalDateTime.now()));
+        log.info("User '{}' has successfully reseted the password at {}", user.getUsername(), LocalDateTime.now());
     }
 
 }

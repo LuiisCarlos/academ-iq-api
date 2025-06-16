@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.features.course.model;
+package dev.luiiscarlos.academ_iq_api.features.course.structure.section;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -7,6 +7,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
+import dev.luiiscarlos.academ_iq_api.features.course.model.Course;
+import dev.luiiscarlos.academ_iq_api.features.course.structure.lesson.Lesson;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

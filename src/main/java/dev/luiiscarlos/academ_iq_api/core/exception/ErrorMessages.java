@@ -12,6 +12,8 @@ public class ErrorMessages {
 
     public static final String USER_NOT_FOUND_BY_NAME = "User with name '%s' not found";
 
+    public static final String USER_NOT_FOUND_BY_EMAIL = "User with email '%s' not found";
+
     public static final String USER_AVATAR_NOT_FOUND = "User avatar";
 
     public static final String USER_NOT_VERIFIED = "User account '%s' not verified";
@@ -25,6 +27,8 @@ public class ErrorMessages {
 
 
     public static final String REFRESH_TOKEN_NOT_FOUND = "Refresh token not found";
+
+    public static final String REFRESH_TOKEN_NOT_FOUND_BY_USER = "Refresh token not found for user with ID: '%d'";
 
     public static final String REFRESH_TOKEN_NOT_ASSOCIATED_WITH_USER = "No refresh token associated with user '%s'";
 
@@ -46,7 +50,6 @@ public class ErrorMessages {
     public static final String FILE_DELETION_BY_NAME = "Failed to delete file with name '%s'";
 
     public static final String INVALID_CONTENT_TYPE = "Failed to upload file with content type %s";
-
 
     public static final String FILE_NOT_FOUND_CLOUDINARY = "File not found in Cloudinary with public ID '%s'";
 

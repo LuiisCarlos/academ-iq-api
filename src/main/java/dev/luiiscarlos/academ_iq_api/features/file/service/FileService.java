@@ -11,6 +11,7 @@ import java.util.Map;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,7 +24,7 @@ import dev.luiiscarlos.academ_iq_api.features.file.exception.FileStorageExceptio
 import dev.luiiscarlos.academ_iq_api.features.file.exception.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.features.file.model.File;
 import dev.luiiscarlos.academ_iq_api.features.file.repository.FileRepository;
-import jakarta.transaction.Transactional;
+import dev.luiiscarlos.academ_iq_api.shared.enums.FileType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,9 +33,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FileService {
 
-	public static final String[] ALLOWED_IMAGE_TYPES = new String[] { "image/jpeg", "image/png" };
+	public static final String[] ALLOWED_IMAGE_TYPES = { "image/jpeg", "image/png" };
 
-	public static final String[] ALLOWED_VIDEO_TYPES = new String[] { "video/mp4", "video/avi", "video/mkv" };
+	public static final String[] ALLOWED_VIDEO_TYPES = { "video/mp4", "video/avi", "video/mkv" };
 
 	private final FileRepository fileRepository;
 
@@ -44,16 +45,16 @@ public class FileService {
 	 * Saves a file to Cloudinary and the database
 	 *
 	 * @param multipartFile the file to be saved
-	 * @param type          the type (e.g. avatar, thumbnail, course)
-	 * @param image         the resource type (image or video)
+	 * @param fileType      the type (e.g. AVATAR, THUMBNAIL, COURSE_VIDEO)
 	 * @return {@link File} the file entity saved in the database
 	 * @throws FileStorageException     if the file can not be saved
 	 * @throws InvalidFileTypeException if the resource type is not valid
 	 */
-	public File save(MultipartFile multipartFile, String type, boolean image) {
+	public File create(MultipartFile multipartFile, FileType fileType) {
+		boolean image = !fileType.equals(FileType.COURSE_VIDEO);
+
 		if (multipartFile.isEmpty() || multipartFile == null)
 			throw new FileStorageException(ErrorMessages.FILE_MISSING);
-
 		if (image && multipartFile.getSize() > 10_000_000)
 			throw new FileStorageException(String.format(ErrorMessages.FILE_TOO_LARGE, 10));
 
@@ -64,8 +65,8 @@ public class FileService {
 			Map<String, Object> params = new HashMap<>();
 			params.put("resource_type", image ? "image" : "video");
 			params.put("folder", image ? "uploads/images" : "uploads/videos");
-			//params.put("format", image ? "webp" : "mp4");
-			params.put("type", type);
+			params.put("type", fileType);
+
 			Map<?, ?> response = cloudinary.uploader().upload(multipartFile.getBytes(), params);
 
 			String publicId = (String) response.get("public_id");
@@ -85,8 +86,8 @@ public class FileService {
 
 			return fileRepository.save(file);
 		} catch (IOException e) {
-			throw new FileStorageException(String.format(
-					ErrorMessages.FILE_UPLOAD_CLOUDINARY_BY_NAME, originalFilename), e);
+			throw new FileStorageException(
+					String.format(ErrorMessages.FILE_UPLOAD_CLOUDINARY_BY_NAME, originalFilename));
 		}
 	}
 
@@ -96,7 +97,7 @@ public class FileService {
 	 * @return A list of {@link File} entities
 	 * @throws FileNotFoundException if the files can not be found
 	 */
-	public List<File> findAll() {
+	public List<File> getAll() {
 		List<File> files = fileRepository.findAll();
 
 		if (fileRepository.findAll().isEmpty() || fileRepository.findAll() == null)
@@ -112,7 +113,7 @@ public class FileService {
 	 * @return {@link File} the file entity
 	 * @throws FileNotFoundException if the file can not be found
 	 */
-	public File findById(Long fileId) {
+	public File get(long fileId) {
 		return fileRepository.findById(fileId)
 				.orElseThrow(() -> new FileNotFoundException(
 						String.format(ErrorMessages.FILE_NOT_FOUND, fileId)));
@@ -125,7 +126,7 @@ public class FileService {
 	 * @return {@link File} the file
 	 * @throws FileNotFoundException if the file can not be found
 	 */
-	public File findByFilename(String filename) {
+	public File get(String filename) {
 		File file = fileRepository.findByFilename(filename)
 				.orElseThrow(() -> new FileNotFoundException(
 						String.format(ErrorMessages.FILE_NOT_FOUND_BY_NAME, filename)));
@@ -142,14 +143,13 @@ public class FileService {
 	 * @throws FileNotFoundException       if the file can not be found
 	 * @throws InvalidCredentialsException if the file can not be retrieved
 	 */
-	public File findByFilename(String token, String filename) {
+	public File get(String token, String filename) { // TODO Review this
 		File file = fileRepository.findByFilename(filename)
 				.orElseThrow(() -> new FileNotFoundException(
 						String.format(ErrorMessages.FILE_NOT_FOUND_BY_NAME, filename)));
 
 		if ((token == null || token.isEmpty()) && !file.isImage())
-			throw new InvalidCredentialsException(
-					ErrorMessages.ACCESS_DENIED);
+			throw new InvalidCredentialsException(ErrorMessages.ACCESS_DENIED);
 
 		return file;
 	}
@@ -161,7 +161,7 @@ public class FileService {
 	 * @return the Resource (URL) pointing to Cloudinary's CDN
 	 * @throws FileNotFoundException if the file doesn't exist in the database
 	 */
-	public Resource findResourceByFilename(String filename) {
+	public Resource getResource(String filename) {
 		File file = fileRepository.findByFilename(filename)
 				.orElseThrow(() -> new FileNotFoundException(
 						String.format(ErrorMessages.FILE_NOT_FOUND_BY_NAME, filename)));
@@ -177,8 +177,8 @@ public class FileService {
 			URI uri = URI.create(fileUrl);
 			return new UrlResource(uri.toURL());
 		} catch (MalformedURLException e) {
-			throw new FileNotFoundException( // TODO handle this exception properly
-					String.format(ErrorMessages.RESOURCE_GENERATION_BY_NAME, filename), e);
+			throw new FileNotFoundException(
+					String.format(ErrorMessages.RESOURCE_GENERATION_BY_NAME, filename));
 		}
 	}
 
@@ -190,7 +190,7 @@ public class FileService {
 	 * @throws FileNotFoundException if the file doesn't exist in the database
 	 * @throws FileStorageException  if the file can't be deleted from Cloudinary
 	 */
-	public void deleteByFilename(String filename) {
+	public void delete(String filename) {
 		File file = fileRepository.findByFilename(filename)
 				.orElseThrow(() -> new FileNotFoundException(
 						String.format(ErrorMessages.FILE_NOT_FOUND_BY_NAME, filename)));
@@ -208,13 +208,11 @@ public class FileService {
 			Map<?, ?> response = cloudinary.uploader().destroy(folder + filename, params);
 
 			if (!"ok".equals(response.get("result")))
-				throw new FileStorageException(String.format(
-						ErrorMessages.FILE_DELETION_CLOUDINARY, filename));
+				throw new FileStorageException(String.format(ErrorMessages.FILE_DELETION_CLOUDINARY, filename));
 
 			fileRepository.deleteByFilename(filename);
 		} catch (IOException e) {
-			throw new FileStorageException(String.format(
-					ErrorMessages.FILE_DELETION_CLOUDINARY_BY_NAME, filename), e);
+			throw new FileStorageException(String.format(ErrorMessages.FILE_DELETION_CLOUDINARY_BY_NAME, filename));
 		}
 	}
 

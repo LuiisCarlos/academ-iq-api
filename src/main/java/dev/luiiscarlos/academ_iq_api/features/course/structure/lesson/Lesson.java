@@ -1,7 +1,7 @@
-package dev.luiiscarlos.academ_iq_api.features.category.model;
+package dev.luiiscarlos.academ_iq_api.features.course.structure.lesson;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import dev.luiiscarlos.academ_iq_api.features.course.structure.section.Section;
+import dev.luiiscarlos.academ_iq_api.features.file.model.File;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,22 +20,21 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "benefits")
-public class Benefit {
+@Table(name = "lessons")
+public class Lesson {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @JoinColumn(name = "section_id")
+    private Section section;
 
-    private String title;
+    @ManyToOne
+    @JoinColumn(name = "video_id")
+    private File video;
 
-    private String subtitle;
-
-    private String svg;
+    private String name;
 
 }

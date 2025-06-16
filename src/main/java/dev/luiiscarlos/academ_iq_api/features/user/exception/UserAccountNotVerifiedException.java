@@ -21,4 +21,3 @@ public class UserAccountNotVerifiedException extends RuntimeException {
     }
 
 }
-

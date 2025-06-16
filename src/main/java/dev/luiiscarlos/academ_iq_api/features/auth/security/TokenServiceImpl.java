@@ -15,11 +15,10 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
-
-import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,15 +33,25 @@ public class TokenServiceImpl implements TokenService {
 
     private final JwtDecoder jwtDecoder;
 
+    @Override
     public RefreshToken findByToken(String token) {
         return refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RefreshTokenNotFoundException(ErrorMessages.REFRESH_TOKEN_NOT_FOUND));
     }
 
-    public boolean existsByTokenAndUserId(String token, Long  userId) {
+    @Override
+    public RefreshToken findByUserId(long userId) {
+        return refreshTokenRepository.findByUserId(userId)
+                .orElseThrow(() -> new TokenNotFoundException(
+                        String.format(ErrorMessages.REFRESH_TOKEN_NOT_FOUND_BY_USER, userId)));
+    }
+
+    @Override
+    public boolean existsByTokenAndUserId(String token, Long userId) {
         return refreshTokenRepository.existsByTokenAndUserId(token, userId);
     }
 
+    @Override
     public String generateAccessToken(User user) {
         Instant expiresAt = Instant.now().plus(1, ChronoUnit.HOURS);
         String tokenType = "access";
@@ -50,6 +59,7 @@ public class TokenServiceImpl implements TokenService {
         return generateToken(user, expiresAt, tokenType);
     }
 
+    @Override
     public RefreshToken generateRefreshToken(User user) {
         Instant expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
         ZoneId zoneId = ZoneId.of("Europe/Madrid");
@@ -71,6 +81,7 @@ public class TokenServiceImpl implements TokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
+    @Override
     public String generateVerificationToken(User user) {
         Instant expiresAt = Instant.now().plus(24, ChronoUnit.HOURS);
         String tokenType = "verify";
@@ -78,6 +89,7 @@ public class TokenServiceImpl implements TokenService {
         return generateToken(user, expiresAt, tokenType);
     }
 
+    @Override
     public String generateRecoverPasswordToken(User user) {
         Instant expiresAt = Instant.now().plus(30, ChronoUnit.MINUTES);
         String tokenType = "recover";
@@ -85,6 +97,7 @@ public class TokenServiceImpl implements TokenService {
         return generateToken(user, expiresAt, tokenType);
     }
 
+    @Override
     public String refreshAccessToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RefreshTokenNotFoundException(ErrorMessages.REFRESH_TOKEN_NOT_FOUND));
@@ -94,6 +107,7 @@ public class TokenServiceImpl implements TokenService {
         return generateAccessToken(refreshToken.getUser());
     }
 
+    @Override
     public Jwt decode(String token) {
         token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
 
@@ -104,6 +118,7 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
+    @Override
     public String getSubject(String token) {
         token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
 
@@ -114,6 +129,7 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
+    @Override
     public Instant getExpiresAt(String token) {
         token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
 
@@ -124,6 +140,7 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
+    @Override
     public Object getClaim(String token, String claim) {
         token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
 
@@ -134,6 +151,7 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
+    @Override
     public void validate(String token, @Nullable String tokenType) {
         if (token.isBlank() || token == null)
             throw new TokenNotFoundException(ErrorMessages.REQUIRED_TOKEN);
@@ -143,13 +161,16 @@ public class TokenServiceImpl implements TokenService {
         Instant expiresAt = this.getExpiresAt(token);
         String type = (String) this.getClaim(token, "token_type");
 
-        if (expiresAt == null || expiresAt.isBefore(Instant.now()))
+        if (expiresAt.isBefore(Instant.now()))
             throw new RefreshTokenExpiredException(ErrorMessages.EXPIRED_TOKEN);
 
-        if (tokenType == null || !tokenType.equals(type))
-            throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
+        if (tokenType != null) {
+            if (!type.equals(tokenType))
+                throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
+        }
     }
 
+    @Override
     public void invalidate(String token) {
         token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
 

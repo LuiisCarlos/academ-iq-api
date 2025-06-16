@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.features.course.exception;
+package dev.luiiscarlos.academ_iq_api.features.course.structure.section;
 
 import java.io.Serial;
 import java.util.UUID;

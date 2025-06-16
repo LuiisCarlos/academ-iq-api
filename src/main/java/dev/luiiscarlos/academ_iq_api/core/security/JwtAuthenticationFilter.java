@@ -16,7 +16,7 @@ import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenTypeException;
 import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenService;
 import dev.luiiscarlos.academ_iq_api.features.user.model.User;
-import dev.luiiscarlos.academ_iq_api.features.user.service.impl.CustomUserDetailsService;
+import dev.luiiscarlos.academ_iq_api.features.user.service.impl.UserDetailsServiceImpl;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
 
-    private final CustomUserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     /**
      * Filters the request and checks if the access token is valid and if it is,
@@ -59,18 +59,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String tokenType = jwt.getClaimAsString("token_type");
             String subject = jwt.getSubject();
 
+            System.out.println(subject);
+
             if (expiresAt != null && expiresAt.isBefore(Instant.now())) {
                 ErrorHandler.createErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorMessages.EXPIRED_TOKEN);
                 return;
             }
 
-            if (!isRefreshPath(endpoint) && !"access".equals(tokenType)) {
-                ErrorHandler.createErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorMessages.INVALID_TOKEN_TYPE);
-                return;
-            }
-
-            if (isRefreshPath(endpoint) && !"refresh".equals(tokenType)) {
-                throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
+            if (isRefreshPath(endpoint)) {
+                if (!"refresh".equals(tokenType))
+                    throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
+            } else {
+                if (!"access".equals(tokenType))
+                    throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
             }
 
             User currentUser = (User) userDetailsService.loadUserByUsername(subject);

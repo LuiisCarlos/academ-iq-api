@@ -1,13 +1,19 @@
 package dev.luiiscarlos.academ_iq_api.core.security;
 
+import java.util.Collection;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
 import com.nimbusds.jose.jwk.JWK;
@@ -18,6 +24,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
 import dev.luiiscarlos.academ_iq_api.core.utils.RSAKeyProperties;
+import dev.luiiscarlos.academ_iq_api.features.user.model.User;
 
 @Configuration
 public class JwtConfig {
@@ -56,14 +63,18 @@ public class JwtConfig {
      * @return a JwtAuthenticationConverter instance
      */
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+    public Converter<Jwt, AbstractAuthenticationToken> customJwtAuthenticationConverter(
+            UserDetailsService userDetailsService) {
+        return jwt -> {
+            JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+            jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+            jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+            Collection<GrantedAuthority> authorities = jwtGrantedAuthoritiesConverter.convert(jwt);
 
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+            String username = jwt.getSubject();
+            User user = (User) userDetailsService.loadUserByUsername(username);
 
-        return jwtAuthenticationConverter;
+            return new UsernamePasswordAuthenticationToken(user.getId(), jwt, authorities);
+        };
     }
 }

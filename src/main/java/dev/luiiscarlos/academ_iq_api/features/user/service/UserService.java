@@ -1,174 +1,72 @@
 package dev.luiiscarlos.academ_iq_api.features.user.service;
 
-import java.util.List;
-
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.auth.exception.AuthCredentialsNotFoundException;
-import dev.luiiscarlos.academ_iq_api.features.auth.exception.InvalidCredentialsException;
-import dev.luiiscarlos.academ_iq_api.features.auth.security.InvalidTokenException;
 import dev.luiiscarlos.academ_iq_api.features.file.dto.FileResponse;
+import dev.luiiscarlos.academ_iq_api.features.file.exception.FileStorageException;
+import dev.luiiscarlos.academ_iq_api.features.file.exception.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.features.user.dto.UpdatePasswordRequest;
-import dev.luiiscarlos.academ_iq_api.features.user.exception.UserNotFoundException;
-import dev.luiiscarlos.academ_iq_api.features.user.model.User;
+import dev.luiiscarlos.academ_iq_api.features.user.dto.UpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.user.dto.UserResponse;
 
 public interface UserService {
 
     /**
-     * Saves the user
+     * Retrieves the user's full information by ID
      *
-     * @param user the new user
-     * @return user the user
-     * @throws UserNotFoundException if the user does not exist
+     * @param userId the ID of the user
+     * @return the user response
      */
-    User save(User user);
+    UserResponse get(long userId);
 
     /**
-     * Finds all users
+     * Retrieves the user's avatar file
      *
-     * @return the list of users
-     * @throws UserNotFoundException if the user does not exist
+     * @param userId the ID of the user
+     * @return the avatar file response
      */
-    List<User> findAll();
+    FileResponse getAvatar(long userId);
 
     /**
-     * Finds the user by its id
+     * Updates user information
      *
-     * @param id the id of the user
-     * @return the user
-     * @throws UserNotFoundException if the user does not exist
+     * @param userId  the ID of the user
+     * @param request the data to update
+     * @return the updated user response
      */
-    User findById(Long id);
+    UserResponse update(long userId, UpdateRequest request);
 
     /**
-     * Finds the user by its username
+     * Replaces or updates the user's avatar
      *
-     * @param username the user name
-     * @return the user
-     * @throws UserNotFoundException if the user does not exist
+     * @param userId        the ID of the user
+     * @param multipartFile the new avatar file
+     * @return the uploaded avatar file response
+     * @throws FileStorageException     if the user does not exist
+     * @throws InvalidFileTypeException if the content type of the file is invalid
      */
-    User findByUsername(String username);
+    FileResponse patchAvatar(long userId, MultipartFile multipartFile);
 
     /**
-     * Finds the user by its email
+     * Updates the user's password
      *
-     * @param email The user's email
-     * @return The user
-     * @throws UserNotFoundException if the user does not exist
+     * @param userId  the ID of the user
+     * @param request the request containing the new password
      */
-    User findByEmail(String email);
+    void updatePassword(long userId, UpdatePasswordRequest request);
 
     /**
-     * Finds the user's avatar by its id
+     * Deletes the user account
      *
-     * @param id the user's id
-     * @return {@link FileResponse} the user's avatar
-     * @throws UserNotFoundException if the user does not exist
+     * @param userId the ID of the user
      */
-    FileResponse findAvatarById(Long id);
+    void delete(long userId);
 
     /**
-     * Finds the user by the token
+     * Deletes the user's avatar file
      *
-     * @param token the user's token
-     * @return the user
-     * @throws AuthCredentialsNotFoundException if the token does not exist
-     * @throws InvalidCredentialsException      if the token is invalid
-     * @throws InvalidTokenException            if the token is expired
-     * @throws UserNotFoundException            if the user does not exist
+     * @param userId the ID of the user
      */
-    User findByToken(String token);
-
-    /**
-     * Finds the user's avatar by the token
-     *
-     * @param token the user's token
-     * @return the user's avatar
-     */
-    FileResponse findAvatarByToken(String token);
-
-    /**
-     * Updates the user's information by its id
-     *
-     * @param userId the id of the user
-     * @param user   the new user
-     * @return the updated user
-     * @throws UserNotFoundException if the user does not exist
-     */
-    User updateById(Long id, User user);
-
-    /**
-     * Updates the user's password by the token
-     *
-     * @param token       the user's token
-     * @param passwordDto the current and new password
-     */
-    void updatePasswordByToken(String token, UpdatePasswordRequest passwordDto);
-
-    /**
-     * Updates the user's information by the token
-     *
-     * @param token   the user's token
-     * @param userDto the user's token
-     * @return the updated user
-     */
-    User updateByToken(String token, User user);
-
-    /**
-     * Updates the user's avatar by its id
-     *
-     * @param userId the id of the user
-     * @param avatar the new avatar
-     * @return the updated avatar
-     * @throws UserNotFoundException if the user does not exist
-     */
-    FileResponse patchAvatarById(Long id, MultipartFile avatar);
-
-    /**
-     * Updates the user's avatar by the token
-     *
-     * @param token  the user's token
-     * @param avatar the new avatar
-     * @return the updated avatar
-     */
-    FileResponse patchAvatarByToken(String token, MultipartFile avatar);
-
-    /**
-     * Deletes the user by its id
-     *
-     * @param userId the id of the user
-     * @throws UserNotFoundException if the user does not exist
-     */
-    void deleteById(Long id);
-
-    /**
-     * Deletes the user's avatar by its id
-     *
-     * @param userId the id of the user
-     * @throws UserNotFoundException if the user does not exist
-     */
-    void deleteAvatarById(Long id);
-
-    /**
-     * Deletes the user by the token
-     *
-     * @param token the user's token
-     */
-    void deleteByToken(String token);
-
-    /**
-     * Deletes the user's avatar by the token
-     *
-     * @param token the user's token
-     */
-    void deleteAvatarByToken(String token);
-
-    /**
-     * Checks if a user exists by its username
-     *
-     * @param username the username of the user
-     * @return true if the user exists, false otherwise
-     */
-    Boolean existsByUsername(String username);
+    void deleteAvatar(long userId);
 
 }

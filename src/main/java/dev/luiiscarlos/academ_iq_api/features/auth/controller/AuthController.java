@@ -3,6 +3,7 @@ package dev.luiiscarlos.academ_iq_api.features.auth.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,9 +42,7 @@ public class AuthController {
 	public ResponseEntity<Void> verify(@RequestParam String verifyToken) {
 		authService.verify(verifyToken);
 
-		return ResponseEntity
-				.status(HttpStatus.OK)
-				.build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@PostMapping("/register")
@@ -67,12 +66,12 @@ public class AuthController {
 	}
 
 	@PostMapping("/logout")
-	public ResponseEntity<Void> logout(@RequestBody String refreshToken) {
-		authService.logout(refreshToken);
+	public ResponseEntity<Void> logout(
+			@AuthenticationPrincipal Long userId,
+			@RequestBody String refreshToken) {
+		authService.logout(userId, refreshToken);
 
-		return ResponseEntity
-				.status(HttpStatus.NO_CONTENT)
-				.build();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@PostMapping("/recover-password")
@@ -81,9 +80,7 @@ public class AuthController {
 			@RequestHeader("Origin") String origin) {
 		authService.recoverPassword(origin, email);
 
-		return ResponseEntity
-				.status(HttpStatus.OK)
-				.build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@PostMapping("/reset-password")
@@ -92,9 +89,7 @@ public class AuthController {
 			@RequestParam String recoverToken) {
 		authService.resetPassword(recoverToken, request);
 
-		return ResponseEntity
-				.status(HttpStatus.OK)
-				.build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 }

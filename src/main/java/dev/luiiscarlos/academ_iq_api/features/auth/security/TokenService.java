@@ -24,6 +24,16 @@ public interface TokenService {
     RefreshToken findByToken(String token);
 
     /**
+     * Finds a refresh token by the ID of the user
+     *
+     * @param token the value of the refresh token to be found
+     * @return {@link RefreshToken} the found RefreshToken object
+     * @throws RefreshTokenNotFoundException if the refresh token is not found in
+     *                                       the database
+     */
+    RefreshToken findByUserId(long userId);
+
+    /**
      *
      * @param token
      * @param id

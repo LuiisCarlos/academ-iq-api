@@ -3,7 +3,7 @@ package dev.luiiscarlos.academ_iq_api.features.auth.dto;
 import java.time.LocalDate;
 
 import dev.luiiscarlos.academ_iq_api.core.validation.adult.Adult;
-
+import dev.luiiscarlos.academ_iq_api.core.validation.password.Password;
 import dev.luiiscarlos.academ_iq_api.core.validation.password.PasswordConfirmable;
 import dev.luiiscarlos.academ_iq_api.core.validation.password.PasswordMatches;
 
@@ -17,6 +17,7 @@ public class RegisterRequest implements PasswordConfirmable {
 
     private String username;
 
+    @Password
     private String password;
 
     private String confirmPassword;

@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseRequest;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.CourseResponse;
-import dev.luiiscarlos.academ_iq_api.features.course.dto.course.PublicCourseResponse;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.CourseRequest;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.CourseResponse;
+import dev.luiiscarlos.academ_iq_api.features.course.dto.PublicCourseResponse;
 import dev.luiiscarlos.academ_iq_api.features.course.mapper.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.features.course.service.CourseService;
 
@@ -75,9 +75,7 @@ public class CourseController {
     public ResponseEntity<Void> deleteById(@PathVariable("id") Long courseId) {
         courseService.deleteById(courseId);
 
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

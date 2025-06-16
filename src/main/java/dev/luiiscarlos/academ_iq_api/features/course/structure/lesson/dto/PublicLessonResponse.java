@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.features.course.dto.lesson;
+package dev.luiiscarlos.academ_iq_api.features.course.structure.lesson.dto;
 
 import lombok.Builder;
 import lombok.Data;

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import dev.luiiscarlos.academ_iq_api.features.course.mapper.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.dto.EnrollmentResponse;
 import dev.luiiscarlos.academ_iq_api.features.enrollment.model.Enrollment;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
