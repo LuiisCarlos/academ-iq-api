@@ -2,6 +2,8 @@ package dev.luiiscarlos.academ_iq_api.features.file.model;
 
 import java.time.LocalDateTime;
 
+import org.springframework.cglib.core.Local;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
@@ -10,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -48,10 +51,14 @@ public class File {
     @Column(name = "is_default")
     private Boolean primary = false;
 
-    @Builder.Default
     @Column(name = "updated_at")
     @JsonFormat(shape = Shape.STRING)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
+
+    @Builder.Default
+    @Column(name = "saved_at")
+    @JsonFormat(shape = Shape.STRING)
+    private LocalDateTime saved_at = LocalDateTime.now();
 
     public Boolean isImage() {
         return this.image;
@@ -59,6 +66,11 @@ public class File {
 
     public Boolean isPrimary() {
         return this.primary;
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
 }

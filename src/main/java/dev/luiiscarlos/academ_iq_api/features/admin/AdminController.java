@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.luiiscarlos.academ_iq_api.features.user.dto.UserResponse;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController

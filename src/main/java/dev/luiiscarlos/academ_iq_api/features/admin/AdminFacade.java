@@ -10,10 +10,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.features.file.dto.FileResponse;
-import dev.luiiscarlos.academ_iq_api.features.user.dto.UpdatePasswordRequest;
-import dev.luiiscarlos.academ_iq_api.features.user.dto.UpdateRequest;
-import dev.luiiscarlos.academ_iq_api.features.user.dto.UserResponse;
-import dev.luiiscarlos.academ_iq_api.features.user.facade.UserFacade;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UpdatePasswordRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.facade.UserFacade;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.security.RoleType;
+
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,19 +43,19 @@ public class AdminFacade {
         return users;
     }
 
-    public void assignRole(long userId, String role) {
+    public void assignRole(long userId, RoleType role) {
         userFacade.assignRole(userId, role);
 
         log.warn("Admin '{}' assigned role '{}' to user with ID {}", admin(), role, userId);
     }
 
-    public void removeRole(long userId, String role) {
+    public void removeRole(long userId, RoleType role) {
         userFacade.removeRole(userId, role);
 
         log.warn("Admin '{}' removed role '{}' from user with ID {}", admin(), role, userId);
     }
 
-    public void setRoles(long userId, List<String> roles) {
+    public void setRoles(long userId, List<RoleType> roles) {
         userFacade.setRoles(userId, roles);
 
         log.warn("Admin '{}' set roles {} for user with ID {}", admin(), roles, userId);
@@ -137,9 +139,8 @@ public class AdminFacade {
         Long userId = (long) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();
-        String admin = userFacade.get(userId).getUsername();
 
-        return admin;
+        return userFacade.get(userId).getUsername();
     }
 
 }

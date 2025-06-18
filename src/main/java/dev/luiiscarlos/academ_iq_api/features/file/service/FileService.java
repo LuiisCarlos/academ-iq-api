@@ -17,14 +17,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 
-import dev.luiiscarlos.academ_iq_api.core.exception.ErrorMessages;
-import dev.luiiscarlos.academ_iq_api.features.auth.exception.InvalidCredentialsException;
+import dev.luiiscarlos.academ_iq_api.shared.exception.ErrorMessages;
+import dev.luiiscarlos.academ_iq_api.features.identity.auth.exception.InvalidCredentialsException;
 import dev.luiiscarlos.academ_iq_api.features.file.exception.FileNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.file.exception.FileStorageException;
 import dev.luiiscarlos.academ_iq_api.features.file.exception.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.features.file.model.File;
+import dev.luiiscarlos.academ_iq_api.features.file.model.FileType;
 import dev.luiiscarlos.academ_iq_api.features.file.repository.FileRepository;
-import dev.luiiscarlos.academ_iq_api.shared.enums.FileType;
 
 import lombok.RequiredArgsConstructor;
 
