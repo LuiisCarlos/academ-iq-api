@@ -21,7 +21,7 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
 
     public Category create(CategoryRequest request) {
-        Category category = categoryMapper.toModel(request);
+        Category category = categoryMapper.toEntity(request);
 
         return categoryRepository.save(category);
     }

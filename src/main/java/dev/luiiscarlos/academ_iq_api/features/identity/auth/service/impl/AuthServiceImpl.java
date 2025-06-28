@@ -17,8 +17,7 @@ import dev.luiiscarlos.academ_iq_api.features.identity.auth.mapper.AuthMapper;
 import dev.luiiscarlos.academ_iq_api.features.identity.auth.security.TokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.identity.auth.security.TokenService;
 import dev.luiiscarlos.academ_iq_api.features.identity.auth.service.AuthService;
-import dev.luiiscarlos.academ_iq_api.features.file.model.File;
-import dev.luiiscarlos.academ_iq_api.features.file.service.FileService;
+import dev.luiiscarlos.academ_iq_api.domain.notification.mail.service.MailService;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserAccountNotVerifiedException;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserAlreadyExistsException;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserNotFoundException;
@@ -27,7 +26,8 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.security.Role;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.security.RoleService;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.security.RoleType;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.service.impl.UserQueryService;
-import dev.luiiscarlos.academ_iq_api.features.mail.service.MailService;
+import dev.luiiscarlos.academ_iq_api.features.storage.model.File;
+import dev.luiiscarlos.academ_iq_api.features.storage.service.StorageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final RoleService roleService;
 
-    private final FileService fileService;
+    private final StorageService storageService;
 
     public String refresh(String refreshToken) {
         tokenService.validate(refreshToken, "refresh");
@@ -84,9 +84,9 @@ public class AuthServiceImpl implements AuthService {
 
         String encodedPassword = BCRYPT_PREFIX + passwordEncoder.encode(request.getPassword());
         Set<Role> authorities = Set.of(roleService.findByAuthority(RoleType.USER));
-        File avatar = fileService.get("default-user-avatar_nsfvaz");
+        File avatar = storageService.get("default-user-avatar_nsfvaz");
 
-        User user = authMapper.toModel(request);
+        User user = authMapper.toEntity(request);
         user.setPassword(encodedPassword);
         user.setAuthorities(authorities);
         user.setAvatar(avatar);
@@ -97,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
 
         mailService.sendVerificationMail(user, origin);
 
-        return authMapper.toRegisterResponse(user);
+        return authMapper.toDto(user);
     }
 
     public LoginResponse login(Credentials credentials, String origin) {
@@ -118,7 +118,7 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("User '{}' has successfully logged in", user.getUsername());
 
-        return authMapper.toLoginResponse(user, accessToken, refreshToken);
+        return authMapper.toDto(user, accessToken, refreshToken);
     }
 
     public void logout(long userId, String refreshToken) {
@@ -149,11 +149,11 @@ public class AuthServiceImpl implements AuthService {
         log.info("User '{}' has requested to recover the password", user.getUsername());
     }
 
-    public void resetPassword(String recoverToken, ResetPasswordRequest request) {
-        tokenService.validate(recoverToken, "recover");
+    public void resetPassword(ResetPasswordRequest request) {
+        tokenService.validate(request.getRecoverToken(), "recover");
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        String username = tokenService.getSubject(recoverToken);
+        String username = tokenService.getSubject(request.getRecoverToken());
 
         User user = userQueryService.findByUsername(username);
         user.setPassword(BCRYPT_PREFIX + encodedPassword);

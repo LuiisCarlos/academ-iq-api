@@ -18,10 +18,13 @@ import jakarta.servlet.http.HttpServletResponse;
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     /**
-     * Creates an AccessDeniedHandler bean that handles access denied exceptions
+     * Handles access denied exceptions by sending a 403 Forbidden response with an error message.
      *
-     * @param errorHandler the error handler to use for setting the error response
-     * @return an AccessDeniedHandler instance
+     * @param request the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @param accessDeniedException the AccessDeniedException that was thrown
+     * @throws IOException if an input or output error occurs
+     * @throws ServletException if a servlet error occurs
      */
     @Override
     public void handle(

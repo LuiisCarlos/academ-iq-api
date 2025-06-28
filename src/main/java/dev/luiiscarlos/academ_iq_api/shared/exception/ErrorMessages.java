@@ -19,13 +19,6 @@ public class ErrorMessages {
     public static final String USER_NOT_VERIFIED = "User account '%s' not verified";
 
 
-    public static final String COURSE_NOT_FOUND = "Course with ID '%d' not found";
-
-    public static final String COURSE_NOT_FOUND_BY_NAME = "Course with name '%s' not found";
-
-    public static final String CATEGORY_NOT_FOUND = "Category '%s' does not exist";
-
-
     public static final String REFRESH_TOKEN_NOT_FOUND = "Refresh token not found";
 
     public static final String REFRESH_TOKEN_NOT_FOUND_BY_USER = "Refresh token not found for user with ID: '%d'";
@@ -49,7 +42,7 @@ public class ErrorMessages {
 
     public static final String FILE_DELETION_BY_NAME = "Failed to delete file with name '%s'";
 
-    public static final String INVALID_CONTENT_TYPE = "Failed to upload file with content type %s";
+    public static final String INVALID_CONTENT_TYPE = "Failed to upload file with content type '%s'";
 
     public static final String FILE_NOT_FOUND_CLOUDINARY = "File not found in Cloudinary with public ID '%s'";
 
@@ -98,7 +91,18 @@ public class ErrorMessages {
     public static final String TOKEN_SUBJECT_NOT_FOUND = "Token subject '%s'  does not match any user record";
 
 
-    public static final String COURSE_ALREADY_EXISTS = "Course '%s' already exists";
+    public static final String NO_COURSES_FOUND = "No courses found";
+
+    public static final String COURSE_NOT_FOUND = "Course with ID '%d' not found";
+
+    public static final String COURSE_NOT_FOUND_BY_TITLE = "Course with title '%s' not found";
+
+    public static final String COURSE_ALREADY_EXISTS_BY_TITLE = "Course '%s' already exists";
+
+    public static final String COURSE_LESSONS_IDS_NOT_FOUND = "No lessons found for course with ID '%d'";
+
+    public static final String CATEGORY_NOT_FOUND = "Category '%s' does not exist";
+
 
     public static final String USERNAME_ALREADY_TAKEN = "Username '%s' is already in use";
 

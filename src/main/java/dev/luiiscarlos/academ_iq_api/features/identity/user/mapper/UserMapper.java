@@ -9,7 +9,7 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.model.UserInfo;
 @Component
 public class UserMapper {
 
-    public User toModel(UpdateRequest dto) {
+    public User toEntity(UserUpdateRequest dto) {
         UserInfo userInfo = UserInfo.builder()
                 .dni(dto.getDni())
                 .githubUrl(dto.getGithubUrl())
@@ -34,31 +34,38 @@ public class UserMapper {
                 .build();
     }
 
-    public UserResponse toUserResponse(User user) {
-        String fullname = String.format("%s %s", user.getFirstname(), user.getLastname());
+    public UserResponse toDto(User entity) {
+        String fullname = entity.getFirstname() + " " + entity.getLastname();
 
         return UserResponse.builder()
-                .username(user.getUsername())
-                .avatar(user.getAvatar().getUrl())
-                .email(user.getEmail())
+                .username(entity.getUsername())
+                .avatar(entity.getAvatar().getUrl())
+                .email(entity.getEmail())
                 .fullname(fullname)
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
-                .phone(user.getPhone())
-                .birthdate(user.getBirthdate())
-                .dni(user.getInfo().getDni())
-                .githubUrl(user.getInfo().getGithubUrl())
-                .linkedinUrl(user.getInfo().getLinkedinUrl())
-                .websiteUrl(user.getInfo().getWebsiteUrl())
-                .jobArea(user.getInfo().getJobArea())
-                .workExperience(user.getInfo().getWorkExperience())
-                .studies(user.getInfo().getStudies())
-                .companyName(user.getInfo().getCompanyName())
-                .biography(user.getInfo().getBiography())
-                .hours(user.getInfo().getHours())
-                .manager(user.getInfo().isManager())
-                .registeredAt(user.getRegisteredAt())
+                .firstname(entity.getFirstname())
+                .lastname(entity.getLastname())
+                .phone(entity.getPhone())
+                .birthdate(entity.getBirthdate())
+                .dni(entity.getInfo().getDni())
+                .githubUrl(entity.getInfo().getGithubUrl())
+                .linkedinUrl(entity.getInfo().getLinkedinUrl())
+                .websiteUrl(entity.getInfo().getWebsiteUrl())
+                .jobArea(entity.getInfo().getJobArea())
+                .workExperience(entity.getInfo().getWorkExperience())
+                .studies(entity.getInfo().getStudies())
+                .companyName(entity.getInfo().getCompanyName())
+                .biography(entity.getInfo().getBiography())
+                .hours(entity.getInfo().getHours())
+                .manager(entity.getInfo().isManager())
+                .registeredAt(entity.getRegisteredAt())
                 .build();
+    }
+
+    public UserInstructorResponse toInstructorDto(User entity) {
+		return UserInstructorResponse.builder()
+				.fullname(entity.getFullname())
+				.avatar(entity.getAvatar().getUrl())
+				.build();
     }
 
 }

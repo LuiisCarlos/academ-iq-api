@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.lang.Nullable;
@@ -166,7 +167,7 @@ public class TokenServiceImpl implements TokenService {
         if (expiresAt.isBefore(Instant.now()))
             throw new RefreshTokenExpiredException(ErrorMessages.EXPIRED_TOKEN);
 
-        if (tokenType != null) {
+        if (Objects.nonNull(tokenType) && !tokenType.isBlank()) {
             if (!type.equals(tokenType))
                 throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
         }

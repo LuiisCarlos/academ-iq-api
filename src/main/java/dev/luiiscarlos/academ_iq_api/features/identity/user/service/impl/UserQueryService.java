@@ -38,10 +38,10 @@ public class UserQueryService {
         return users;
     }
 
-    public User findById(long userId) {
-        return userRepository.findById(userId)
+    public User findById(long id) {
+        return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ErrorMessages.USER_NOT_FOUND, userId)));
+                        String.format(ErrorMessages.USER_NOT_FOUND, id)));
     }
 
     public User findByUsername(String username) {
@@ -72,16 +72,16 @@ public class UserQueryService {
         });
     }
 
-    public void deleteById(long userId) {
-        userRepository.findById(userId).ifPresentOrElse((u) -> {
+    public void deleteById(long id) {
+        userRepository.findById(id).ifPresentOrElse((u) -> {
             userRepository.deleteById(u.getId());
         }, () -> {
-            throw new UserNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, userId));
+            throw new UserNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, id));
         });
     }
 
-    public boolean existsById(long userId) {
-        return userRepository.existsById(userId);
+    public boolean existsById(long id) {
+        return userRepository.existsById(id);
     }
 
     public boolean existsByUsername(String username) {

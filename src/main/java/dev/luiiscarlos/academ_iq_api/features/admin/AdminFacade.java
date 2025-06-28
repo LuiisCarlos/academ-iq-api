@@ -9,14 +9,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.file.dto.FileResponse;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UpdatePasswordRequest;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.PasswordUpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserUpdateRequest;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.facade.UserFacade;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.security.RoleType;
-
-
+import dev.luiiscarlos.academ_iq_api.features.storage.dto.FileResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,7 +99,7 @@ public class AdminFacade {
         return fileResponse;
     }
 
-    public UserResponse update(long userId, UpdateRequest request) {
+    public UserResponse update(long userId, UserUpdateRequest request) {
         UserResponse userResponse = userFacade.update(userId, request);
 
         log.info("Admin '{}' updated user with ID {}", admin(), userId);
@@ -117,7 +115,7 @@ public class AdminFacade {
         return fileResponse;
     }
 
-    public void updatePassword(long userId, UpdatePasswordRequest request) {
+    public void updatePassword(long userId, PasswordUpdateRequest request) {
         userFacade.updatePassword(userId, request);
 
         log.info("Admin '{}' updated password for user with ID {}", admin(), userId);

@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import dev.luiiscarlos.academ_iq_api.domain.billing.subcription.SubscriptionPlan;
 import dev.luiiscarlos.academ_iq_api.domain.billing.subcription.SubscriptionStatus;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.model.Enrollment;
-import dev.luiiscarlos.academ_iq_api.features.file.model.File;
+import dev.luiiscarlos.academ_iq_api.features.storage.model.File;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.security.Role;
 
 import jakarta.persistence.CascadeType;
@@ -40,11 +40,13 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
@@ -55,6 +57,7 @@ public class User implements UserDetails {
     private Long id;
 
     @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "avatar_id")
     private File avatar;
 
@@ -79,6 +82,7 @@ public class User implements UserDetails {
     @Column(name = "subscription_status")
     private SubscriptionStatus subscriptionStatus;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "subscription_plan")
     private SubscriptionPlan subscriptionPlan;
 
@@ -94,11 +98,15 @@ public class User implements UserDetails {
     private Boolean enabled = Boolean.TRUE;
 
     @Builder.Default
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Enrollment> enrollments = new ArrayList<>();
 
-    @JoinTable(name = "user_role_junction", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @EqualsAndHashCode.Exclude
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinTable(name = "user_role_junction",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> authorities;
 
     @Builder.Default

@@ -3,6 +3,8 @@ package dev.luiiscarlos.academ_iq_api.features.learning.course.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,18 +19,21 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     @NonNull
     @EntityGraph(attributePaths = {
-            "category",
-            "requirements",
-    })
-    List<Course> findAll();
-
-    @EntityGraph(attributePaths = {
-            "category","category.benefits",
+            "category", "category.benefits",
             "reviews",
             "requirements",
-            "sections","sections.lessons",
+            "sections", "sections.lessons",
             "instructor", "instructor.avatar",
-            "thumbnail"})
+            "thumbnail" })
+    Page<Course> findAll(@NonNull Pageable pageable);
+
+    @EntityGraph(attributePaths = {
+            "category", "category.benefits",
+            "reviews",
+            "requirements",
+            "sections", "sections.lessons",
+            "instructor", "instructor.avatar",
+            "thumbnail" })
     Optional<Course> findById(long id);
 
     Boolean existsByTitle(String title);

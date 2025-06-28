@@ -47,7 +47,7 @@ public class UserAdminServiceImpl implements UserAdminService {
 	public Page<UserResponse> getAll(Pageable pageable) {
 		Page<User> users = userQueryService.findAll(pageable);
 
-		return users.map(userMapper::toUserResponse);
+		return users.map(userMapper::toDto);
 	}
 
 	@Override

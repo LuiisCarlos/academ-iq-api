@@ -8,13 +8,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.file.dto.FileResponse;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UpdatePasswordRequest;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.PasswordUpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserUpdateRequest;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserAdminService;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserService;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.service.impl.UserDetailsServiceImpl;
+import dev.luiiscarlos.academ_iq_api.features.storage.dto.FileResponse;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.security.RoleType;
 
 
@@ -74,7 +74,7 @@ public class UserFacade {
         return userService.getAvatar(userId);
     }
 
-    public UserResponse update(long userId, UpdateRequest request) {
+    public UserResponse update(long userId, UserUpdateRequest request) {
         return userService.update(userId, request);
     }
 
@@ -82,7 +82,7 @@ public class UserFacade {
         return userService.patchAvatar(userId, MultipartFile);
     }
 
-    public void updatePassword(long userId, UpdatePasswordRequest request) {
+    public void updatePassword(long userId, PasswordUpdateRequest request) {
         userService.updatePassword(userId, request);
     }
 

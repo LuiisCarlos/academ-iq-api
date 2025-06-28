@@ -1,17 +1,17 @@
 package dev.luiiscarlos.academ_iq_api.features.learning.course.dto;
 
-import java.util.List;
+import java.util.Set;
 
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.CourseAccess;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.CourseLevel;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.section.SectionRequest;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.dto.SectionRequest;
 
 import lombok.Data;
 
 @Data
 public class CourseRequest {
 
-    private Long userId;
+    private Long instructorId;
 
     private Long categoryId;
 
@@ -25,8 +25,8 @@ public class CourseRequest {
 
     private CourseLevel level;
 
-    private List<String> requirements;
+    private Set<String> requirements;
 
-    private List<SectionRequest> sections;
+    private Set<SectionRequest> sections;
 
 }

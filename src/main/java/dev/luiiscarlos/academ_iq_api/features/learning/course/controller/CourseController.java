@@ -1,8 +1,9 @@
 package dev.luiiscarlos.academ_iq_api.features.learning.course.controller;
 
-import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.CourseRequest;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.CourseResponse;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.PublicCourseResponse;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.mapper.CourseMapper;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.CoursePublicResponse;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.service.CourseService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,48 +32,46 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    private final CourseMapper courseMapper;
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CourseResponse> create(
-            @RequestPart("course") CourseRequest courseDto,
+            @RequestPart("course") CourseRequest request,
             @RequestParam Map<String, MultipartFile> files) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(courseService.create(courseDto, files));
+                .body(courseService.create(request, files));
     }
 
     @GetMapping
-    public ResponseEntity<List<PublicCourseResponse>> findAll() {
+    public ResponseEntity<Page<CoursePublicResponse>> getAll(Pageable pageable) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(courseService.findAll());
+                .body(courseService.getAllPublic(pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CourseResponse> findById(@PathVariable("id") Long courseId) {
+    public ResponseEntity<CourseResponse> get(@PathVariable("id") Long courseId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(courseMapper.toResponseDto(courseService.findById(courseId)));
+                .body(courseService.get(courseId));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CourseResponse> updateById(
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CourseResponse> update(
             @PathVariable("id") Long courseId,
-            @RequestPart("course") CourseRequest courseDto,
+            @RequestPart("course") CourseRequest request,
             @RequestParam Map<String, MultipartFile> files) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(courseService.updateById(courseId, courseDto, files));
+                .body(courseService.update(courseId, request, files));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable("id") Long courseId) {
-        courseService.deleteById(courseId);
+    public ResponseEntity<Void> delete(@PathVariable("id") Long courseId) {
+        courseService.delete(courseId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

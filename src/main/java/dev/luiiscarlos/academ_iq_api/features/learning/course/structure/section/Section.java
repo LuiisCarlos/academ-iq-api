@@ -1,8 +1,8 @@
 package dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
@@ -23,11 +23,13 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "sections")
@@ -38,6 +40,7 @@ public class Section {
     private Long id;
 
     @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "course_id")
     private Course course;
 
@@ -48,7 +51,8 @@ public class Section {
     private Duration duration = Duration.ZERO;
 
     @Builder.Default
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "section", fetch = FetchType.LAZY , cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Lesson> lessons = new ArrayList<>();
+    private Set<Lesson> lessons = new LinkedHashSet<>();
 
 }

@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.file.dto.FileResponse;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UpdatePasswordRequest;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.PasswordUpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserUpdateRequest;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.service.impl.UserServiceImpl;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserService;
+import dev.luiiscarlos.academ_iq_api.features.storage.dto.FileResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/v1/users")
 public class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @GetMapping("/@me")
     public ResponseEntity<UserResponse> get(@AuthenticationPrincipal Long userId) {
@@ -40,7 +40,7 @@ public class UserController {
     @PutMapping("/@me")
     public ResponseEntity<UserResponse> update(
             @AuthenticationPrincipal Long userId,
-            @RequestBody UpdateRequest request) {
+            @RequestBody UserUpdateRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -50,7 +50,7 @@ public class UserController {
     @PutMapping("/@me/change-password")
     public ResponseEntity<Void> updatePassword(
             @AuthenticationPrincipal Long userId,
-            @RequestBody UpdatePasswordRequest request) {
+            @RequestBody PasswordUpdateRequest request) {
         userService.updatePassword(userId, request);
 
         return ResponseEntity.status(HttpStatus.OK).build();

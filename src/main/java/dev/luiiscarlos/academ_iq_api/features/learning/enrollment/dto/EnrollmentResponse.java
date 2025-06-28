@@ -14,7 +14,7 @@ import lombok.Data;
 @Builder
 public class EnrollmentResponse {
 
-    private EnrollmentCourseResponse course;
+    private CourseEnrollmentResponse course;
 
     private Double progress;
 

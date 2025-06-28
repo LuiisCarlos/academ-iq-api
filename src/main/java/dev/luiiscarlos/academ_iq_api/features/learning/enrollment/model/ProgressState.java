@@ -43,4 +43,5 @@ public class ProgressState {
             .anyMatch(cl -> cl.getSectionId().equals(sectionId) &&
                            cl.getLessonId().equals(lessonId));
     }
+
 }

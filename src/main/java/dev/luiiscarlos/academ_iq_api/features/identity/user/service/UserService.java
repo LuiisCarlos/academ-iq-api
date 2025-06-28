@@ -2,12 +2,12 @@ package dev.luiiscarlos.academ_iq_api.features.identity.user.service;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.file.dto.FileResponse;
-import dev.luiiscarlos.academ_iq_api.features.file.exception.FileStorageException;
-import dev.luiiscarlos.academ_iq_api.features.file.exception.InvalidFileTypeException;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UpdatePasswordRequest;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.PasswordUpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserUpdateRequest;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
+import dev.luiiscarlos.academ_iq_api.features.storage.dto.FileResponse;
+import dev.luiiscarlos.academ_iq_api.features.storage.exception.FileStorageException;
+import dev.luiiscarlos.academ_iq_api.features.storage.exception.InvalidFileTypeException;
 
 public interface UserService {
 
@@ -34,7 +34,7 @@ public interface UserService {
      * @param request the data to update
      * @return the updated user response
      */
-    UserResponse update(long userId, UpdateRequest request);
+    UserResponse update(long userId, UserUpdateRequest request);
 
     /**
      * Replaces or updates the user's avatar
@@ -53,7 +53,7 @@ public interface UserService {
      * @param userId  the ID of the user
      * @param request the request containing the new password
      */
-    void updatePassword(long userId, UpdatePasswordRequest request);
+    void updatePassword(long userId, PasswordUpdateRequest request);
 
     /**
      * Deletes the user account

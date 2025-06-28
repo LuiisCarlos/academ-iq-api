@@ -1,5 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.shared.exception;
 
+import java.util.Objects;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,14 +30,14 @@ import dev.luiiscarlos.academ_iq_api.features.identity.auth.security.RefreshToke
 import dev.luiiscarlos.academ_iq_api.features.identity.auth.security.TokenNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.exception.CourseAlreadyExistsException;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.exception.CourseNotFoundException;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.SectionNotFoundException;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.exception.SectionNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.exception.EnrollmentNotFoundException;
-import dev.luiiscarlos.academ_iq_api.features.file.exception.FileNotFoundException;
-import dev.luiiscarlos.academ_iq_api.features.file.exception.FileStorageException;
-import dev.luiiscarlos.academ_iq_api.features.file.exception.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.exception.InvalidReviewException;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.exception.ReviewAlreadyExistsException;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.exception.ReviewNotFoundException;
+import dev.luiiscarlos.academ_iq_api.features.storage.exception.FileNotFoundException;
+import dev.luiiscarlos.academ_iq_api.features.storage.exception.FileStorageException;
+import dev.luiiscarlos.academ_iq_api.features.storage.exception.InvalidFileTypeException;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserAccountNotVerifiedException;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserAlreadyExistsException;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserNotFoundException;
@@ -56,7 +58,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			SectionNotFoundException.class,
 			TokenNotFoundException.class })
 	public ResponseEntity<ErrorResponse> handleNotFoundExceptions(Exception ex) {
-		String message = ex.getCause() != null
+		String message = Objects.nonNull(ex.getCause())
 				? ex.getCause().getLocalizedMessage()
 				: ex.getMessage();
 
@@ -78,7 +80,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			InvalidReviewException.class,
 			ReviewNotFoundException.class, })
 	public ResponseEntity<ErrorResponse> handleBadRequestExceptions(Exception ex) {
-		String message = ex.getCause() != null
+		String message =  Objects.nonNull(ex.getCause())
 				? ex.getCause().getLocalizedMessage()
 				: ex.getMessage();
 
@@ -97,7 +99,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			InvalidCredentialsException.class,
 			InvalidTokenTypeException.class })
 	public ResponseEntity<ErrorResponse> handleUnauthorizedExceptions(Exception ex) {
-		String message = ex.getCause() != null
+		String message =  Objects.nonNull(ex.getCause())
 				? ex.getCause().getLocalizedMessage()
 				: ex.getMessage();
 
@@ -119,7 +121,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			UserAccountNotVerifiedException.class,
 			InvalidFileTypeException.class })
 	public ResponseEntity<ErrorResponse> handleForbiddenExceptions(Exception ex) {
-		String message = ex.getCause() != null
+		String message =  Objects.nonNull(ex.getCause())
 				? ex.getCause().getLocalizedMessage()
 				: ex.getMessage();
 
@@ -136,7 +138,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			ReviewAlreadyExistsException.class,
 			DataIntegrityViolationException.class })
 	public ResponseEntity<ErrorResponse> handleConflictExceptions(Exception ex) {
-		String message = ex.getCause() != null
+		String message =  Objects.nonNull(ex.getCause())
 				? ex.getCause().getLocalizedMessage()
 				: ex.getMessage();
 
@@ -165,7 +167,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
-		String message = ex.getCause() != null
+		ex.printStackTrace();
+		String message =  Objects.nonNull(ex.getCause())
 				? ex.getCause().getLocalizedMessage()
 				: ex.getMessage();
 
@@ -185,7 +188,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			@NonNull HttpHeaders headers,
 			@NonNull HttpStatusCode statusCode,
 			@NonNull WebRequest request) {
-		String message = ex.getCause() != null
+		String message =  Objects.nonNull(ex.getCause())
 				? ex.getCause().getLocalizedMessage()
 				: ex.getMessage();
 

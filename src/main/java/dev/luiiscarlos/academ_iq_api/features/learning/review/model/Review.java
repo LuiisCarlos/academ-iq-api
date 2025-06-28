@@ -20,11 +20,13 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user_course_reviews")
@@ -35,10 +37,12 @@ public class Review {
     private Long id;
 
     @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "course_id")
     private Course course;
 

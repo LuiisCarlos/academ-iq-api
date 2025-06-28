@@ -4,16 +4,18 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import dev.luiiscarlos.academ_iq_api.shared.util.EnumUtils;
+import dev.luiiscarlos.academ_iq_api.shared.util.JsonValuedEnum;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public enum CourseAccess {
+public enum CourseAccess implements JsonValuedEnum {
 
     FREE("Free"),
 
     PRO("Pro"),
 
-    PREMIUN("Premiun");
+    PREMIUM("Premium");
 
     private String value;
 

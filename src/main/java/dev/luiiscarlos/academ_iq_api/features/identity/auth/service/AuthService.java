@@ -77,10 +77,9 @@ public interface AuthService {
     /**
      * Changes the password of the current user
      *
-     * @param recoverToken the recover token
-     * @param request      {@link ResetPasswordRequest} the new password and its
-     *                     confirmation
+     * @param request {@link ResetPasswordRequest} the new password and its
+     *                confirmation
      */
-    void resetPassword(String recoverToken, ResetPasswordRequest request);
+    void resetPassword(ResetPasswordRequest request);
 
 }

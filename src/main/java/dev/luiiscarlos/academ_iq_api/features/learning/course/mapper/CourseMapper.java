@@ -1,20 +1,18 @@
 package dev.luiiscarlos.academ_iq_api.features.learning.course.mapper;
 
-import dev.luiiscarlos.academ_iq_api.features.learning.category.dto.CategoryResponse;
+import dev.luiiscarlos.academ_iq_api.features.learning.category.mapper.CategoryMapper;
 import dev.luiiscarlos.academ_iq_api.features.learning.category.model.Category;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.CourseRequest;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.CourseResponse;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.InstructorResponse;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.PublicCourseResponse;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.CoursePublicResponse;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.Course;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.Lesson;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.dto.LessonResponse;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.Section;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.section.SectionResponse;
-import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.dto.EnrollmentCourseResponse;
-import dev.luiiscarlos.academ_iq_api.features.file.mapper.FileMapper;
-import dev.luiiscarlos.academ_iq_api.features.learning.review.dto.ReviewResponse;
-import dev.luiiscarlos.academ_iq_api.features.learning.review.model.Review;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.mapper.SectionMapper;
+import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.dto.CourseEnrollmentResponse;
+import dev.luiiscarlos.academ_iq_api.features.storage.model.File;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.mapper.UserMapper;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
+
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -24,116 +22,107 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CourseMapper {
 
-    private final FileMapper fileMapper;
+	private final SectionMapper sectionMapper;
 
-    public PublicCourseResponse toPublicResponseDto(Course course) {
-        return PublicCourseResponse.builder()
-                .id(course.getId())
-                .title(course.getTitle())
-                .subtitle(course.getSubtitle())
-                .description(course.getDescription())
-                .instructor(course.getInstructor().getFullname())
-                .thumbnail(course.getThumbnail().getUrl())
-                .requirements(course.getRequirements())
-                .category(this.toCourseCategoryResponseDto(course.getCategory()))
-                .sections(course.getSections().size())
-                .rating(course.getRating())
-                .reviews(course.getReviews().size())
-                .level(course.getLevel())
-                .duration(course.getDuration())
-                .updatedAt(course.getUpdatedAt())
-                .createdAt(course.getCreatedAt())
-                .build();
-    }
+	private final CategoryMapper categoryMapper;
 
-    public CourseResponse toResponseDto(Course course) {
-        return CourseResponse.builder()
-                .id(course.getId())
-                .title(course.getTitle())
-                .subtitle(course.getSubtitle())
-                .description(course.getDescription())
-                .instructor(toInstructorResponse(course.getInstructor()))
-                .thumbnail(course.getThumbnail().getUrl())
-                .requirements(course.getRequirements())
-                .category(this.toCourseCategoryResponseDto(course.getCategory()))
-                .sections(course.getSections().stream().map(this::toSectionResponseDto).toList())
-                .rating(course.getRating())
-                .reviews(course.getReviews().stream().map(this::toReviewResponseDto).toList())
-                .level(course.getLevel())
-                .duration(course.getDuration())
-                .updatedAt(course.getUpdatedAt())
-                .createdAt(course.getCreatedAt())
-                .build();
-    }
+	private final UserMapper userMapper;
 
-    private SectionResponse toSectionResponseDto(Section section) {
-        return SectionResponse.builder()
-                .id(section.getId())
-                .name(section.getName())
-                .duration(section.getDuration())
-                .lessons(section.getLessons().stream().map(this::toLessonResponseDto).toList())
-                .build();
-    }
+	public Course toEntity(CourseRequest dto) {
+		User instructor = new User();
+		instructor.setId(dto.getInstructorId());
 
-    private LessonResponse toLessonResponseDto(Lesson lesson) {
-        return LessonResponse.builder()
-                .id(lesson.getId())
-                .name(lesson.getName())
-                .video(fileMapper.toFileResponseDto(lesson.getVideo()))
-                .build();
-    }
+		Category category = new Category();
+		category.setId(dto.getCategoryId());
 
-    private InstructorResponse toInstructorResponse(User instructor) {
-        return InstructorResponse.builder()
-                .fullname(instructor.getFullname())
-                .avatar(instructor.getAvatar().getUrl())
-                .build();
-    }
+		return Course.builder()
+				.instructor(instructor)
+				.category(category)
+				.title(dto.getTitle())
+				.subtitle(dto.getSubtitle())
+				.description(dto.getDescription())
+				.requirements(dto.getRequirements())
+				.access(dto.getAccess())
+				.level(dto.getLevel())
+				.build();
+	}
 
-    /* private CourseSectionResponseDto toCourseSectionResponseDto(Section section) {
-        return CourseSectionResponseDto.builder()
-                .id(section.getId())
-                .name(section.getName())
-                .duration(section.getDuration())
-                .lessons(section.getLessons().stream().map(this::toCourseLessonResponseDto).toList())
-                .build();
-    } */
+	public Course toEntity(CourseRequest dto, File file) {
+		User instructor = new User();
+		instructor.setId(dto.getInstructorId());
 
-    /* private CourseLessonResponseDto toCourseLessonResponseDto(Lesson lesson) {
-        return CourseLessonResponseDto.builder()
-                .id(lesson.getId())
-                .name(lesson.getName())
-                .build();
-    } */
+		Category category = new Category();
+		category.setId(dto.getCategoryId());
 
-    private ReviewResponse toReviewResponseDto(Review review) {
-        return ReviewResponse.builder()
-                .rating(review.getRating())
-                .comment(review.getComment())
-                .username(review.getUser().getUsername())
-                .avatar(review.getUser().getAvatar().getUrl())
-                .ratedAt(review.getRatedAt())
-                .build();
-    }
+		return Course.builder()
+				.instructor(instructor)
+				.category(category)
+				.thumbnail(file)
+				.title(dto.getTitle())
+				.subtitle(dto.getSubtitle())
+				.description(dto.getDescription())
+				.requirements(dto.getRequirements())
+				.access(dto.getAccess())
+				.level(dto.getLevel())
+				.build();
+	}
 
-    public CategoryResponse toCourseCategoryResponseDto(Category category) {
-        return CategoryResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .shortDescription(category.getShortDescription())
-                .build();
-    }
+	public CourseResponse toDto(Course entity) {
+		return CourseResponse.builder()
+				.id(entity.getId())
+				.title(entity.getTitle())
+				.subtitle(entity.getSubtitle())
+				.description(entity.getDescription())
+				.instructor(userMapper.toInstructorDto(entity.getInstructor()))
+				.thumbnail(entity.getThumbnail().getUrl())
+				.requirements(entity.getRequirements())
+				.category(categoryMapper.toDto(entity.getCategory()))
+				.price(entity.getPrice())
+				.sections(entity.getSections().stream()
+						.map(sectionMapper::toDto)
+						.collect(Collectors.toSet()))
+				.rating(entity.getRating())
+				.reviews(entity.getReviews().size())
+				.access(entity.getAccess())
+				.level(entity.getLevel())
+				.duration(entity.getDuration().toMillis())
+				.updatedAt(entity.getUpdatedAt())
+				.createdAt(entity.getCreatedAt())
+				.build();
+	}
 
-    public EnrollmentCourseResponse toEnrollmentCourseResponseDto(Course course) {
-        return EnrollmentCourseResponse.builder()
-                .id(course.getId())
-                .title(course.getTitle())
-                .instructor(course.getInstructor().getFullname())
-                .thumbnailUrl(course.getThumbnail().getUrl())
-                .category(course.getCategory().getName())
-                .categorySvg(course.getCategory().getSvg())
-                .duration(course.getDuration())
-                .build();
-    }
+	public CoursePublicResponse toPublicDto(Course entity) {
+		return CoursePublicResponse.builder()
+				.id(entity.getId())
+				.title(entity.getTitle())
+				.subtitle(entity.getSubtitle())
+				.description(entity.getDescription())
+				.instructor(entity.getInstructor().getFullname())
+				.thumbnail(entity.getThumbnail().getUrl())
+				.requirements(entity.getRequirements())
+				.category(categoryMapper.toDto(entity.getCategory()))
+				.sections(entity.getSections().size())
+				.rating(entity.getRating())
+				.price(entity.getPrice())
+				.reviews(entity.getReviews().size())
+				.access(entity.getAccess())
+				.level(entity.getLevel())
+				.duration(entity.getDuration().toMillis())
+				.updatedAt(entity.getUpdatedAt())
+				.createdAt(entity.getCreatedAt())
+				.build();
+	}
+
+	public CourseEnrollmentResponse toEnrollmentDto(Course entity) {
+		return CourseEnrollmentResponse.builder()
+				.id(entity.getId())
+				.title(entity.getTitle())
+				.instructor(entity.getInstructor().getFullname())
+				.thumbnailUrl(entity.getThumbnail().getUrl())
+				.category(entity.getCategory().getName())
+				.categorySvg(entity.getCategory().getSvg())
+				.duration(entity.getDuration())
+				.build();
+	}
 
 }

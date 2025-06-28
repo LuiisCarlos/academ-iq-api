@@ -1,17 +1,16 @@
 package dev.luiiscarlos.academ_iq_api.features.learning.course.dto;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserInstructorResponse;
 import dev.luiiscarlos.academ_iq_api.features.learning.category.dto.CategoryResponse;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.CourseAccess;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.CourseLevel;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.section.SectionResponse;
-import dev.luiiscarlos.academ_iq_api.features.learning.review.dto.ReviewResponse;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.dto.SectionResponse;
 
 import lombok.Builder;
 import lombok.Data;
@@ -28,7 +27,7 @@ public class CourseResponse {
 
     private String description;
 
-    private InstructorResponse instructor;
+    private UserInstructorResponse instructor;
 
     private String thumbnail;
 
@@ -42,16 +41,15 @@ public class CourseResponse {
 
     private Double rating;
 
-    @JsonFormat(shape = Shape.STRING)
-    private Duration duration;
+    private Long duration;
 
     private CategoryResponse category;
 
-    private List<String> requirements;
+    private Set<String> requirements;
 
-    private List<ReviewResponse> reviews;
+    private Integer reviews;
 
-    private List<SectionResponse> sections;
+    private Set<SectionResponse> sections;
 
     @JsonFormat(shape = Shape.STRING)
     private LocalDateTime updatedAt;

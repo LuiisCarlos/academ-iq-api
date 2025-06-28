@@ -10,6 +10,8 @@ import lombok.Data;
 @PasswordMatches
 public class ResetPasswordRequest implements PasswordConfirmable {
 
+    private String recoverToken;
+
     @Password
     private String password;
 

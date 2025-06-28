@@ -1,9 +1,10 @@
 package dev.luiiscarlos.academ_iq_api.features.learning.course.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
@@ -11,8 +12,8 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import dev.luiiscarlos.academ_iq_api.features.learning.category.model.Category;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.Section;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.model.Enrollment;
-import dev.luiiscarlos.academ_iq_api.features.file.model.File;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.model.Review;
+import dev.luiiscarlos.academ_iq_api.features.storage.model.File;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 
 import jakarta.persistence.CascadeType;
@@ -35,11 +36,13 @@ import jakarta.persistence.FetchType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "courses")
@@ -50,14 +53,17 @@ public class Course {
     private Long id;
 
     @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "instructor_id")
     private User instructor;
 
     @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "thumbnail_id")
     private File thumbnail;
 
     @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "category_id")
     private Category category;
 
@@ -87,19 +93,22 @@ public class Course {
     @Column(name = "requirement")
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "requirements", joinColumns = @JoinColumn(name = "course_id"))
-    private List<String> requirements = new ArrayList<>();
+    private Set<String> requirements = new LinkedHashSet<>();
 
     @Builder.Default
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Review> reviews = new ArrayList<>();
+    private Set<Review> reviews = new HashSet<>();
 
     @Builder.Default
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    private Set<Section> sections = new LinkedHashSet<>();
 
     @Builder.Default
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Enrollment> enrollments = new ArrayList<>();
+    private Set<Enrollment> enrollments = new HashSet<>();
 
     @Column(name = "updated_at")
     @JsonFormat(shape = Shape.STRING)

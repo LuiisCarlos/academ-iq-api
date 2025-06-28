@@ -20,4 +20,5 @@ public class CompletedLesson {
 
     @Builder.Default
     private LocalDateTime completedAt = LocalDateTime.now();
+
 }

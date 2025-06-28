@@ -4,16 +4,18 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import dev.luiiscarlos.academ_iq_api.shared.util.EnumUtils;
+import dev.luiiscarlos.academ_iq_api.shared.util.JsonValuedEnum;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public enum CourseLevel {
+public enum CourseLevel implements JsonValuedEnum {
 
     BEGINNER("Beginner"),
 
     INTERMEDIATE("Intermediate"),
 
-    ADVANDED("Advanced");
+    ADVANCED("Advanced");
 
     private String value;
 

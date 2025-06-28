@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import dev.luiiscarlos.academ_iq_api.shared.util.EnumUtils;
+import dev.luiiscarlos.academ_iq_api.shared.util.JsonValuedEnum;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public enum RoleType {
+public enum RoleType implements JsonValuedEnum {
 
     USER("USER"),
 

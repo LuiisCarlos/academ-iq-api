@@ -16,16 +16,16 @@ public class EnrollmentMapper {
 
     private final CourseMapper courseMapper;
 
-    public EnrollmentResponse toEnrollmentResponse(Enrollment enrollment) {
+    public EnrollmentResponse toDto(Enrollment entity) {
         return EnrollmentResponse.builder()
-                .course(courseMapper.toEnrollmentCourseResponseDto(enrollment.getCourse()))
-                .progress(enrollment.getProgress())
-                .progressState(enrollment.getProgressState())
-                .favorite(enrollment.isFavorite())
-                .archived(enrollment.isArchived())
-                .completed(enrollment.isCompleted())
-                .enrolledAt(enrollment.getEnrolledAt())
-                .completedAt(enrollment.getCompletedAt())
+                .course(courseMapper.toEnrollmentDto(entity.getCourse()))
+                .progress(entity.getProgress())
+                .progressState(entity.getProgressState())
+                .favorite(entity.isFavorite())
+                .archived(entity.isArchived())
+                .completed(entity.isCompleted())
+                .enrolledAt(entity.getEnrolledAt())
+                .completedAt(entity.getCompletedAt())
                 .build();
     }
 

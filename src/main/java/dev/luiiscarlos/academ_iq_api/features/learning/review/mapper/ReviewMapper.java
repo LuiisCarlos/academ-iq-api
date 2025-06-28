@@ -2,6 +2,7 @@ package dev.luiiscarlos.academ_iq_api.features.learning.review.mapper;
 
 import org.springframework.stereotype.Component;
 
+import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.dto.ReviewRequest;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.dto.ReviewResponse;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.model.Review;
@@ -9,24 +10,23 @@ import dev.luiiscarlos.academ_iq_api.features.learning.review.model.Review;
 @Component
 public class ReviewMapper {
 
-    public ReviewResponse toResponseDto(Review rating) {
-        String userAvatarUrl = rating.getUser().getAvatar() != null
-                ? rating.getUser().getAvatar().getUrl()
-                : "";
+    public Review toEntity(ReviewRequest dto) {
+        return Review.builder()
+                .rating(dto.getRating())
+                .comment(dto.getComment())
+                .build();
+    }
+
+    public ReviewResponse toDto(Review entity) {
+        User user = entity.getUser();
 
         return ReviewResponse.builder()
-                .username(rating.getUser().getUsername())
-                .avatar(userAvatarUrl)
-                .rating(rating.getRating())
-                .comment(rating.getComment())
-                .ratedAt(rating.getRatedAt())
+                .username(user.getUsername())
+                .avatar(user.getAvatar().getUrl())
+                .rating(entity.getRating())
+                .comment(entity.getComment())
+                .ratedAt(entity.getRatedAt())
                 .build();
     }
 
-    public Review toModel(ReviewRequest requestDto) {
-        return Review.builder()
-                .rating(requestDto.getRating())
-                .comment(requestDto.getComment())
-                .build();
-    }
 }

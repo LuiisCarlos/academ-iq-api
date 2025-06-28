@@ -11,6 +11,6 @@ public class CategoryResponse {
 
     private String name;
 
-    private String shortDescription;
+    private String description;
 
 }

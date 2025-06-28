@@ -9,12 +9,15 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.mapper.UserMapper;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class AuthMapper {
 
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    public User toModel(RegisterRequest dto) {
+    public User toEntity(RegisterRequest dto) {
         String fullname = dto.getFirstname() + " " + dto.getLastname();
 
         return User.builder()
@@ -28,8 +31,8 @@ public class AuthMapper {
                 .build();
     }
 
-    public LoginResponse toLoginResponse(User model, String accessToken, String refreshToken) {
-        UserResponse userResponse = userMapper.toUserResponse(model);
+    public LoginResponse toDto(User entity, String accessToken, String refreshToken) {
+        UserResponse userResponse = userMapper.toDto(entity);
 
         return LoginResponse.builder()
                 .user(userResponse)
@@ -38,17 +41,23 @@ public class AuthMapper {
                 .build();
     }
 
-    public RegisterResponse toRegisterResponse(User model) {
-        String fullname = model.getFirstname() + " " + model.getLastname();
+    /**
+     * Converts a User model to a RegisterResponse DTO
+     *
+     * @param entity {@link User} the User model to convert
+     * @return a {@link RegisterResponse} containing user information
+     */
+    public RegisterResponse toDto(User entity) {
+        String fullname = entity.getFirstname() + " " + entity.getLastname();
 
         return RegisterResponse.builder()
-                .username(model.getUsername())
-                .email(model.getEmail())
+                .username(entity.getUsername())
+                .email(entity.getEmail())
                 .fullname(fullname)
-                .firstname(model.getFirstname())
-                .lastname(model.getLastname())
-                .phone(model.getPhone())
-                .birthdate(model.getBirthdate())
+                .firstname(entity.getFirstname())
+                .lastname(entity.getLastname())
+                .phone(entity.getPhone())
+                .birthdate(entity.getBirthdate())
                 .build();
     }
 
