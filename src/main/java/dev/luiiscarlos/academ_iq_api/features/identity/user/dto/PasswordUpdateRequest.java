@@ -1,0 +1,20 @@
+package dev.luiiscarlos.academ_iq_api.features.identity.user.dto;
+
+import dev.luiiscarlos.academ_iq_api.shared.validation.password.Password;
+import dev.luiiscarlos.academ_iq_api.shared.validation.password.PasswordConfirmable;
+import dev.luiiscarlos.academ_iq_api.shared.validation.password.PasswordMatches;
+
+import lombok.Data;
+
+@Data
+@PasswordMatches
+public class PasswordUpdateRequest implements PasswordConfirmable {
+
+    private String currentPassword;
+
+    @Password
+    private String password;
+
+    private String confirmPassword;
+
+}

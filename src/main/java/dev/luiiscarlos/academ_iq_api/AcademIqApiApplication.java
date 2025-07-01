@@ -6,11 +6,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
-import dev.luiiscarlos.academ_iq_api.features.auth.security.RefreshToken;
-import dev.luiiscarlos.academ_iq_api.features.auth.security.RefreshTokenRepository;
-import dev.luiiscarlos.academ_iq_api.features.auth.security.TokenService;
-import dev.luiiscarlos.academ_iq_api.features.user.model.User;
-import dev.luiiscarlos.academ_iq_api.features.user.repository.UserRepository;
+import dev.luiiscarlos.academ_iq_api.features.identity.auth.security.RefreshToken;
+import dev.luiiscarlos.academ_iq_api.features.identity.auth.security.RefreshTokenRepository;
+import dev.luiiscarlos.academ_iq_api.features.identity.auth.security.TokenService;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.repository.UserRepository;
 
 @SpringBootApplication
 public class AcademIqApiApplication {
