@@ -56,7 +56,8 @@ public class Payment {
 
     private Long amount;
 
-    private String currency;
+    @Builder.Default
+    private String currency = "EUR";
 
     @Enumerated(EnumType.STRING)
     private PaymentType type;

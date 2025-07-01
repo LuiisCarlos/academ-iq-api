@@ -19,8 +19,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import dev.luiiscarlos.academ_iq_api.shared.filters.GlobalExceptionFilter;
-import dev.luiiscarlos.academ_iq_api.shared.filters.JwtAuthenticationFilter;
+import dev.luiiscarlos.academ_iq_api.shared.filter.GlobalExceptionFilter;
+import dev.luiiscarlos.academ_iq_api.shared.filter.JwtAuthenticationFilter;
 import dev.luiiscarlos.academ_iq_api.shared.util.CustomAccessDeniedHandler;
 
 @EnableWebMvc
@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/categories/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/courses/{id}/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/courses/{id}/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/v1/courses/**").permitAll()
                         .requestMatchers("/v1/courses/**").hasAnyRole("ADMIN", "ACADEMIQ_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/v1/enrollments/@me/**").authenticated()
