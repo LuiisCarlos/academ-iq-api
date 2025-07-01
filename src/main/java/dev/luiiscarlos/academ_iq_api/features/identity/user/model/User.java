@@ -1,10 +1,9 @@
 package dev.luiiscarlos.academ_iq_api.features.identity.user.model;
 
-import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -100,7 +99,7 @@ public class User implements UserDetails {
     @Builder.Default
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Enrollment> enrollments = new ArrayList<>();
+    private Set<Enrollment> enrollments = new HashSet<>();
 
     @EqualsAndHashCode.Exclude
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)

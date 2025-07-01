@@ -132,7 +132,6 @@ public class AuthServiceImpl implements AuthService {
         tokenService.invalidate(refreshToken);
 
         log.info("User '{}' has successfully logged out", user.getUsername());
-
     }
 
     public void recoverPassword(String email, String origin) {

@@ -15,17 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dev.luiiscarlos.academ_iq_api.features.learning.review.dto.ReviewRequest;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.dto.ReviewResponse;
-import dev.luiiscarlos.academ_iq_api.features.learning.review.service.ReviewService;
+import dev.luiiscarlos.academ_iq_api.features.learning.review.service.ReviewServiceImpl;
 
 import lombok.RequiredArgsConstructor;
-
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/reviews")
 public class ReviewControlller { // Create proper Course review endpoint
 
-    private final ReviewService reviewService;
+    private final ReviewServiceImpl reviewService;
 
     @PostMapping
     public ResponseEntity<ReviewResponse> create(
@@ -45,7 +44,7 @@ public class ReviewControlller { // Create proper Course review endpoint
                 .body(reviewService.getAll(pageable, courseId));
     }
 
-   /*  @GetMapping("/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ReviewResponse> get(
             @AuthenticationPrincipal Long userId,
             @PathVariable("id") Long courseId) {
@@ -53,6 +52,6 @@ public class ReviewControlller { // Create proper Course review endpoint
                 .status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(reviewService.get(userId, courseId));
-    } */
+    }
 
 }
