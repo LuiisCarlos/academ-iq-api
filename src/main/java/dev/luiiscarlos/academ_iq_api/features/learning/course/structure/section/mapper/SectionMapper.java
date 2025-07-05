@@ -5,9 +5,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.mapper.LessonMapper;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.Section;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.dto.SectionResponse;
-
+import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.model.Section;
 import lombok.RequiredArgsConstructor;
 
 @Component

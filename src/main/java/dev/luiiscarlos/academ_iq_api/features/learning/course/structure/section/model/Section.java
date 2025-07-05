@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section;
+package dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.model;
 
 import java.time.Duration;
 import java.util.LinkedHashSet;
@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.Course;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.Lesson;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.model.Lesson;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

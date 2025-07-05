@@ -21,26 +21,21 @@ public class ProgressState {
     @Builder.Default
     private Long currentLessonId = null;
 
-    // Lecciones completadas (Set para evitar duplicados)
     @Builder.Default
     private Set<CompletedLesson> completedLessons = new HashSet<>();
 
-    // Método para agregar una lección completada
     public void addCompletedLesson(Long sectionId, Long lessonId) {
-        this.completedLessons.add(
-            CompletedLesson.builder()
+        this.completedLessons.add(CompletedLesson.builder()
                 .sectionId(sectionId)
                 .lessonId(lessonId)
                 .completedAt(LocalDateTime.now())
-                .build()
-        );
+                .build());
     }
 
-    // Verificar si una lección está completada
     public boolean isLessonCompleted(Long sectionId, Long lessonId) {
         return this.completedLessons.stream()
-            .anyMatch(cl -> cl.getSectionId().equals(sectionId) &&
-                           cl.getLessonId().equals(lessonId));
+                .anyMatch(cl -> cl.getSectionId().equals(sectionId) &&
+                        cl.getLessonId().equals(lessonId));
     }
 
 }

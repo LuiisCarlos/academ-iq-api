@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.features.learning.review.service;
+package dev.luiiscarlos.academ_iq_api.features.learning.review.service.impl;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +13,7 @@ import dev.luiiscarlos.academ_iq_api.features.learning.review.exception.ReviewNo
 import dev.luiiscarlos.academ_iq_api.features.learning.review.mapper.ReviewMapper;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.model.Review;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.repository.ReviewRepository;
+import dev.luiiscarlos.academ_iq_api.features.learning.review.service.ReviewService;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 
 import lombok.RequiredArgsConstructor;

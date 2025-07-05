@@ -38,7 +38,7 @@ public class CourseQueryService {
                 .orElseThrow(() -> new CourseNotFoundException(String.format(ErrorMessages.COURSE_NOT_FOUND, id)));
     }
 
-    public List<Long> findAllLessonIdsById(Long id) {
+    public List<Long> findAllLessonIdsById(long id) {
         List<Long> lessonsIds = courseRepository.findAllLessonIdsById(id);
 
         if (Objects.isNull(lessonsIds) || lessonsIds.isEmpty())
@@ -47,7 +47,7 @@ public class CourseQueryService {
         return lessonsIds;
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(long id) {
         courseRepository.findById(id).ifPresentOrElse((u) -> {
             courseRepository.deleteById(u.getId());
         }, () -> {
@@ -55,7 +55,7 @@ public class CourseQueryService {
         });
     }
 
-    public boolean existsById(Long id) {
+    public boolean existsById(long id) {
         return courseRepository.existsById(id);
     }
 

@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.service.impl.CourseQueryService;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.dto.EnrollmentResponse;
+import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.exception.EnrollmentAlreadyExists;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.exception.EnrollmentNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.mapper.EnrollmentMapper;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.model.CompletedLesson;
@@ -40,8 +43,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     public EnrollmentResponse create(long userId, long courseId, @Nullable Map<String, Boolean> args) {
-        if (enrollmentRepository.existsByUserIdAndCourseId(userId, courseId)) // TODO Change Exception
-            throw new EnrollmentNotFoundException("Failed to save enrollment: User is already enrolled");
+        if (enrollmentRepository.existsByUserIdAndCourseId(userId, courseId))
+            throw new EnrollmentAlreadyExists("User is already enrolled");
 
         User user = new User();
         user.setId(userId);
@@ -61,22 +64,19 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     @Override
-    public List<EnrollmentResponse> getAll(long userId) {
-        List<Enrollment> enrollments = enrollmentRepository.findAllByUserId(userId);
+    public Page<EnrollmentResponse> getAll(Pageable pageable, long userId) {
+        Page<Enrollment> enrollments = enrollmentRepository.findAllByUserId(pageable, userId);
 
-        if (enrollments.isEmpty() || enrollments == null)
-            throw new EnrollmentNotFoundException("Failed to find enrollments: No enrollments found");
+        if (enrollments.isEmpty() || Objects.isNull(enrollments))
+            throw new EnrollmentNotFoundException("No enrollments found");
 
-        return enrollments.stream()
-                .map(enrollmentMapper::toDto)
-                .toList();
+        return enrollments.map(enrollmentMapper::toDto);
     }
 
     @Override
     public EnrollmentResponse get(long userId, long courseId) {
         Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(userId, courseId)
-                .orElseThrow(() -> new EnrollmentNotFoundException(
-                        "Failed to find enrollment: Enrollment not found with course id: " + courseId));
+                .orElseThrow(() -> new EnrollmentNotFoundException("Enrollment not found with course id: " + courseId));
 
         return enrollmentMapper.toDto(enrollment);
     }
@@ -86,7 +86,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         if (enrollmentRepository.existsByUserIdAndCourseId(userId, courseId)) {
             return enrollmentRepository.findByUserIdAndCourseId(userId, courseId)
                     .orElseThrow(() -> new EnrollmentNotFoundException(
-                            "Failed to find enrollment: Enrollment not found with course id: " + courseId));
+                            "Enrollment not found with course id: " + courseId));
         } else {
             User user = new User();
             user.setId(userId);
@@ -106,8 +106,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public EnrollmentResponse update(long userId, long courseId, Map<String, Boolean> args) {
         Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(userId, courseId)
-                .orElseThrow(() -> new EnrollmentNotFoundException(
-                        "Failed to update enrollment: Enrollment not found with course id " + courseId));
+                .orElseThrow(() -> new EnrollmentNotFoundException("Enrollment not found with course id " + courseId));
 
         if (args.containsKey("isFavorite"))
             enrollment.setFavorite(args.get("isFavorite"));
@@ -125,9 +124,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     @Override
-    public EnrollmentResponse patchProgress(long userId, long courseId, Map<String, Object> args) {
+    public EnrollmentResponse patchState(long userId, long courseId, Map<String, Object> args) {
         Enrollment enrollment = this.getOrCreate(userId, courseId);
-        ProgressState progressState = enrollment.getProgressState();
+        ProgressState progressState = enrollment.getState();
 
         long sectionId = (long) args.get("sectionId");
         long lessonId = (long) args.get("lessonId");
@@ -158,14 +157,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public void delete(long userId, long courseId) {
         if (!enrollmentRepository.existsByUserIdAndCourseId(userId, courseId))
-            throw new EnrollmentNotFoundException(
-                    "Failed to delete enrollment: Enrollment no found with course id " + courseId);
+            throw new EnrollmentNotFoundException("Enrollment no found with course id " + courseId);
 
         enrollmentRepository.deleteByUserIdAndCourseId(userId, courseId);
     }
 
     /**
-     * Checks if the course is completed based on the enrollment's progress
+     * Checks if the course is completed based on the current enrollment state
      *
      * @param enrollment the enrollment to check
      */
@@ -179,13 +177,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
             return;
         }
 
-        Set<Long> completedLessonIds = enrollment.getProgressState().getCompletedLessons().stream()
+        Set<Long> completedLessonIds = enrollment.getState().getCompletedLessons().stream()
                 .filter(cl -> Objects.nonNull(cl.getSectionId()) && Objects.nonNull(cl.getLessonId()))
                 .map(CompletedLesson::getLessonId)
                 .collect(Collectors.toSet());
-
-        completedLessonIds.size();
-        lessonIds.size();
 
         double progress = (double) completedLessonIds.size() / lessonIds.size();
         progress = Math.round(progress * 100.0) / 100.0;

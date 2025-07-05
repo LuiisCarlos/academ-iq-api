@@ -58,7 +58,7 @@ public class Enrollment {
     @Builder.Default
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private ProgressState progressState = new ProgressState();
+    private ProgressState state = new ProgressState();
 
     @Builder.Default
     @Column(name = "is_favorite")

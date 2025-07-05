@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.features.learning.category.model.Category;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.Section;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.model.Section;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.model.Enrollment;
 import dev.luiiscarlos.academ_iq_api.features.learning.review.model.Review;
 import dev.luiiscarlos.academ_iq_api.features.storage.model.File;

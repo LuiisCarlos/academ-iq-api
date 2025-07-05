@@ -3,6 +3,8 @@ package dev.luiiscarlos.academ_iq_api.features.learning.enrollment.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,11 +43,13 @@ public class EnrollmentController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<EnrollmentResponse>> getAll(@AuthenticationPrincipal Long userId) {
+	public ResponseEntity<Page<EnrollmentResponse>> getAll(
+			Pageable pageable,
+			@AuthenticationPrincipal Long userId) {
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(enrollmentService.getAll(userId));
+				.body(enrollmentService.getAll(pageable, userId));
 	}
 
 	@GetMapping("/@me/{id}")
@@ -70,14 +74,14 @@ public class EnrollmentController {
 	}
 
 	@PatchMapping("/@me/{id}/progress")
-	public ResponseEntity<EnrollmentResponse> patchProgressState(
+	public ResponseEntity<EnrollmentResponse> patchState(
 			@AuthenticationPrincipal Long userId,
 			@PathVariable("id") Long courseId,
 			@RequestBody Map<String, Object> args) {
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(enrollmentService.patchProgress(userId, courseId, args));
+				.body(enrollmentService.patchState(userId, courseId, args));
 	}
 
 	@DeleteMapping("/@me/{id}")

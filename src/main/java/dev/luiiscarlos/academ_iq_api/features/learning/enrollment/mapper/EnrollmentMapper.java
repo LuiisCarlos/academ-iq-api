@@ -20,7 +20,7 @@ public class EnrollmentMapper {
         return EnrollmentResponse.builder()
                 .course(courseMapper.toEnrollmentDto(entity.getCourse()))
                 .progress(entity.getProgress())
-                .progressState(entity.getProgressState())
+                .progressState(entity.getState())
                 .favorite(entity.isFavorite())
                 .archived(entity.isArchived())
                 .completed(entity.isCompleted())

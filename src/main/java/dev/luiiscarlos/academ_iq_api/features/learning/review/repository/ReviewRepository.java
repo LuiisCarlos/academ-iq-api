@@ -12,10 +12,10 @@ import dev.luiiscarlos.academ_iq_api.features.learning.review.model.Review;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    Page<Review> findAllByCourseId(Pageable pageable, Long courseId);
+    Page<Review> findAllByCourseId(Pageable pageable, long courseId);
 
-    boolean existsByUserIdAndCourseId(Long userId, Long courseId);
+    boolean existsByUserIdAndCourseId(long userId, long courseId);
 
-    Optional<Review> findByUserIdAndCourseId(Long userId, Long courseId);
+    Optional<Review> findByUserIdAndCourseId(long userId, long courseId);
 
 }
