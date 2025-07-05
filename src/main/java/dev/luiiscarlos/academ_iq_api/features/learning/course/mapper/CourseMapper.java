@@ -12,6 +12,7 @@ import dev.luiiscarlos.academ_iq_api.features.storage.model.File;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.mapper.UserMapper;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -85,7 +86,9 @@ public class CourseMapper {
 				.reviews(entity.getReviews().size())
 				.access(entity.getAccess())
 				.level(entity.getLevel())
-				.duration(entity.getDuration().toMillis())
+				.duration(Objects.nonNull(entity.getDuration())
+						? entity.getDuration().toMillis()
+						: null)
 				.updatedAt(entity.getUpdatedAt())
 				.createdAt(entity.getCreatedAt())
 				.build();
@@ -107,7 +110,9 @@ public class CourseMapper {
 				.reviews(entity.getReviews().size())
 				.access(entity.getAccess())
 				.level(entity.getLevel())
-				.duration(entity.getDuration().toMillis())
+				.duration(Objects.nonNull(entity.getDuration())
+						? entity.getDuration().toMillis()
+						: null)
 				.updatedAt(entity.getUpdatedAt())
 				.createdAt(entity.getCreatedAt())
 				.build();

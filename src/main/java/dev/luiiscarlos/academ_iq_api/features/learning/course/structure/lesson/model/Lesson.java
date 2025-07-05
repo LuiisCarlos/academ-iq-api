@@ -1,6 +1,6 @@
-package dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson;
+package dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.model;
 
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.Section;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.model.Section;
 import dev.luiiscarlos.academ_iq_api.features.storage.model.File;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

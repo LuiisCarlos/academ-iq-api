@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.features.identity.user.security;
+package dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -13,9 +13,7 @@ public enum RoleType implements JsonValuedEnum {
 
     USER("USER"),
 
-    ADMIN("ADMIN"),
-
-    ACADEMIQ_ADMIN("ACADEMIQ_ADMIN");
+    ADMIN("ADMIN");
 
     private String value;
 

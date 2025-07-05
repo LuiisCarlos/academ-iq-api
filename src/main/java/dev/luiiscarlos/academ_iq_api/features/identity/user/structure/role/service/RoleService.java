@@ -1,9 +1,12 @@
-package dev.luiiscarlos.academ_iq_api.features.identity.user.security;
+package dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import dev.luiiscarlos.academ_iq_api.features.identity.auth.exception.RoleNotFoundException;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model.Role;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model.RoleType;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.repository.RoleRepository;
 
 import lombok.RequiredArgsConstructor;
 

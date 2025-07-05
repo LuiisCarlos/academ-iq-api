@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @PasswordMatches
-public class PasswordUpdateRequest implements PasswordConfirmable {
+public class UserPasswordUpdateRequest implements PasswordConfirmable {
 
     private String currentPassword;
 

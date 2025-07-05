@@ -2,8 +2,8 @@ package dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.
 
 import org.springframework.stereotype.Component;
 
-import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.Lesson;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.dto.LessonResponse;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.model.Lesson;
 
 @Component
 public class LessonMapper {

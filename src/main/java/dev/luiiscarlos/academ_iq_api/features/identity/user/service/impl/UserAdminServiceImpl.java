@@ -12,13 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import dev.luiiscarlos.academ_iq_api.features.identity.auth.security.TokenService;
 import dev.luiiscarlos.academ_iq_api.features.identity.auth.service.AuthService;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.AdminPasswordRequest;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.mapper.UserMapper;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.security.Role;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.security.RoleService;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.security.RoleType;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserAdminService;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.dto.*;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model.Role;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.service.RoleService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,16 +45,22 @@ public class UserAdminServiceImpl implements UserAdminService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Override
-	public Page<UserResponse> getAll(Pageable pageable) {
-		Page<User> users = userQueryService.findAll(pageable);
+	public void setRoles(long userId, RolesRequest request) {
+		User user = userQueryService.findById(userId);
 
-		return users.map(userMapper::toDto);
+		Set<Role> authorities = request.roles().stream()
+				.map(roleService::findByAuthority)
+				.collect(Collectors.toSet());
+
+		user.setAuthorities(authorities);
+
+		userQueryService.save(user);
 	}
 
 	@Override
-	public void assignRole(long userId, RoleType role) {
+	public void assignRole(long userId, RoleRequest request) {
 		User user = userQueryService.findById(userId);
-		Role authority = roleService.findByAuthority(role);
+		Role authority = roleService.findByAuthority(request.role());
 
 		Set<Role> authorities = user.getAuthorities().stream()
 				.filter(Role.class::isInstance)
@@ -67,9 +74,9 @@ public class UserAdminServiceImpl implements UserAdminService {
 	}
 
 	@Override
-	public void removeRole(long userId, RoleType role) {
+	public void removeRole(long userId, RoleRequest request) {
 		User user = userQueryService.findById(userId);
-		Role authority = roleService.findByAuthority(role);
+		Role authority = roleService.findByAuthority(request.role());
 
 		Set<Role> authorities = user.getAuthorities().stream()
 				.filter(Role.class::isInstance)
@@ -83,32 +90,26 @@ public class UserAdminServiceImpl implements UserAdminService {
 	}
 
 	@Override
-	public void setRoles(long userId, List<RoleType> roles) {
-		User user = userQueryService.findById(userId);
-
-		Set<Role> authorities = roles.stream()
-				.map(roleService::findByAuthority)
-				.collect(Collectors.toSet());
-
-		user.setAuthorities(authorities);
-
-		userQueryService.save(user);
-	}
-
-	@Override
-	public void changePassword(long userId, String newPassword) {
-		User user = userQueryService.findById(userId);
-
-		user.setPassword(BCRYPT_PREFIX + passwordEncoder.encode(newPassword));
-
-		userQueryService.save(user);
-	}
-
-	@Override
 	public void forceLogout(long userId) {
 		String refreshToken = tokenService.findByUserId(userId).getToken();
 
 		authService.logout(userId, refreshToken);
+	}
+
+	@Override
+	public Page<UserResponse> getAll(Pageable pageable) {
+		Page<User> users = userQueryService.findAll(pageable);
+
+		return users.map(userMapper::toDto);
+	}
+
+	@Override
+	public void changePassword(long userId, AdminPasswordRequest request) {
+		User user = userQueryService.findById(userId);
+
+		user.setPassword(BCRYPT_PREFIX + passwordEncoder.encode(request.password()));
+
+		userQueryService.save(user);
 	}
 
 	@Override

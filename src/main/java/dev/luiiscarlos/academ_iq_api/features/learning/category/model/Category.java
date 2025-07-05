@@ -1,7 +1,7 @@
 package dev.luiiscarlos.academ_iq_api.features.learning.category.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import dev.luiiscarlos.academ_iq_api.features.learning.category.structure.Benefit;
 
@@ -44,6 +44,6 @@ public class Category {
 
     @Builder.Default
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Benefit> benefits = new ArrayList<>();
+    private Set<Benefit> benefits = new HashSet<>();
 
 }

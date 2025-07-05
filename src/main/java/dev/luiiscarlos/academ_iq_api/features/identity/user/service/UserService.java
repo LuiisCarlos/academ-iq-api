@@ -2,7 +2,7 @@ package dev.luiiscarlos.academ_iq_api.features.identity.user.service;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.PasswordUpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserPasswordUpdateRequest;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserUpdateRequest;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
 import dev.luiiscarlos.academ_iq_api.features.storage.dto.FileResponse;
@@ -53,7 +53,7 @@ public interface UserService {
      * @param userId  the ID of the user
      * @param request the request containing the new password
      */
-    void updatePassword(long userId, PasswordUpdateRequest request);
+    void updatePassword(long userId, UserPasswordUpdateRequest request);
 
     /**
      * Deletes the user account
