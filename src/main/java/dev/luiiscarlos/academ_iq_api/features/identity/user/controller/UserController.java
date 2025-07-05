@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.PasswordUpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserPasswordUpdateRequest;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserUpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.facade.UserFacade;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserService;
 import dev.luiiscarlos.academ_iq_api.features.storage.dto.FileResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -27,14 +27,14 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/v1/users")
 public class UserController {
 
-    private final UserService userService;
+    private final UserFacade userFacade;
 
     @GetMapping("/@me")
     public ResponseEntity<UserResponse> get(@AuthenticationPrincipal Long userId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(userService.get(userId));
+                .body(userFacade.get(userId));
     }
 
     @PutMapping("/@me")
@@ -44,14 +44,14 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(userService.update(userId, request));
+                .body(userFacade.update(userId, request));
     }
 
-    @PutMapping("/@me/change-password")
+    @PatchMapping("/@me/update-password")
     public ResponseEntity<Void> updatePassword(
             @AuthenticationPrincipal Long userId,
-            @RequestBody PasswordUpdateRequest request) {
-        userService.updatePassword(userId, request);
+            @RequestBody UserPasswordUpdateRequest request) {
+        userFacade.updatePassword(userId, request);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -63,19 +63,19 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(userService.patchAvatar(userId, multipartFile));
+                .body(userFacade.patchAvatar(userId, multipartFile));
     }
 
     @DeleteMapping("/@me")
     public ResponseEntity<Void> delete(@AuthenticationPrincipal Long userId) {
-        userService.delete(userId);
+        userFacade.delete(userId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/@me/avatar")
     public ResponseEntity<Void> deleteAvatar(@AuthenticationPrincipal Long userId) {
-        userService.deleteAvatar(userId);
+        userFacade.deleteAvatar(userId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

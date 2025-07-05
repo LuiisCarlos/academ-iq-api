@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.PasswordUpdateRequest;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserPasswordUpdateRequest;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserUpdateRequest;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserWithDifferentPasswordsException;
@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
         return fileMapper.toDto(userQueryService.save(user).getAvatar());
     }
 
-    public void updatePassword(long userId, PasswordUpdateRequest request) {
+    public void updatePassword(long userId, UserPasswordUpdateRequest request) {
         User user = userQueryService.findById(userId);
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword().substring(8)))

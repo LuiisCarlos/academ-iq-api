@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.features.identity.user.security;
+package dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model;
 
 import org.springframework.security.core.GrantedAuthority;
 

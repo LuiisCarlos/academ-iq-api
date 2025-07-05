@@ -14,27 +14,11 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import dev.luiiscarlos.academ_iq_api.domain.billing.subcription.SubscriptionPlan;
 import dev.luiiscarlos.academ_iq_api.domain.billing.subcription.SubscriptionStatus;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model.Role;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.model.Enrollment;
 import dev.luiiscarlos.academ_iq_api.features.storage.model.File;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.security.Role;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

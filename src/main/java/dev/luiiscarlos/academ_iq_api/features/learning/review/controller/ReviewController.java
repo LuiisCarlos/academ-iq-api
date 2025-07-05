@@ -1,7 +1,5 @@
 package dev.luiiscarlos.academ_iq_api.features.learning.review.controller;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
