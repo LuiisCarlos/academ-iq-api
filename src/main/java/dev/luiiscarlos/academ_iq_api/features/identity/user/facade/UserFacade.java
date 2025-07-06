@@ -169,8 +169,8 @@ public class UserFacade {
         return userCrudService.findAll(pageable);
     }
 
-    public User findById(long id) {
-        return userCrudService.findById(id);
+    public User findById(long userId) {
+        return userCrudService.findById(userId);
     }
 
     public User findByUsername(String username) {
@@ -181,10 +181,6 @@ public class UserFacade {
         return userCrudService.findByEmail(email);
     }
 
-    public User findReferenceById(long id) {
-        return userCrudService.findReferenceById(id);
-    }
-
     public User update(User user) {
         return userCrudService.update(user);
     }
@@ -193,12 +189,16 @@ public class UserFacade {
         userCrudService.delete(user);
     }
 
-    public void deleteById(long id) {
-        userCrudService.deleteById(id);
+    public void deleteById(long userId) {
+        userCrudService.deleteById(userId);
     }
 
-    public boolean existsById(long id) {
-        return userCrudService.existsById(id);
+    public User getReferenceById(long userId) {
+        return userCrudService.getReferenceById(userId);
+    }
+
+    public boolean existsById(long userId) {
+        return userCrudService.existsById(userId);
     }
 
     public boolean existsByUsername(String username) {

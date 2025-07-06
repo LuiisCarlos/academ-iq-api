@@ -38,7 +38,6 @@ public class CourseFacade {
             log.warn("Admin '{}' created course with name {}", adminContext.admin(), request.getTitle());
 
         return courseAdminService.create(request, files);
-
     }
 
     public List<Long> getLessonsIds(long courseId) {
@@ -85,20 +84,24 @@ public class CourseFacade {
 
     }
 
-    public Course findById(long id) {
-        return courseCrudService.findById(id);
+    public Course findById(long courseId) {
+        return courseCrudService.findById(courseId);
     }
 
-    public List<Long> findAllLessonIdsById(long id) {
-        return courseCrudService.findAllLessonIdsById(id);
+    public List<Long> findAllLessonIdsById(long courseId) {
+        return courseCrudService.findAllLessonIdsById(courseId);
     }
 
-    public void deleteById(long id) {
-        courseCrudService.deleteById(id);
+    public void deleteById(long courseId) {
+        courseCrudService.deleteById(courseId);
     }
 
-    public boolean existsById(long id) {
-        return courseCrudService.existsById(id);
+    public Course getReferenceById(long courseId) {
+        return courseCrudService.getReferenceById(courseId);
+    }
+
+    public boolean existsById(long courseId) {
+        return courseCrudService.existsById(courseId);
     }
 
     public boolean existsByTitle(String title) {

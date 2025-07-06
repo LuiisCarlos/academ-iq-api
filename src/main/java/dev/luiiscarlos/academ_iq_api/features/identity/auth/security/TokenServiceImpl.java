@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import dev.luiiscarlos.academ_iq_api.shared.constants.AppDefaults;
 import dev.luiiscarlos.academ_iq_api.shared.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 
@@ -110,7 +111,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Jwt decode(String token) {
-        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+        token = token.contains(AppDefaults.TOKEN_PREFIX) ? token.substring(AppDefaults.TOKEN_PREFIX.length()) : token;
 
         try {
             return jwtDecoder.decode(token);
@@ -121,7 +122,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String getSubject(String token) {
-        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+        token = token.contains(AppDefaults.TOKEN_PREFIX) ? token.substring(AppDefaults.TOKEN_PREFIX.length()) : token;
 
         try {
             return jwtDecoder.decode(token).getSubject();
@@ -132,7 +133,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Instant getExpiresAt(String token) {
-        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+        token = token.contains(AppDefaults.TOKEN_PREFIX) ? token.substring(AppDefaults.TOKEN_PREFIX.length()) : token;
 
         try {
             return jwtDecoder.decode(token).getExpiresAt();
@@ -143,7 +144,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Object getClaim(String token, String claim) {
-        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+        token = token.contains(AppDefaults.TOKEN_PREFIX) ? token.substring(AppDefaults.TOKEN_PREFIX.length()) : token;
 
         try {
             return jwtDecoder.decode(token).getClaimAsString(claim);
@@ -157,7 +158,7 @@ public class TokenServiceImpl implements TokenService {
         if (token.isBlank() || token == null)
             throw new TokenNotFoundException(ErrorMessages.REQUIRED_TOKEN);
 
-        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+        token = token.contains(AppDefaults.TOKEN_PREFIX) ? token.substring(AppDefaults.TOKEN_PREFIX.length()) : token;
 
         Instant expiresAt = this.getExpiresAt(token);
         String type = (String) this.getClaim(token, "token_type");
@@ -175,7 +176,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void invalidate(String token) {
-        token = token.contains(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+        token = token.contains(AppDefaults.TOKEN_PREFIX) ? token.substring(AppDefaults.TOKEN_PREFIX.length()) : token;
 
         if (refreshTokenRepository.existsByToken(token))
             refreshTokenRepository.deleteByToken(token);

@@ -20,6 +20,7 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserCrudServ
 import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.dto.*;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model.Role;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.service.RoleService;
+import dev.luiiscarlos.academ_iq_api.shared.constants.AppDefaults;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserAdminServiceImpl implements UserAdminService {
 
-	private final static String BCRYPT_PREFIX = "{bcrypt}";
 
 	private final UserCrudService userQueryService;
 
@@ -107,7 +107,7 @@ public class UserAdminServiceImpl implements UserAdminService {
 	public void changePassword(long userId, AdminPasswordRequest request) {
 		User user = userQueryService.findById(userId);
 
-		user.setPassword(BCRYPT_PREFIX + passwordEncoder.encode(request.password()));
+		user.setPassword(AppDefaults.ENCRYPTED_PASSWORD_PREFIX + passwordEncoder.encode(request.password()));
 
 		userQueryService.save(user);
 	}

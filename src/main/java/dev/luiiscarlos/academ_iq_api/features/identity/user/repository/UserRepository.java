@@ -18,17 +18,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findAll(@NonNull Pageable pageable);
 
     @EntityGraph(attributePaths = { "enrollments", "avatar"})
-    Optional<User> findById(long id);
+    Optional<User> findById(long userId);
 
     @EntityGraph(attributePaths = { "enrollments", "authorities", "avatar" })
     Optional<User> findByUsername(String username);
 
     Optional<User> findByEmail(String email);
 
-    Optional<User> findReferenceById(long id);
+    Optional<User> findReferenceById(long userId);
 
     boolean existsByUsername(String username);
 
-    void deleteById(long id);
+    void deleteById(long userId);
 
 }

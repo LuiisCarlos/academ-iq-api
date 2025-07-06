@@ -39,7 +39,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @EqualsAndHashCode.Exclude
     @JoinColumn(name = "avatar_id")
     private File avatar;
@@ -65,9 +65,10 @@ public class User implements UserDetails {
     @Column(name = "subscription_status")
     private SubscriptionStatus subscriptionStatus;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "subscription_plan")
-    private SubscriptionPlan subscriptionPlan;
+    private SubscriptionPlan subscriptionPlan = SubscriptionPlan.BASIC;
 
     @Embedded
     private UserInfo info;

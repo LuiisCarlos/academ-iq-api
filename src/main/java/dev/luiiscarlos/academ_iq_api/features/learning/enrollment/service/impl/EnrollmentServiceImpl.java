@@ -13,8 +13,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import dev.luiiscarlos.academ_iq_api.features.learning.course.facade.CourseFacade;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.Course;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.service.CourseCrudService;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.dto.EnrollmentResponse;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.exception.EnrollmentAlreadyExists;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.exception.EnrollmentNotFoundException;
@@ -24,6 +24,7 @@ import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.model.Enrollme
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.model.ProgressState;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.repository.EnrollmentRepository;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.service.EnrollmentService;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.facade.UserFacade;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 
 import lombok.RequiredArgsConstructor;
@@ -39,18 +40,17 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     private final EnrollmentMapper enrollmentMapper;
 
-    private final CourseCrudService courseQueryService;
+    private final CourseFacade courseFacade;
+
+    private final UserFacade userFacade;
 
     @Override
     public EnrollmentResponse create(long userId, long courseId, @Nullable Map<String, Boolean> args) {
         if (enrollmentRepository.existsByUserIdAndCourseId(userId, courseId))
             throw new EnrollmentAlreadyExists("User is already enrolled");
 
-        User user = new User();
-        user.setId(userId);
-
-        Course course = new Course();
-        course.setId(courseId);
+        User user = userFacade.getReferenceById(userId);
+        Course course = courseFacade.getReferenceById(courseId);
 
         Enrollment enrollment = Enrollment.builder()
                 .user(user)
@@ -168,7 +168,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      * @param enrollment the enrollment to check
      */
     private void checkCourseCompletion(Enrollment enrollment) {
-        List<Long> lessonIds = courseQueryService.findAllLessonIdsById(enrollment.getCourse().getId());
+        List<Long> lessonIds = courseFacade.findAllLessonIdsById(enrollment.getCourse().getId());
 
         if (lessonIds.isEmpty()) {
             enrollment.setCompleted(true);

@@ -14,8 +14,6 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 
 public interface AuthService {
 
-    static final String BCRYPT_PREFIX = "{bcrypt}";
-
     /**
      * Refresh the access token for the refresh token given
      *

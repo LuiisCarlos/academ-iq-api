@@ -27,6 +27,7 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model
 import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.service.RoleService;
 import dev.luiiscarlos.academ_iq_api.features.storage.model.File;
 import dev.luiiscarlos.academ_iq_api.features.storage.service.StorageService;
+import dev.luiiscarlos.academ_iq_api.shared.constants.AppDefaults;
 import dev.luiiscarlos.academ_iq_api.shared.exception.ErrorMessages;
 
 import lombok.RequiredArgsConstructor;
@@ -82,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
         if (userQueryService.existsByUsername(request.getUsername()))
             throw new UserAlreadyExistsException(ErrorMessages.INVALID_CREDENTIALS);
 
-        String encodedPassword = BCRYPT_PREFIX + passwordEncoder.encode(request.getPassword());
+        String encodedPassword = AppDefaults.ENCRYPTED_PASSWORD_PREFIX + passwordEncoder.encode(request.getPassword());
         Set<Role> authorities = Set.of(roleService.findByAuthority(RoleType.USER));
         File avatar = storageService.get("default-user-avatar_nsfvaz");
 
@@ -104,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userQueryService.findByUsername(credentials.getUsername());
 
         if (!passwordEncoder.matches(credentials.getPassword(),
-                user.getPassword().substring(BCRYPT_PREFIX.length())))
+                user.getPassword().substring(AppDefaults.ENCRYPTED_PASSWORD_PREFIX.length())))
             throw new InvalidCredentialsException(ErrorMessages.INVALID_CREDENTIALS);
 
         if (!user.isVerified()) {
@@ -155,7 +156,7 @@ public class AuthServiceImpl implements AuthService {
         String username = tokenService.getSubject(request.getRecoverToken());
 
         User user = userQueryService.findByUsername(username);
-        user.setPassword(BCRYPT_PREFIX + encodedPassword);
+        user.setPassword(AppDefaults.ENCRYPTED_PASSWORD_PREFIX + encodedPassword);
 
         userQueryService.save(user);
 

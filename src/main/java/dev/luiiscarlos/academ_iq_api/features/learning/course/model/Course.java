@@ -123,6 +123,10 @@ public class Course {
         return calculateAverageRating();
     }
 
+    public long getPriceInCents() {
+        return (long) (this.price * 100);
+    }
+
     private Double calculateAverageRating() {
         if (this.reviews == null || this.reviews.isEmpty())
             return 0.0;

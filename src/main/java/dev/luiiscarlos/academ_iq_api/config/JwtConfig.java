@@ -24,6 +24,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
+import dev.luiiscarlos.academ_iq_api.shared.constants.AppDefaults;
 import dev.luiiscarlos.academ_iq_api.shared.util.RSAKeyProperties;
 
 @Configuration
@@ -68,7 +69,7 @@ public class JwtConfig {
         return jwt -> {
             JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
             jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
-            jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+            jwtGrantedAuthoritiesConverter.setAuthorityPrefix(AppDefaults.ROLE_PREFIX);
             Collection<GrantedAuthority> authorities = jwtGrantedAuthoritiesConverter.convert(jwt);
 
             String username = jwt.getSubject();

@@ -28,33 +28,41 @@ public interface CourseCrudService {
     /**
      * Finds a course by its unique ID from the database
      *
-     * @param id The course ID
+     * @param courseId The course ID
      * @return The course entity, or null if not found
      */
-    Course findById(long id);
+    Course findById(long courseId);
 
     /**
      * Retrieves all lesson IDs associated with a course by course ID
      *
-     * @param id The course ID
+     * @param courseId The course ID
      * @return List of lesson IDs
      */
-    List<Long> findAllLessonIdsById(long id);
+    List<Long> findAllLessonIdsById(long courseId);
 
     /**
      * Deletes a course from the database by its unique ID
      *
-     * @param id The course ID
+     * @param courseId The course ID
      */
-    void deleteById(long id);
+    void deleteById(long courseId);
+
+    /**
+     * Gets a reference to a course by ID without fully loading the entity
+     *
+     * @param courseId The user's ID
+     * @return A reference to the user entity
+     */
+    Course getReferenceById(long courseId);
 
     /**
      * Checks if a course exists in the database by its unique ID
      *
-     * @param id The course ID
+     * @param courseId The course ID
      * @return True if the course exists, false otherwise
      */
-    boolean existsById(long id);
+    boolean existsById(long courseId);
 
     /**
      * Checks if a course exists in the database by its title

@@ -35,30 +35,34 @@ public class CourseCrudServiceImpl implements CourseCrudService {
         return courses;
     }
 
-    public Course findById(long id) {
-        return courseRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException(String.format(ErrorMessages.COURSE_NOT_FOUND, id)));
+    public Course findById(long courseId) {
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(String.format(ErrorMessages.COURSE_NOT_FOUND, courseId)));
     }
 
-    public List<Long> findAllLessonIdsById(long id) {
-        List<Long> lessonsIds = courseRepository.findAllLessonIdsById(id);
+    public List<Long> findAllLessonIdsById(long courseId) {
+        List<Long> lessonsIds = courseRepository.findAllLessonIdsById(courseId);
 
         if (Objects.isNull(lessonsIds) || lessonsIds.isEmpty())
-            throw new CourseNotFoundException(String.format(ErrorMessages.COURSE_LESSONS_IDS_NOT_FOUND, id));
+            throw new CourseNotFoundException(String.format(ErrorMessages.COURSE_LESSONS_IDS_NOT_FOUND, courseId));
 
         return lessonsIds;
     }
 
-    public void deleteById(long id) {
-        courseRepository.findById(id).ifPresentOrElse((u) -> {
+    public void deleteById(long courseId) {
+        courseRepository.findById(courseId).ifPresentOrElse((u) -> {
             courseRepository.deleteById(u.getId());
         }, () -> {
-            throw new UserNotFoundException(String.format(ErrorMessages.COURSE_NOT_FOUND, id));
+            throw new UserNotFoundException(String.format(ErrorMessages.COURSE_NOT_FOUND, courseId));
         });
     }
 
-    public boolean existsById(long id) {
-        return courseRepository.existsById(id);
+    public Course getReferenceById(long courseId) {
+        return courseRepository.getReferenceById(courseId);
+    }
+
+    public boolean existsById(long courseId) {
+        return courseRepository.existsById(courseId);
     }
 
     public boolean existsByTitle(String title) {

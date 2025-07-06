@@ -42,10 +42,9 @@ public class UserCrudServiceImpl implements UserCrudService {
     }
 
     @Override
-    public User findById(long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ErrorMessages.USER_NOT_FOUND, id)));
+    public User findById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, userId)));
     }
 
     @Override
@@ -63,15 +62,9 @@ public class UserCrudServiceImpl implements UserCrudService {
     }
 
     @Override
-    public User findReferenceById(long id) {
-        return userRepository.getReferenceById(id);
-    }
-
-    @Override
     public User update(User user) {
         if (!userRepository.existsById(user.getId()))
-            throw new UserNotFoundException(
-                    String.format(ErrorMessages.USER_NOT_FOUND, user.getId()));
+            throw new UserNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, user.getId()));
 
         return userRepository.save(user);
     }
@@ -86,17 +79,22 @@ public class UserCrudServiceImpl implements UserCrudService {
     }
 
     @Override
-    public void deleteById(long id) {
-        userRepository.findById(id).ifPresentOrElse((u) -> {
+    public void deleteById(long userId) {
+        userRepository.findById(userId).ifPresentOrElse((u) -> {
             userRepository.deleteById(u.getId());
         }, () -> {
-            throw new UserNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, id));
+            throw new UserNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, userId));
         });
     }
 
     @Override
-    public boolean existsById(long id) {
-        return userRepository.existsById(id);
+    public User getReferenceById(long userId) {
+        return userRepository.getReferenceById(userId);
+    }
+
+    @Override
+    public boolean existsById(long userId) {
+        return userRepository.existsById(userId);
     }
 
     @Override

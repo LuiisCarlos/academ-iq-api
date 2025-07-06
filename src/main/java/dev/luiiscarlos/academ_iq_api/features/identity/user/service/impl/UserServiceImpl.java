@@ -21,6 +21,7 @@ import dev.luiiscarlos.academ_iq_api.features.storage.mapper.FileMapper;
 import dev.luiiscarlos.academ_iq_api.features.storage.model.File;
 import dev.luiiscarlos.academ_iq_api.features.storage.model.FileType;
 import dev.luiiscarlos.academ_iq_api.features.storage.service.StorageService;
+import dev.luiiscarlos.academ_iq_api.shared.constants.AppDefaults;
 
 import lombok.RequiredArgsConstructor;
 
@@ -108,7 +109,7 @@ public class UserServiceImpl implements UserService {
         if (request.getPassword().equals(request.getCurrentPassword()))
             throw new UserWithDifferentPasswordsException("New password is the same as the old password");
 
-        user.setPassword("{bcrypt}" + passwordEncoder.encode(request.getPassword()));
+        user.setPassword(AppDefaults.ENCRYPTED_PASSWORD_PREFIX + passwordEncoder.encode(request.getPassword()));
         userQueryService.save(user);
     }
 

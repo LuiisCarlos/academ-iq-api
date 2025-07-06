@@ -26,10 +26,10 @@ public interface UserCrudService {
     /**
      * Finds a user by their unique ID
      *
-     * @param id The user's ID
+     * @param userId The user's ID
      * @return The user entity, or null if not found
      */
-    User findById(long id);
+    User findById(long userId);
 
     /**
      * Finds a user by their username
@@ -46,14 +46,6 @@ public interface UserCrudService {
      * @return The user entity, or null if not found
      */
     User findByEmail(String email);
-
-    /**
-     * Gets a reference to a user by ID without fully loading the entity
-     *
-     * @param id The user's ID
-     * @return A reference to the user entity
-     */
-    User findReferenceById(long id);
 
     /**
      * Updates an existing user in the database
@@ -73,17 +65,25 @@ public interface UserCrudService {
     /**
      * Deletes a user by their unique ID
      *
-     * @param id The user's ID
+     * @param userId The user's ID
      */
-    void deleteById(long id);
+    void deleteById(long userId);
+
+    /**
+     * Gets a reference to a user by ID without fully loading the entity
+     *
+     * @param userId The user's ID
+     * @return A reference to the user entity
+     */
+    User getReferenceById(long userId);
 
     /**
      * Checks if a user exists by their unique ID
      *
-     * @param id The user's ID
+     * @param userId The user's ID
      * @return True if the user exists, false otherwise
      */
-    boolean existsById(long id);
+    boolean existsById(long userId);
 
     /**
      * Checks if a user exists by their username

@@ -11,8 +11,6 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 
 public interface TokenService {
 
-    static final String BEARER_PREFIX = "Bearer ";
-
     /**
      * Finds a refresh token by its value
      *
