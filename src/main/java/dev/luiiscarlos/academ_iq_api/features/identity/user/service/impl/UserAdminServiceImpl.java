@@ -1,6 +1,5 @@
 package dev.luiiscarlos.academ_iq_api.features.identity.user.service.impl;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +16,7 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.dto.UserResponse;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.mapper.UserMapper;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserAdminService;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserCrudService;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.dto.*;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model.Role;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.service.RoleService;
@@ -32,7 +32,7 @@ public class UserAdminServiceImpl implements UserAdminService {
 
 	private final static String BCRYPT_PREFIX = "{bcrypt}";
 
-	private final UserQueryService userQueryService;
+	private final UserCrudService userQueryService;
 
 	private final UserMapper userMapper;
 

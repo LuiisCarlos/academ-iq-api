@@ -11,12 +11,14 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserNotFou
 import dev.luiiscarlos.academ_iq_api.features.learning.course.exception.CourseNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.repository.CourseRepository;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.service.CourseCrudService;
 import dev.luiiscarlos.academ_iq_api.shared.exception.ErrorMessages;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CourseQueryService {
+public class CourseCrudServiceImpl implements CourseCrudService {
 
     private final CourseRepository courseRepository;
 

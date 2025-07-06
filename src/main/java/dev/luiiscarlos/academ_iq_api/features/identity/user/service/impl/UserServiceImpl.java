@@ -13,6 +13,7 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.mapper.UserMapper;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.UserInfo;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserService;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserCrudService;
 import dev.luiiscarlos.academ_iq_api.features.storage.dto.FileResponse;
 import dev.luiiscarlos.academ_iq_api.features.storage.exception.FileStorageException;
 import dev.luiiscarlos.academ_iq_api.features.storage.exception.InvalidFileTypeException;
@@ -28,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserQueryService userQueryService;
+    private final UserCrudService userQueryService;
 
     private final UserMapper userMapper;
 
@@ -38,18 +39,21 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    @Override
     public UserResponse get(long userId) {
         User user = userQueryService.findById(userId);
 
         return userMapper.toDto(user);
     }
 
+    @Override
     public FileResponse getAvatar(long userId) {
         User user = userQueryService.findById(userId);
 
         return fileMapper.toDto(user.getAvatar());
     }
 
+    @Override
     public UserResponse update(long userId, UserUpdateRequest request) {
         User user = userQueryService.findById(userId);
         UserInfo userInfo = new UserInfo();
@@ -75,6 +79,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(userQueryService.save(user));
     }
 
+    @Override
     public FileResponse patchAvatar(long userId, MultipartFile multipartFile) {
         User user = userQueryService.findById(userId);
 
@@ -93,6 +98,7 @@ public class UserServiceImpl implements UserService {
         return fileMapper.toDto(userQueryService.save(user).getAvatar());
     }
 
+    @Override
     public void updatePassword(long userId, UserPasswordUpdateRequest request) {
         User user = userQueryService.findById(userId);
 
@@ -106,6 +112,7 @@ public class UserServiceImpl implements UserService {
         userQueryService.save(user);
     }
 
+    @Override
     public void delete(long userId) {
         User user = userQueryService.findById(userId);
 
@@ -115,6 +122,7 @@ public class UserServiceImpl implements UserService {
         userQueryService.delete(user);
     }
 
+    @Override
     public void deleteAvatar(long userId) {
         User user = userQueryService.findById(userId);
 
