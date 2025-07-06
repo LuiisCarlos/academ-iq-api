@@ -39,6 +39,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Boolean existsByTitle(String title);
 
     @Query("SELECT l.id FROM Course c JOIN c.sections s JOIN s.lessons l WHERE c.id = :id")
-    List<Long> findAllLessonIdsById(@Param("id") long courseId);
+    List<Long> findAllLessonIdsById(@Param("id") long id);
 
 }

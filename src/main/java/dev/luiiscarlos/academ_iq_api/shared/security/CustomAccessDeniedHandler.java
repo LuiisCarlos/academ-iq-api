@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.shared.util;
+package dev.luiiscarlos.academ_iq_api.shared.security;
 
 import java.io.IOException;
 

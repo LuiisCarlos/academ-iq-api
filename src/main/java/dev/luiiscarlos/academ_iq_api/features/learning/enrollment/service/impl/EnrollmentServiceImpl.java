@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.Course;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.service.impl.CourseQueryService;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.service.CourseCrudService;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.dto.EnrollmentResponse;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.exception.EnrollmentAlreadyExists;
 import dev.luiiscarlos.academ_iq_api.features.learning.enrollment.exception.EnrollmentNotFoundException;
@@ -39,7 +39,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     private final EnrollmentMapper enrollmentMapper;
 
-    private final CourseQueryService courseQueryService;
+    private final CourseCrudService courseQueryService;
 
     @Override
     public EnrollmentResponse create(long userId, long courseId, @Nullable Map<String, Boolean> args) {

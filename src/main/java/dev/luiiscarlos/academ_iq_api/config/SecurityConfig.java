@@ -21,7 +21,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import dev.luiiscarlos.academ_iq_api.shared.filter.GlobalExceptionFilter;
 import dev.luiiscarlos.academ_iq_api.shared.filter.JwtAuthenticationFilter;
-import dev.luiiscarlos.academ_iq_api.shared.util.CustomAccessDeniedHandler;
+import dev.luiiscarlos.academ_iq_api.shared.security.CustomAccessDeniedHandler;
 
 @EnableWebMvc
 @Configuration

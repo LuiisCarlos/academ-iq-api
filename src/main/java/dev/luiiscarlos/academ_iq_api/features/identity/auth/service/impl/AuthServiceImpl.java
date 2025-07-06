@@ -21,7 +21,7 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserAccoun
 import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserAlreadyExistsException;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.service.impl.UserQueryService;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.service.impl.UserCrudServiceImpl;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model.Role;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.model.RoleType;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.structure.role.service.RoleService;
@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final UserQueryService userQueryService;
+    private final UserCrudServiceImpl userQueryService;
 
     private final AuthMapper authMapper;
 

@@ -9,6 +9,7 @@ import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.CourseResponse
 import dev.luiiscarlos.academ_iq_api.features.learning.course.dto.CoursePublicResponse;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.mapper.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.Course;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.service.CourseCrudService;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.service.CourseService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
-    private final CourseQueryService courseQueryService;
+    private final CourseCrudService courseQueryService;
 
     private final CourseMapper courseMapper;
 

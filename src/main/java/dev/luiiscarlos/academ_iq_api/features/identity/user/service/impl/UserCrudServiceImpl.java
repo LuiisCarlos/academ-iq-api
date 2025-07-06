@@ -10,16 +10,18 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserAlread
 import dev.luiiscarlos.academ_iq_api.features.identity.user.exception.UserNotFoundException;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.repository.UserRepository;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserCrudService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserQueryService {
+public class UserCrudServiceImpl implements UserCrudService {
 
     private final UserRepository userRepository;
 
+    @Override
     public User save(User user) {
         if (user == null)
             throw new UserNotFoundException("User is null");
@@ -29,6 +31,7 @@ public class UserQueryService {
         return userRepository.save(user);
     }
 
+    @Override
     public Page<User> findAll(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
 
@@ -38,24 +41,33 @@ public class UserQueryService {
         return users;
     }
 
+    @Override
     public User findById(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(
                         String.format(ErrorMessages.USER_NOT_FOUND, id)));
     }
 
+    @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(
                         String.format(ErrorMessages.USER_NOT_FOUND_BY_NAME, username)));
     }
 
+    @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(
                         String.format(ErrorMessages.USER_NOT_FOUND_BY_EMAIL, email)));
     }
 
+    @Override
+    public User findReferenceById(long id) {
+        return userRepository.getReferenceById(id);
+    }
+
+    @Override
     public User update(User user) {
         if (!userRepository.existsById(user.getId()))
             throw new UserNotFoundException(
@@ -64,6 +76,7 @@ public class UserQueryService {
         return userRepository.save(user);
     }
 
+    @Override
     public void delete(User user) {
         userRepository.findById(user.getId()).ifPresentOrElse((u) -> {
             userRepository.deleteById(u.getId());
@@ -72,6 +85,7 @@ public class UserQueryService {
         });
     }
 
+    @Override
     public void deleteById(long id) {
         userRepository.findById(id).ifPresentOrElse((u) -> {
             userRepository.deleteById(u.getId());
@@ -80,10 +94,12 @@ public class UserQueryService {
         });
     }
 
+    @Override
     public boolean existsById(long id) {
         return userRepository.existsById(id);
     }
 
+    @Override
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }

@@ -18,6 +18,7 @@ import dev.luiiscarlos.academ_iq_api.features.learning.course.exception.CourseAl
 import dev.luiiscarlos.academ_iq_api.features.learning.course.mapper.CourseMapper;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.Course;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.service.CourseAdminService;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.service.CourseCrudService;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.dto.LessonRequest;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.model.Lesson;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.dto.SectionRequest;
@@ -33,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CourseAdminServiceImpl implements CourseAdminService {
 
-    private final CourseQueryService courseQueryService;
+    private final CourseCrudService courseQueryService;
 
     private final CourseMapper courseMapper;
 
