@@ -12,7 +12,7 @@ public class StripeConfig {
 
     @Bean
     boolean init(Dotenv dotenv) {
-        String stripeApiKey = dotenv.get("STRIPE_API_KEY");
+        String stripeApiKey = dotenv.get("STRIPE_SECRET");
 
         if (Objects.isNull(stripeApiKey) || stripeApiKey.isEmpty()) // TODO Change exception
             throw new IllegalArgumentException("Stripe API key is not set in environment variables");

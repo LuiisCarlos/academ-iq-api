@@ -19,21 +19,21 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     @NonNull
     @EntityGraph(attributePaths = {
+            "instructor", "instructor.avatar",
+            "thumbnail",
             "category", "category.benefits",
             "reviews",
             "requirements",
-            "sections", "sections.lessons",
-            "instructor", "instructor.avatar",
-            "thumbnail" })
+            "sections", "sections.lessons", "sections.lessons.video"})
     Page<Course> findAll(@NonNull Pageable pageable);
 
     @EntityGraph(attributePaths = {
+            "instructor", "instructor.avatar",
+            "thumbnail",
             "category", "category.benefits",
             "reviews",
             "requirements",
-            "sections", "sections.lessons",
-            "instructor", "instructor.avatar",
-            "thumbnail" })
+            "sections", "sections.lessons", "section.lessons.video"})
     Optional<Course> findById(long courseId);
 
     Boolean existsByTitle(String title);

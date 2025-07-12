@@ -18,6 +18,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @EntityGraph(attributePaths = { "benefits" })
     Page<Category> findAll(@NonNull Pageable pageable);
 
+    @EntityGraph(attributePaths = { "benefits" })
     Optional<Category> findByName(String name);
 
 }

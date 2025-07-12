@@ -3,21 +3,22 @@ package dev.luiiscarlos.academ_iq_api.shared.security;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import dev.luiiscarlos.academ_iq_api.features.identity.user.facade.UserFacade;
+import dev.luiiscarlos.academ_iq_api.features.identity.user.service.UserCrudService;
+
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class AdminContext {
 
-    private final UserFacade userFacade;
+    private final UserCrudService UserCrudService;
 
     /**
      *
      * @return
      */
     public String admin() {
-        return userFacade.get((long) SecurityContextHolder.getContext()
+        return UserCrudService.findById((long) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal()).getUsername();
     }
@@ -31,7 +32,7 @@ public class AdminContext {
                 .getAuthentication()
                 .getAuthorities()
                 .stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
     }
 
 }

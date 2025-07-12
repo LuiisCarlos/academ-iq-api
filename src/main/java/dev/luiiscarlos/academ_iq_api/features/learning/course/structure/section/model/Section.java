@@ -39,9 +39,9 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
     @EqualsAndHashCode.Exclude
     @JoinColumn(name = "course_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private Course course;
 
     private String name;

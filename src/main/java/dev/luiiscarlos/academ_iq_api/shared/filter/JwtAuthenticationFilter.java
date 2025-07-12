@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -16,7 +17,6 @@ import dev.luiiscarlos.academ_iq_api.shared.exception.ErrorHandler;
 import dev.luiiscarlos.academ_iq_api.shared.exception.ErrorMessages;
 import dev.luiiscarlos.academ_iq_api.features.identity.auth.security.InvalidTokenTypeException;
 import dev.luiiscarlos.academ_iq_api.features.identity.auth.security.TokenService;
-import dev.luiiscarlos.academ_iq_api.features.identity.user.facade.UserFacade;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 
 import jakarta.servlet.FilterChain;
@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
 
-    private final UserFacade userFacade;
+    private final UserDetailsService userDetailsService;
 
     /**
      * Filters the request and checks if the access token is valid and if it is,
@@ -73,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     throw new InvalidTokenTypeException(ErrorMessages.INVALID_TOKEN_TYPE);
             }
 
-            User currentUser = (User) userFacade.loadUserByUsername(subject);
+            User currentUser = (User) userDetailsService.loadUserByUsername(subject);
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                     currentUser, null, currentUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);

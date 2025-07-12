@@ -1,5 +1,7 @@
-# IDE files
+## IDE files ##
+.vscode/
 .mvn/
+
 .apt_generated
 .classpath
 .factorypath
@@ -8,30 +10,37 @@
 .springBeans
 .sts4-cache
 .idea
+
 *.iws
 *.iml
 *.ipr
-/nbproject/private/
-/nbbuild/
+
+## Build files ##
 /dist/
-/nbdist/
-/.nb-gradle/
+
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-.vscode/
 
-# Build files
 target/
-!.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-# Custom files
-.env
-*.env
-*.pem
-*.log
+!.mvn/wrapper/maven-wrapper.jar
+
+## Environment files ##
+.env*
+!.env.example
+
+## Keys files ##
 **/keys/
+*.pem
+*.pub
+
+## Misc files ##
+*.log
+
+Makefile
+
 data/
 logs/

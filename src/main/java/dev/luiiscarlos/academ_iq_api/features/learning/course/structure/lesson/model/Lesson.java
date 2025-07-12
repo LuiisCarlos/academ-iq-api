@@ -3,6 +3,7 @@ package dev.luiiscarlos.academ_iq_api.features.learning.course.structure.lesson.
 import dev.luiiscarlos.academ_iq_api.features.learning.course.structure.section.model.Section;
 import dev.luiiscarlos.academ_iq_api.features.storage.model.File;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,14 +30,14 @@ public class Lesson {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
     @EqualsAndHashCode.Exclude
     @JoinColumn(name = "section_id")
+    @ManyToOne(fetch =  FetchType.LAZY)
     private Section section;
 
-    @ManyToOne
     @EqualsAndHashCode.Exclude
     @JoinColumn(name = "video_id")
+    @ManyToOne(fetch =  FetchType.LAZY)
     private File video;
 
     private String name;

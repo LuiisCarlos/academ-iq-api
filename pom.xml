@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>dev.luiiscarlos</groupId>
 	<artifactId>academ-iq-api</artifactId>
-	<version>1.1.0-beta</version>
+	<version>1.1.0</version>
 	<name>Academ-IQ API</name>
 	<description>RESTful API for my senior grade year final project</description>
 	<url>https://github.com/LuiisCarlos/academ-iq-api</url>

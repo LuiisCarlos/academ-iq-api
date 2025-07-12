@@ -39,9 +39,9 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @EqualsAndHashCode.Exclude
     @JoinColumn(name = "avatar_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private File avatar;
 
     private String username;

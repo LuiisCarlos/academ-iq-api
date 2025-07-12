@@ -3,6 +3,7 @@ package dev.luiiscarlos.academ_iq_api.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import dev.luiiscarlos.academ_iq_api.AcademIqApiApplication;
 import io.github.cdimascio.dotenv.Dotenv;
 
 @Configuration
@@ -15,10 +16,7 @@ public class EnvConfig {
      */
     @Bean
     Dotenv dotenv() {
-        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
-        dotenv.entries().forEach(e -> System.setProperty(e.getKey(), e.getValue()));
-
-        return dotenv;
+        return AcademIqApiApplication.DOTENV;
     }
 
 }

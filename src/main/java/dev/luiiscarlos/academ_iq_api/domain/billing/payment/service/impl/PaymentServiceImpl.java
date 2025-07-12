@@ -19,7 +19,7 @@ import dev.luiiscarlos.academ_iq_api.domain.billing.payment.repository.PaymentRe
 import dev.luiiscarlos.academ_iq_api.domain.billing.payment.service.PaymentService;
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 import dev.luiiscarlos.academ_iq_api.features.learning.course.model.Course;
-import dev.luiiscarlos.academ_iq_api.features.learning.course.service.impl.CourseQueryService;
+import dev.luiiscarlos.academ_iq_api.features.learning.course.service.CourseCrudService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentMapper paymentMapper;
 
-    private final CourseQueryService courseQueryService;
+    private final CourseCrudService courseQueryService;
 
     @Override
     public PaymentResponse create(long userId, PaymentRequest request) {

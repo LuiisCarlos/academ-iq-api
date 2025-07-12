@@ -14,6 +14,7 @@ import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -42,14 +43,14 @@ public class Enrollment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
     @EqualsAndHashCode.Exclude
     @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @ManyToOne
     @EqualsAndHashCode.Exclude
     @JoinColumn(name = "course_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private Course course;
 
     @Builder.Default
