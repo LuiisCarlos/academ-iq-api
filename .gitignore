@@ -37,3 +37,9 @@ build/
 !**/src/test/**/build/
 
 .vscode/
+
+.env*
+!.env.example
+keys/
+*.pem
+*.pub
