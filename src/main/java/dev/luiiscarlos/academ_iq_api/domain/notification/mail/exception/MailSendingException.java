@@ -20,12 +20,4 @@ public class MailSendingException extends RuntimeException {
         super(message, cause);
     }
 
-    public MailSendingException(String messageFormat, Object... args) {
-        super(String.format(messageFormat, args));
-    }
-
-    public MailSendingException(String messageFormat, Throwable cause, Object... args) {
-        super(String.format(messageFormat, args), cause);
-    }
-
 }

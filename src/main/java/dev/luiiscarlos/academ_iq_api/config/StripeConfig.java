@@ -4,17 +4,16 @@ import java.util.Objects;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.core.env.Environment;
 
 @Configuration
 public class StripeConfig {
 
     @Bean
-    boolean init(Dotenv dotenv) {
-        String stripeApiKey = dotenv.get("STRIPE_SECRET");
+    boolean init(Environment env) {
+        String stripeSecret = env.getProperty("stripe.secret");
 
-        if (Objects.isNull(stripeApiKey) || stripeApiKey.isEmpty()) // TODO Change exception
+        if (Objects.isNull(stripeSecret) || stripeSecret.isEmpty()) // TODO Change exception
             throw new IllegalArgumentException("Stripe API key is not set in environment variables");
 
         return true;

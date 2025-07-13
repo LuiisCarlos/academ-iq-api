@@ -55,8 +55,7 @@ public class MailServiceImpl implements MailService {
             throw new MailSendingException("Failed to send the confirmation email: " + ex.getMessage());
         }
 
-        log.info(String.format(
-                "A verification e-mail has been sent to '%s' at %s", user.getUsername(), LocalDateTime.now()));
+        log.info("A verification e-mail has been sent to '{}' at {}", user.getUsername(), LocalDateTime.now());
     }
 
     @Async("mailExecutor")
@@ -83,8 +82,7 @@ public class MailServiceImpl implements MailService {
             throw new MailSendingException("Failed to send the reset password email: " + ex.getMessage());
         }
 
-        log.info(String.format(
-                "A recover password e-mail has been sent to '%s' at %s", user.getUsername(), LocalDateTime.now()));
+        log.info("A recover password e-mail has been sent to '{}' at {}", user.getUsername(), LocalDateTime.now());
     }
 
     /**

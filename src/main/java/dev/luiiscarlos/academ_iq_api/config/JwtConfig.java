@@ -64,7 +64,7 @@ public class JwtConfig {
      * @return a JwtAuthenticationConverter instance
      */
     @Bean
-    public Converter<Jwt, AbstractAuthenticationToken> customJwtAuthenticationConverter(
+    Converter<Jwt, AbstractAuthenticationToken> customJwtAuthenticationConverter(
             UserDetailsService userDetailsService) {
         return jwt -> {
             JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
