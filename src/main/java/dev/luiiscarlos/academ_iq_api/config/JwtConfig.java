@@ -25,7 +25,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 
 import dev.luiiscarlos.academ_iq_api.features.identity.user.model.User;
 import dev.luiiscarlos.academ_iq_api.shared.constants.AppDefaults;
-import dev.luiiscarlos.academ_iq_api.shared.util.RSAKeyProperties;
+import dev.luiiscarlos.academ_iq_api.shared.security.RSAKeyProperties;
 
 @Configuration
 public class JwtConfig {

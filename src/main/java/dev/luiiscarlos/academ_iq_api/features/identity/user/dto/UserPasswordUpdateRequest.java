@@ -1,9 +1,8 @@
 package dev.luiiscarlos.academ_iq_api.features.identity.user.dto;
 
-import dev.luiiscarlos.academ_iq_api.shared.validation.password.Password;
-import dev.luiiscarlos.academ_iq_api.shared.validation.password.PasswordConfirmable;
-import dev.luiiscarlos.academ_iq_api.shared.validation.password.PasswordMatches;
-
+import dev.luiiscarlos.academ_iq_api.shared.security.validation.password.Password;
+import dev.luiiscarlos.academ_iq_api.shared.security.validation.password.PasswordConfirmable;
+import dev.luiiscarlos.academ_iq_api.shared.security.validation.password.PasswordMatches;
 import lombok.Data;
 
 @Data

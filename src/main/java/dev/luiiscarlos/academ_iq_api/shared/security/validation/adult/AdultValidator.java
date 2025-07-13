@@ -1,4 +1,4 @@
-package dev.luiiscarlos.academ_iq_api.shared.validation.adult;
+package dev.luiiscarlos.academ_iq_api.shared.security.validation.adult;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

@@ -2,6 +2,7 @@ package dev.luiiscarlos.academ_iq_api.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,20 +14,30 @@ import com.cloudinary.Cloudinary;
 public class CloudinaryConfig {
 
     /**
-     * Creates and configure a Cloudinary bean to upload files
+     * Creates and configures a Cloudinary bean for uploading files
      *
-     * @param dotenv the environment variables needed for configuration
-     * @return a cloudinary instance
+     * @param env the {@link Environment} used to access Cloudinary configuration properties
+     * @return a configured {@link Cloudinary} instance
+     * @throws RuntimeException if any required environment variable is missing or empty
      */
     @Bean
     Cloudinary cloudinary(Environment env) {
+        String cloudName = env.getProperty("cloudinary.name");
+        String apiKey = env.getProperty("cloudinary.key");
+        String apiSecret = env.getProperty("cloudinary.secret");
+
+        if ((Objects.isNull(cloudName) || cloudName.isEmpty()) ||
+                (Objects.isNull(apiKey) || apiKey.isEmpty()) ||
+                (Objects.isNull(apiSecret) || apiSecret.isEmpty()))
+            throw new RuntimeException("Failed to load environments variables required for Cloudinary");
+
         Map<String, Object> config = new HashMap<>();
 
-        config.put("cloud_name", env.getProperty("storage.cloudinary.name"));
-        config.put("api_key", env.getProperty("storage.cloudinary.key"));
-        config.put("api_secret", env.getProperty("storage.cloudinary.secret"));
+        config.put("cloud_name", cloudName);
+        config.put("api_key", apiKey);
+        config.put("api_secret", apiSecret);
         config.put("secure", true);
-        config.put("connect_timeout", 30000);
+        config.put("connect_timeout", 20000);
 
         return new Cloudinary(config);
     }

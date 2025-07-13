@@ -1,5 +1,6 @@
-package dev.luiiscarlos.academ_iq_api.shared.validation.password;
+package dev.luiiscarlos.academ_iq_api.shared.security.validation.password;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -8,15 +9,15 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-@Target({ElementType.TYPE})
+@Documented
+@Constraint(validatedBy = PasswordValidator.class)
+@Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = PasswordMatchesValidator.class)
-public @interface PasswordMatches {
+public @interface Password {
 
-    String message() default "Passwords do not match";
+    String message() default "Invalid password";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
 }

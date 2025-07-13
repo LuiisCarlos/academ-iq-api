@@ -35,10 +35,12 @@ public interface TokenService {
      * Checks if a refresh token exists for the given token and user ID
      *
      * @param token the value of the refresh token to be checked
-     * @param id  the ID of the user
-     * @return true if the refresh token exists for the given user ID, false otherwise
+     * @param id    the ID of the user
+     * @return true if the refresh token exists for the given user ID, false
+     *         otherwise
      */
     boolean existsByTokenAndUserId(String token, Long id);
+
     /**
      * Generates an access token for the given user
      *

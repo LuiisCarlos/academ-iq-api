@@ -2,11 +2,10 @@ package dev.luiiscarlos.academ_iq_api.features.identity.auth.dto;
 
 import java.time.LocalDate;
 
-import dev.luiiscarlos.academ_iq_api.shared.validation.adult.Adult;
-import dev.luiiscarlos.academ_iq_api.shared.validation.password.Password;
-import dev.luiiscarlos.academ_iq_api.shared.validation.password.PasswordConfirmable;
-import dev.luiiscarlos.academ_iq_api.shared.validation.password.PasswordMatches;
-
+import dev.luiiscarlos.academ_iq_api.shared.security.validation.adult.Adult;
+import dev.luiiscarlos.academ_iq_api.shared.security.validation.password.Password;
+import dev.luiiscarlos.academ_iq_api.shared.security.validation.password.PasswordConfirmable;
+import dev.luiiscarlos.academ_iq_api.shared.security.validation.password.PasswordMatches;
 import io.micrometer.common.lang.Nullable;
 
 import lombok.Data;

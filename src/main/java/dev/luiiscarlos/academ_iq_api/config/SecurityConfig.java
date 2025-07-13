@@ -30,11 +30,14 @@ public class SecurityConfig {
     private CustomAccessDeniedHandler customAccessDeniedHandler;
 
     /**
-     * Configures the security filter chain for the application
+     * Defines the security filter chain for HTTP requests, configuring CORS, CSRF,
+     * authorization rules, JWT authentication, session management, exception
+     * handling, and custom filters.
      *
-     * @param http                    the HttpSecurity object to configure
-     * @param globalExceptionFilter   the filter for handling exceptions
-     * @param jwtAuthenticationFilter the filter for handling access tokens
+     * @param http                             the HttpSecurity object to configure
+     * @param {@link GlobalExceptionFilter}    the filter for handling exceptions
+     * @param {@link JwtAuthenticationFilter}  the filter for handling access tokens
+     * @param customJwtAuthenticationConverter the converter for custom JWT auth
      * @return the configured SecurityFilterChain
      * @throws Exception if an error occurs during configuration
      */
