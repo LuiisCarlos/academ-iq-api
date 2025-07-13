@@ -20,7 +20,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @Component
 public class RSAKeyProperties {
@@ -32,7 +34,10 @@ public class RSAKeyProperties {
     private RSAPrivateKey privateKey;
 
     public RSAKeyProperties(Environment env) {
+        log.debug("Loading RSA paths from environment");
         this.possiblePaths = loadPaths(env);
+
+        log.debug("Loading RSA keys from selected path");
         this.privateKey = loadPrivateKey();
         this.publicKey = loadPublicKey();
     }
@@ -81,8 +86,6 @@ public class RSAKeyProperties {
 
     private String[] loadPaths(Environment env) {
         String pathsStr = env.getProperty("rsa.key.paths");
-
-        System.out.println("\n\nRSA key paths:" + pathsStr + "\n\n");
 
         if (Objects.isNull(pathsStr) || pathsStr.isEmpty())
             throw new RuntimeException("Failed to load possibles paths for RSA keys");

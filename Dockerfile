@@ -9,4 +9,4 @@ FROM eclipse-temurin:21
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-Dspring.devtools.add-properties=false", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xms256M", "-Xmx384M", "-Dspring.profiles.active=prod", "-Dspring.devtools.add-properties=false", "-jar", "app.jar"]

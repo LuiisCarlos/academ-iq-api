@@ -10,6 +10,9 @@ import org.springframework.core.env.Environment;
 
 import com.cloudinary.Cloudinary;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 public class CloudinaryConfig {
 
@@ -22,6 +25,8 @@ public class CloudinaryConfig {
      */
     @Bean
     Cloudinary cloudinary(Environment env) {
+        log.debug("Initializing Cloudinary context");
+
         String cloudName = env.getProperty("cloudinary.name");
         String apiKey = env.getProperty("cloudinary.key");
         String apiSecret = env.getProperty("cloudinary.secret");

@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 public class StripeConfig {
 
@@ -18,6 +21,8 @@ public class StripeConfig {
      */
     @Bean
     boolean stripe(Environment env) {
+        log.debug("Initializing Stripe context");
+
         String stripeSecret = env.getProperty("stripe.secret");
 
         if (Objects.isNull(stripeSecret) || stripeSecret.isEmpty())
